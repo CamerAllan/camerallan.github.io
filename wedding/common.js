@@ -123,7 +123,8 @@ function showGate() {
   const gate = document.createElement('div');
   gate.id = 'gate';
   gate.innerHTML = `
-    <h1>Cameron &amp; Annie</h1>
+    <p class="formal"><span data-lang="en">You are hereby invited to the wedding of</span><span data-lang="es">Tenemos el placer de invitaros a la boda de</span></p>
+    <h1 class="names"><span class="first">Cameron</span><span class="last">Allan</span><span class="and"><span data-lang="en">and</span><span data-lang="es">y</span></span><span class="first">Annie</span><span class="last">MacConnachie</span></h1>
     <form class="card" id="gate-form" novalidate>
       <p style="margin-top:0">${code
         ? '<span data-lang="en">To see the website, please enter your surname.</span><span data-lang="es">Para ver la web, escribe tu apellido.</span>'
@@ -135,7 +136,7 @@ function showGate() {
       <div id="gate-error" class="error hidden"></div>
       <p style="margin-bottom:0"><button type="submit" id="gate-btn"><span data-lang="en">Continue</span><span data-lang="es">Continuar</span></button></p>
     </form>
-    <div class="lang-switch"><a href="#" data-set-lang="es" data-lang="en" title="Ver en español" aria-label="Ver en español">🇪🇸</a><a href="#" data-set-lang="en" data-lang="es" title="View in English" aria-label="View in English">🇬🇧</a></div>`;
+    <div class="lang-switch"><a href="#" data-set-lang="es" data-lang="en" lang="es">Español</a><a href="#" data-set-lang="en" data-lang="es" lang="en">English</a></div>`;
   document.body.prepend(gate);
   gate.querySelectorAll('[data-set-lang]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); setLang(a.dataset.setLang, true); }));
   (code ? $('gate-name') : $('gate-code')).focus();

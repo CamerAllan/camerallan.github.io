@@ -1,4 +1,9 @@
-:root { --ink:#222; --muted:#6b6b6b; --line:#ddd; --accent:#5a6b4f; --bg:#fdfcfa; }
+:root { /* Duck egg blue (#91b7c4) for the frame, panels and rules; a deeper shade of the same blue for text,
+     because text in the light blue itself would be too faint to read. ("--wine" is just the name the styles use.) */
+  --duck:#91b7c4; --wine:#2c4a56; --cream:#f3efe8; --paper:#f8f6f1; --page:#e7e6e0;
+  --ink:#2b3a40; --muted:#6c8189; --line:rgba(145,183,196,.75); --accent:#2c4a56; --bg:#f8f6f1;
+  --display:"Instrument Serif", "Bodoni Moda", Didot, Georgia, serif; --script:"Italianno", "Snell Roundhand", cursive;
+  --sans:"Jost", "Futura", "Avenir Next", "Helvetica Neue", Arial, sans-serif; }
   * { box-sizing:border-box; }
   body { margin:0; font:17px/1.55 Georgia, "Times New Roman", serif; color:var(--ink); background:var(--bg); }
   main { max-width:640px; margin:0 auto; padding:48px 20px 80px; }
@@ -127,3 +132,111 @@ a { color:var(--accent); }
 .extras-title { font-weight:normal; font-size:.8rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:28px 0 6px; }
 .event-card.small { padding:14px 18px; }
 .event-card.small .event-title { font-size:1.05rem; }
+
+/* ==========================================================================
+   Burgundy & cream stationery theme
+   Tall condensed serif capitals, a script accent, small spaced sans capitals,
+   and a framed card (burgundy band + thin inner rule).
+   ========================================================================== */
+html { background:var(--page); }
+body { background:var(--page); color:var(--ink); font:400 16.5px/1.65 var(--sans); }
+main, #gate { background:var(--paper); max-width:680px; margin:14px auto 40px; padding:64px clamp(22px, 6vw, 56px) 72px;
+  border:9px solid var(--wine); box-shadow:inset 0 0 0 7px var(--paper), inset 0 0 0 8px var(--wine); position:relative; }
+@media (max-width:520px) { main, #gate { margin:8px; border-width:7px; padding-top:54px; } }
+
+/* Names: tall serif capitals with a script "and" */
+.names { font:400 clamp(2.6rem, 11vw, 4.2rem)/0.95 var(--display); text-transform:uppercase; letter-spacing:.01em; color:var(--wine); margin:0 0 14px; }
+.names a { color:inherit; text-decoration:none; }
+.names .and { display:block; font:400 .52em/1.2 var(--script); text-transform:none; letter-spacing:0; margin:.05em 0 .1em; }
+.eyebrow, header .muted { font:400 .72rem/1.8 var(--sans); letter-spacing:.24em; text-transform:uppercase; color:var(--wine); }
+
+/* Headings */
+h2 { font:400 clamp(1.9rem, 6vw, 2.5rem)/1 var(--display); text-transform:uppercase; letter-spacing:.01em; color:var(--wine);
+     text-align:center; border:0; margin:52px 0 20px; padding:0; }
+h3 { font:500 .78rem/1.5 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--wine); }
+.blurb { font:italic 400 1.35rem/1.45 var(--display); color:var(--ink); }
+
+/* Navigation */
+.site-nav { border-color:var(--line); gap:4px 22px; margin-top:24px; }
+.site-nav a { font:400 .7rem/2 var(--sans); letter-spacing:.22em; text-transform:uppercase; color:var(--muted); }
+.site-nav a[aria-current=page] { color:var(--wine); border-bottom:1px solid var(--wine); }
+.lang-switch { top:16px; right:18px; }
+
+/* Burgundy panel (home RSVP) */
+.panel-wine { background:var(--wine); color:var(--cream); text-align:center; padding:34px 22px 30px; margin:34px 0 10px; }
+.panel-wine .script { font:400 2.3rem/1.1 var(--script); margin:0; }
+.panel-wine .panel-caps { font:400 .74rem/1.8 var(--sans); letter-spacing:.24em; text-transform:uppercase; margin:6px 0 20px; }
+.btn-link.btn-light { background:var(--cream); color:var(--wine); }
+
+/* Cards, forms, buttons */
+.card { background:#fffdf9; border:1px solid var(--line); border-radius:0; }
+input[type=text], select, textarea { background:#fffdf9; border:1px solid var(--line); border-radius:0; color:var(--ink); font-family:var(--sans); }
+input[type=text]:focus, textarea:focus { outline:1px solid var(--wine); outline-offset:0; }
+label { font-size:.9rem; }
+button, .btn-link { font:500 .74rem/1 var(--sans); letter-spacing:.24em; text-transform:uppercase; padding:15px 28px; border-radius:0;
+  background:var(--wine); color:var(--cream); text-decoration:none; }
+button.secondary { background:none; color:var(--wine); border:1px solid var(--wine); }
+.hero { border-radius:0; }
+.room img { border-radius:0; }
+strong, b, dt, .price, .who-row .who-name, .nb-row .nb-name { font-weight:500; }
+.dish { background:#fffdf9; border-color:var(--line); border-radius:0; }
+.dish strong { font:400 1.15rem/1.3 var(--display); color:var(--wine); }
+.dish:has(input:checked) { border-color:var(--wine); background:#fbf5ef; box-shadow:inset 3px 0 0 var(--wine); }
+.dish .tags { color:var(--wine); }
+fieldset.course legend { font:500 .72rem/1.6 var(--sans); letter-spacing:.22em; text-transform:uppercase; color:var(--wine); }
+input[type=radio], input[type=checkbox] { accent-color:var(--wine); }
+.step-title { font:400 1.6rem/1.1 var(--display); text-transform:uppercase; color:var(--wine); }
+.rsvp-step:not(.hidden) .step-title::before { background:var(--wine); font:400 .85rem/1 var(--sans); }
+.notice { border-radius:0; }
+.timeline li { border-color:var(--line); }
+.timeline .time { font:400 1.05rem/1.4 var(--display); color:var(--wine); }
+
+/* Itinerary and event cards */
+.itin-day, .extras-title { font:500 .72rem/1.6 var(--sans); letter-spacing:.22em; color:var(--wine); }
+.timeline.itin { border-color:var(--line); }
+.timeline.itin li::before { background:var(--paper); border-color:var(--wine); }
+.timeline.itin .time { color:var(--wine); }
+.itin .itin-title { font:400 1.25rem/1.25 var(--display); color:var(--ink); }
+.itin-event-title { font:400 1.9rem/1 var(--display); text-transform:uppercase; }
+.itin-event-title a { color:var(--wine); }
+.event-card .event-title { font:400 1.5rem/1.15 var(--display); text-transform:uppercase; color:var(--wine); }
+.event-card .event-more { color:var(--wine); font:500 .7rem/2 var(--sans); letter-spacing:.2em; text-transform:uppercase; }
+.event-card:hover { border-color:var(--wine); }
+.status { font-style:normal; font:500 .68rem/1.8 var(--sans); letter-spacing:.16em; text-transform:uppercase; }
+.status.yes { color:#4f6b45; } .status.no { color:var(--wine); } .status.todo { color:#9a6b2a; }
+
+/* Lock screen */
+#gate { padding-top:80px; padding-bottom:80px; }
+#gate form { max-width:380px; margin:24px auto 0; }
+html:not(.locked) #gate { display:none; }
+.step-title { letter-spacing:.01em; }
+.lang-switch a { font-size:1.9rem; }
+
+/* Duck egg blue accents */
+main, #gate { border-color:var(--duck); box-shadow:inset 0 0 0 7px var(--paper), inset 0 0 0 8px var(--duck); }
+.panel-wine { background:var(--duck); color:#20363f; }
+.btn-link.btn-light { background:var(--wine); color:var(--cream); }
+.site-nav { border-color:var(--line); }
+.dish:has(input:checked) { background:#eef4f6; border-color:var(--duck); box-shadow:inset 3px 0 0 var(--duck); }
+.timeline.itin li::before { border-color:var(--duck); }
+.status.no { color:#9a5f52; }
+
+/* Formal title + text language switch */
+.formal { font:italic 400 1.2rem/1.4 var(--display); color:var(--muted); margin:6px 0 14px; }
+.names { font-size:clamp(2.1rem, 9vw, 3.6rem); }
+.names .person { display:block; }
+.lang-switch a { font:500 .68rem/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; color:var(--wine); text-decoration:none;
+  border-bottom:1px solid var(--line); padding-bottom:3px; }
+.names { font-size:clamp(1.8rem, 7.6vw, 3.6rem); }
+
+/* Type set like the reference: first names in tall capitals, surnames in script tucked underneath,
+   a small-capital "and", and the opening line in small spaced capitals. */
+.names { font-size:clamp(2.6rem, 12vw, 4.6rem); line-height:.88; letter-spacing:-.005em; margin:0 0 18px; }
+.names .first { display:block; }
+.names .last { display:block; font:400 .62em/1 var(--script); text-transform:none; letter-spacing:0; margin:-.18em 0 .12em; color:var(--wine); }
+.names .and { display:block; font:400 .34em/1 var(--display); text-transform:uppercase; letter-spacing:.06em; margin:.35em 0 .3em; }
+.formal { font:400 .7rem/1.9 var(--sans); font-style:normal; letter-spacing:.24em; text-transform:uppercase; color:var(--wine); max-width:22em; margin:0 auto 18px; }
+.panel-wine .script { font-size:3.1rem; line-height:1; }
+.names .last { font-size:.74em; margin:-.26em 0 .1em; }
+/* Surnames sit just below the capitals without touching them */
+.names .last { margin:.02em 0 .12em; }
