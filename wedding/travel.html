@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Travel & Stay · Partner A &amp; Partner B</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1><a href="index.html">Partner A &amp; Partner B</a></h1>
+    <div class="muted">Saturday 12 June 2027 · Rowallan Castle</div>
+    <nav class="site-nav"><a href="index.html">The Day</a><a href="rsvp.html">RSVP</a><a href="travel.html" aria-current="page">Travel &amp; Stay</a><a href="faqs.html">FAQs</a></nav>
+  </header>
+
+  <section>
+    <h2>Getting there</h2>
+    <p><strong>Rowallan Castle</strong><br>[Address placeholder]</p>
+    <p><strong>By car:</strong> Placeholder: parking details, and whether cars can be left overnight.</p>
+    <p><strong>By train:</strong> Placeholder: nearest station and how far it is.</p>
+    <p><strong>Taxis:</strong> Placeholder: local taxi numbers. Book your journey home in advance!</p>
+    <p><a href="https://www.google.com/maps/search/?api=1&query=Rowallan+Castle" target="_blank" rel="noopener">Open in Google Maps</a></p>
+  </section>
+
+  <!-- Only filled in when this household has been offered a room -->
+  <section id="your-room" class="hidden"></section>
+
+  <section>
+    <h2>Places to stay</h2>
+    <p>Placeholder: rooms at the castle are limited and we’ve offered them directly. If you’d like to stay nearby, here are some options:</p>
+    <div class="card"><h3>Hotel one (placeholder)</h3><p style="margin:0">10 minutes away · from £xx per night · <a href="#">Website</a></p></div>
+    <div class="card"><h3>Hotel two (placeholder)</h3><p style="margin:0">15 minutes away · from £xx per night · <a href="#">Website</a></p></div>
+  </section>
+</main>
+<script src="common.js"></script>
+<script>
+// If this household has been offered a room, show it here too.
+(async () => {
+  const code = getCode();
+  if (!code) return;
+  try {
+    const data = await getInvite(code);
+    const r = data.ok && data.invite.room;
+    if (!r) return;
+    const answer = data.existing?.[0]?.room_accepted;
+    $('your-room').innerHTML = `
+      <h2>Your room</h2>
+      <div class="card room">
+        ${r.image ? `<img src="${esc(r.image)}" alt="${esc(r.name)}">` : ''}
+        <h3>${esc(r.name)}</h3>
+        ${r.nights ? `<p class="muted" style="margin:0 0 6px">${esc(r.nights)}</p>` : ''}
+        ${r.price ? `<p class="price">${esc(r.price)}</p>` : ''}
+        <p>${esc(r.description)}</p>
+        <p style="margin-bottom:0">${answer === 'yes' ? 'You’ve accepted this room. ' : answer === 'no' ? 'You’ve declined this room. ' : ''}<a href="rsvp.html" data-keep-code>${answer ? 'Change your answer' : 'Let us know if you’d like it'}</a></p>
+      </div>`;
+    show($('your-room'), true);
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

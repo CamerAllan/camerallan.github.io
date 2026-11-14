@@ -5,6 +5,9 @@
  *   Guests     code | guest_names (comma-separated) | plus_ones_allowed | room_id | notes (private) | night_before
  *              Put anything (e.g. "x") in night_before to invite that household to the night-before party.
  *   Night Before   field | value  (rows: title, when, where, details). Only shown to invited households.
+ *   Guests.bridal_party   names from that household who are in the bridal party (comma-separated), or "all".
+ *   Bridal Party   heading | details  — only sent to households with someone in the bridal party.
+ *   Rooms.price    free text, e.g. "£180 per night".
  *   Rooms      room_id | name | description | nights | image
  *   Menu       course | option | description | <one column per dietary requirement, e.g. Vegetarian | Gluten-free ...>
  *              Mark a dish "x" if it suits that requirement. Any other text (e.g. "on request") also counts as
@@ -130,7 +133,8 @@ function findInvite_(code) {
     guests: String(g.guest_names).split(',').map(function (s) { return s.trim(); }).filter(String),
     plusOnesAllowed: Number(g.plus_ones_allowed) || 0,
     room: room,
-    nightBefore: String(g.night_before || '').trim() !== ''
+    nightBefore: String(g.night_before || '').trim() !== '',
+    bridalParty: bridalNames_(String(g.bridal_party || ''), String(g.guest_names).split(',').map(function (s) { return s.trim(); }).filter(String))
   };
 }
 
@@ -144,11 +148,29 @@ function publicInvite_(inv) {
       name: inv.room.name,
       description: inv.room.description,
       nights: inv.room.nights,
-      image: inv.room.image
+      image: inv.room.image,
+      price: String(inv.room.price || '')
     },
+    // Bridal party info is only sent when someone in this household is in the bridal party.
+    bridalParty: inv.bridalParty.length ? { names: inv.bridalParty, info: readBridalInfo_() } : null,
     // Party details are only sent to invited households, so they never appear in the public page.
     nightBefore: inv.nightBefore ? readNightBefore_() : null
   };
+}
+
+function bridalNames_(cell, guests) {
+  cell = cell.trim();
+  if (!cell) return [];
+  if (cell.toLowerCase() === 'all' || cell.toLowerCase() === 'x') return guests;
+  return cell.split(',').map(function (s) { return s.trim(); }).filter(function (n) { return guests.indexOf(n) !== -1; });
+}
+
+function readBridalInfo_() {
+  var sheet = ss_().getSheetByName('Bridal Party');
+  if (!sheet) return [];
+  return sheet.getDataRange().getValues().slice(1)
+    .filter(function (r) { return String(r[0] || r[1] || '').trim(); })
+    .map(function (r) { return { heading: String(r[0] || ''), details: String(r[1] || '') }; });
 }
 
 function readNightBefore_() {

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>RSVP · Partner A &amp; Partner B</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1><a href="index.html">Partner A &amp; Partner B</a></h1>
+    <div class="muted">Saturday 12 June 2027 · Rowallan Castle</div>
+    <nav class="site-nav"><a href="index.html">The Day</a><a href="rsvp.html" aria-current="page">RSVP</a><a href="travel.html">Travel &amp; Stay</a><a href="faqs.html">FAQs</a></nav>
+  </header>
+
+  <section id="rsvp">
+    <h2>RSVP</h2>
+    <p class="muted">Please reply by 1 June 2027.</p>
+
+    <!-- Step 1: enter code -->
+    <form id="code-form" class="card">
+      <label for="code-input">Your invite code (it's on your invitation)</label>
+      <div class="row">
+        <input id="code-input" type="text" autocomplete="off" autocapitalize="characters" placeholder="e.g. K7QX9P" required>
+        <button type="submit" style="flex:0 0 auto">Find invite</button>
+      </div>
+      <div id="code-error" class="error hidden"></div>
+    </form>
+
+    <div id="loading" class="loading hidden" role="status">
+      <span class="spinner" aria-hidden="true"></span>
+      <span id="loading-text">Finding your invite…</span>
+    </div>
+
+    <!-- Step 2: RSVP form -->
+    <form id="rsvp-form" class="hidden" novalidate>
+      <p id="greeting"></p>
+      <div id="people"></div>
+      <div id="plus-ones"></div>
+      <div id="night-before" class="hidden"></div>
+      <div id="room" class="hidden"></div>
+      <label for="message">Anything else we should know? (optional)</label>
+      <textarea id="message" maxlength="2000"></textarea>
+      <div id="form-notice" class="notice hidden" role="alert"></div>
+      <div id="submit-error" class="error hidden"></div>
+      <p><button type="submit" id="submit-btn">Send RSVP</button></p>
+    </form>
+
+    <!-- Step 3: done -->
+    <div id="done" class="card hidden">
+      <h3>Thank you, your RSVP is in.</h3>
+      <dl id="summary"></dl>
+      <p class="muted">You can change your answers any time before the deadline using the same link.</p>
+      <button type="button" class="secondary" id="edit-btn">Change my answers</button>
+    </div>
+  </section>
+</main>
+<script src="common.js"></script>
+<script src="rsvp.js"></script>
+</body>
+</html>
