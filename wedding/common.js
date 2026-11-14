@@ -136,7 +136,9 @@ function showGate() {
     if (!c) return err(t('gateNeedCode'));
     if (!name) return err(t('gateNeedName'));
     show($('gate-error'), false);
-    $('gate-btn').disabled = true;
+    const btn = $('gate-btn'), label = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="btn-spinner" aria-hidden="true"></span>${esc(t('checking'))}`;
     try {
       const data = await apiGet(c, name);
       if (!data.ok) {
@@ -156,7 +158,7 @@ function showGate() {
     } catch (e2) {
       err(t('unreachable'));
     } finally {
-      if ($('gate-btn')) $('gate-btn').disabled = false; // gone once unlocked
+      if (btn.isConnected) { btn.disabled = false; btn.innerHTML = label; } // gone once unlocked
     }
   });
 
@@ -213,6 +215,7 @@ function term(s) { return (getLang() === 'es' && TERMS_ES[s]) || s; }
 
 const STR = {
   en: {
+    checking: 'Checking…',
     gateNeedCode: 'Please enter your invite code.', gateNeedName: 'Please enter your surname.', gateWrongName: 'That surname doesn’t match this invitation. Please try again.',
     doneNew: 'Thank you, your RSVP is in.', doneExisting: 'You’ve already replied. Here’s your RSVP:',
     whosComing: 'Who’s coming', mealChoices: 'Meal choices', alsoInvitedShort: 'You’re also invited to the night before!',
@@ -238,6 +241,7 @@ const STR = {
     changeAnswer: 'Change your answer', letUsKnowRoom: 'Let us know if you’d like it'
   },
   es: {
+    checking: 'Comprobando…',
     gateNeedCode: 'Escribe tu código de invitación.', gateNeedName: 'Escribe tu apellido.', gateWrongName: 'Ese apellido no coincide con esta invitación. Inténtalo de nuevo.',
     doneNew: '¡Gracias! Hemos recibido vuestra respuesta.', doneExisting: 'Ya nos habéis respondido. Esta es vuestra respuesta:',
     whosComing: '¿Quién viene?', mealChoices: 'Menú', alsoInvitedShort: '¡También estáis invitados a la noche anterior!',

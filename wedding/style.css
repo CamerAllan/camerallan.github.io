@@ -88,3 +88,8 @@ html.locked main { display:none; }
 #gate form { text-align:left; }
 #gate button { width:100%; }
 html:not(.locked) #gate { display:none; }
+
+/* Spinner inside a button (lock screen "Checking…") */
+.btn-spinner { display:inline-block; width:14px; height:14px; margin-right:8px; vertical-align:-2px; border:2px solid rgba(255,255,255,.4);
+  border-top-color:#fff; border-radius:50%; animation:spin .8s linear infinite; }
+#gate-btn:disabled { opacity:.85; cursor:wait; }
