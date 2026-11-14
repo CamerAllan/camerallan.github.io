@@ -6,8 +6,8 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxII2fMqqJvL2AdopDELxpD
 const DEMO = {
   invites: {
     DEMO01: { code:'DEMO01', guests:['Alex Smith','Jamie Smith'], plusOnesAllowed:0,
-      room:{ name:'The Garden Suite', description:'Ground-floor suite opening onto the walled garden.', nights:'Fri 11 – Sun 13 June', image:'rooms/garden.svg', price:'£180 per night (£360 total)',
-             description_es:'Suite en la planta baja con acceso al jardín amurallado.', nights_es:'Viernes 11 – domingo 13 de junio', price_es:'180 £ por noche (360 £ en total)' },
+      room:{ name:'The Garden Suite', description:'Ground-floor suite opening onto the walled garden.', nights:'Saturday 12 June (wedding night)', image:'rooms/garden.svg', price:'£180',
+             description_es:'Suite en la planta baja con acceso al jardín amurallado.', nights_es:'Sábado 12 de junio (noche de la boda)', price_es:'180 £' },
       nightBefore:{ title:'Night-before party', when:'Friday 11 June 2027, from 7pm', where:'Placeholder pub, Somewhere', details:'Casual drinks and food.',
                     title_es:'Fiesta de la noche anterior', when_es:'Viernes 11 de junio de 2027, a partir de las 19:00', where_es:'Pub provisional', details_es:'Copas y algo de comer.' },
       bridalParty:{ names:['Alex Smith'], info:[{heading:'Morning prep',details:'Hair & makeup from 9am.',heading_es:'Preparativos',details_es:'Peluquería y maquillaje desde las 9:00.'},{heading:'Photos',details:'Group photos after the ceremony.'}] } },
