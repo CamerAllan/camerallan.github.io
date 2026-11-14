@@ -27,8 +27,20 @@ const DEMO = {
       {option:'Rowallan Bakery Sticky Toffee Pudding',description:'Vanilla Ice Cream | Toffee Sauce',description_es:'Helado de vainilla | Salsa de toffee',diets:{}},
       {option:'Blueberry Bakewell Tart',description:'Lavender Anglaise | Madagascan Vanilla Ice Cream',diets:{}}] }
   ]},
-  saved:{}
+  saved:{},
+  itinerary:[
+    {day:'Friday 11 June',day_es:'Viernes 11 de junio',time:'7:00pm',time_es:'19:00',title:'Night-before party',title_es:'Fiesta de la noche anterior',for:'night_before',rsvp:'night_before'},
+    {day:'Saturday 12 June',day_es:'Sábado 12 de junio',time:'9:00am',time_es:'9:00',title:'Bridal party: hair & makeup',title_es:'Cortejo nupcial: peluquería y maquillaje',for:'bridal_party',rsvp:''},
+    {day:'Saturday 12 June',day_es:'Sábado 12 de junio',time:'1:00pm',time_es:'13:00',title:'Guests arrive',title_es:'Llegada de los invitados',details:'Please park at the Glasshouse restaurant.',for:'everyone',rsvp:'wedding'},
+    {day:'Saturday 12 June',day_es:'Sábado 12 de junio',time:'1:30pm',time_es:'13:30',title:'Ceremony',title_es:'Ceremonia',for:'everyone',rsvp:'wedding'},
+    {day:'Saturday 12 June',day_es:'Sábado 12 de junio',time:'[time TBC]',time_es:'[hora por confirmar]',title:'Check in to your room',title_es:'Entrada en la habitación',for:'room',rsvp:'room'},
+    {day:'Sunday 13 June',day_es:'Domingo 13 de junio',time:'9:30am',time_es:'9:30',title:'Breakfast',title_es:'Desayuno',details:'Included with your room.',for:'room',rsvp:'room'}
+  ]
 };
+function demoItinerary(inv) {
+  const ok = { everyone:true, night_before:!!inv.nightBefore, room:!!inv.room, bridal_party:!!inv.bridalParty };
+  return DEMO.itinerary.filter(r => ok[r.for]);
+}
 
 async function apiGet(code, name) {
   if (!API_URL) {
@@ -36,7 +48,7 @@ async function apiGet(code, name) {
     const inv = DEMO.invites[code];
     if (!inv) return { ok:false, error:'not_found' };
     if (!nameMatches(inv.guests, name)) return { ok:false, error: name ? 'name_mismatch' : 'name_required', lang: inv.lang || 'en' };
-    return { ok:true, invite:inv, menu:DEMO.menu, existing:DEMO.saved[code] || [] };
+    return { ok:true, invite:inv, menu:DEMO.menu, existing:DEMO.saved[code] || [], itinerary: demoItinerary(inv) };
   }
   const res = await fetch(API_URL + '?code=' + encodeURIComponent(code) + '&name=' + encodeURIComponent(name || ''));
   return res.json();
@@ -215,6 +227,7 @@ function term(s) { return (getLang() === 'es' && TERMS_ES[s]) || s; }
 
 const STR = {
   en: {
+    stYes: 'Confirmed', stNo: 'Declined', stTodo: 'RSVP needed', itinEmpty: 'Your itinerary will appear here soon.', itinLegend: '✓ you’ve said yes · ✗ you’ve said no · ● tap to RSVP',
     roomFree: 'There’s no charge for your room. It’s on us!',
     checking: 'Checking…',
     gateNeedCode: 'Please enter your invite code.', gateNeedName: 'Please enter your surname.', gateWrongName: 'That surname doesn’t match this invitation. Please try again.',
@@ -242,6 +255,7 @@ const STR = {
     changeAnswer: 'Change your answer', letUsKnowRoom: 'Let us know if you’d like it'
   },
   es: {
+    stYes: 'Confirmado', stNo: 'Rechazado', stTodo: 'Falta confirmar', itinEmpty: 'Vuestro itinerario aparecerá aquí pronto.', itinLegend: '✓ habéis dicho que sí · ✗ habéis dicho que no · ● pulsa para confirmar',
     roomFree: 'La habitación no tiene coste para vosotros. ¡Invitamos nosotros!',
     checking: 'Comprobando…',
     gateNeedCode: 'Escribe tu código de invitación.', gateNeedName: 'Escribe tu apellido.', gateWrongName: 'Ese apellido no coincide con esta invitación. Inténtalo de nuevo.',

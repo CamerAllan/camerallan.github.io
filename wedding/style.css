@@ -93,3 +93,13 @@ html:not(.locked) #gate { display:none; }
 .btn-spinner { display:inline-block; width:14px; height:14px; margin-right:8px; vertical-align:-2px; border:2px solid rgba(255,255,255,.4);
   border-top-color:#fff; border-radius:50%; animation:spin .8s linear infinite; }
 #gate-btn:disabled { opacity:.85; cursor:wait; }
+
+/* Itinerary */
+.itin-day { margin:24px 0 4px; }
+.itin .itin-body { flex:1; }
+.itin .desc { display:block; font-size:.92rem; color:var(--muted); }
+.status { display:table; margin-top:4px; font-size:.85rem; padding:1px 8px; border-radius:10px; text-decoration:none; }
+.status.yes { background:#e7f1e3; color:#2f5d27; }
+.status.no { background:#f3e8e6; color:#8a3a2c; }
+.status.todo { background:#fdf3e2; color:#8a5a12; }
+.legend { font-size:.85rem; margin-top:18px; }

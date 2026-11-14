@@ -7,6 +7,8 @@
  *   Night Before   field | value  (rows: title, when, where, details). Only shown to invited households.
  *   Guests.bridal_party   names from that household who are in the bridal party (comma-separated), or "all".
  *   Bridal Party   heading | details  — only sent to households with someone in the bridal party.
+ *   Itinerary      day | time | title | details | for | rsvp (+ *_es). "for" decides who sees a row
+ *                  (everyone / night_before / room / bridal_party); only matching rows are sent to a household.
  *   Rooms.price    free text, e.g. "£180 per night".
  *   Guests.room_price  optional per-household override: blank = the suite's price, "free" = no charge,
  *                  anything else is shown instead (e.g. a share of a suite that several households use).
@@ -47,7 +49,8 @@ function doGet(e) {
       ok: true,
       invite: publicInvite_(invite),
       menu: readMenu_(),
-      existing: readExisting_(code)
+      existing: readExisting_(code),
+      itinerary: readItinerary_(invite)
     });
   } catch (err) {
     return json_({ ok: false, error: 'server_error', detail: String(err) });
@@ -205,6 +208,27 @@ function readBridalInfo_() {
     .filter(function (r) { return String(r[0] || r[1] || '').trim(); })
     .map(function (r) {
       return { heading: String(r[0] || ''), details: String(r[1] || ''), heading_es: String(r[2] || ''), details_es: String(r[3] || '') };
+    });
+}
+
+/** Itinerary rows this household is invited to, in sheet order. */
+function readItinerary_(invite) {
+  var sheet = ss_().getSheetByName('Itinerary');
+  if (!sheet) return [];
+  var invitedTo = {
+    everyone: true, '': true,
+    night_before: invite.nightBefore,
+    room: !!invite.room,
+    bridal_party: invite.bridalParty.length > 0
+  };
+  return rows_('Itinerary')
+    .filter(function (r) { return String(r.title || '').trim() && invitedTo[String(r['for'] || '').trim().toLowerCase()]; })
+    .map(function (r) {
+      var out = {};
+      ['day', 'time', 'title', 'details', 'rsvp', 'day_es', 'time_es', 'title_es', 'details_es'].forEach(function (k) {
+        out[k] = String(r[k] == null ? '' : r[k]).trim();
+      });
+      return out;
     });
 }
 
