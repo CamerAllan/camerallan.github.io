@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Partner A &amp; Partner B — Wedding</title>
+<style>
+  :root { --ink:#222; --muted:#6b6b6b; --line:#ddd; --accent:#5a6b4f; --bg:#fdfcfa; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:17px/1.55 Georgia, "Times New Roman", serif; color:var(--ink); background:var(--bg); }
+  main { max-width:640px; margin:0 auto; padding:48px 20px 80px; }
+  header { text-align:center; margin-bottom:40px; }
+  h1 { font-weight:normal; font-size:2.2rem; margin:0 0 8px; letter-spacing:.02em; }
+  h2 { font-weight:normal; font-size:1.4rem; margin:40px 0 12px; border-bottom:1px solid var(--line); padding-bottom:6px; }
+  h3 { font-size:1.05rem; margin:0 0 10px; }
+  .muted { color:var(--muted); }
+  .card { border:1px solid var(--line); border-radius:6px; padding:18px; margin:14px 0; background:#fff; }
+  label { display:block; margin:10px 0 4px; font-size:.92rem; }
+  input[type=text], select, textarea { width:100%; padding:9px 10px; font:inherit; font-size:.95rem; border:1px solid #ccc; border-radius:4px; background:#fff; }
+  textarea { min-height:80px; resize:vertical; }
+  .choices { display:flex; gap:18px; flex-wrap:wrap; }
+  .choices label { display:flex; align-items:center; gap:6px; margin:4px 0; font-size:1rem; }
+  button { font:inherit; padding:10px 22px; border:0; border-radius:4px; background:var(--accent); color:#fff; cursor:pointer; }
+  button.secondary { background:none; color:var(--accent); border:1px solid var(--accent); }
+  button:disabled { opacity:.6; cursor:wait; }
+  .room img { width:100%; aspect-ratio:3/2; object-fit:cover; border-radius:4px; display:block; margin-bottom:12px; background:#eee; }
+  .error { color:#a33; margin:10px 0; }
+  .hidden { display:none !important; }
+  .row { display:flex; gap:10px; }
+  .row > * { flex:1; }
+  dl { margin:0; } dt { font-weight:bold; margin-top:8px; } dd { margin:0; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Partner A &amp; Partner B</h1>
+    <div class="muted">Saturday 5 September 2027 · The Venue, Somewhere</div>
+  </header>
+
+  <section>
+    <h2>The day</h2>
+    <p>Placeholder details: ceremony at 2pm, drinks and canapés on the lawn, dinner at 5pm, dancing until late.</p>
+  </section>
+
+  <section id="rsvp">
+    <h2>RSVP</h2>
+    <p class="muted">Please reply by 1 June 2027.</p>
+
+    <!-- Step 1: enter code -->
+    <form id="code-form" class="card">
+      <label for="code-input">Your invite code (it's on your invitation)</label>
+      <div class="row">
+        <input id="code-input" type="text" autocomplete="off" autocapitalize="characters" placeholder="e.g. K7QX9P" required>
+        <button type="submit" style="flex:0 0 auto">Find invite</button>
+      </div>
+      <div id="code-error" class="error hidden"></div>
+    </form>
+
+    <div id="loading" class="muted hidden">Loading your invite…</div>
+
+    <!-- Step 2: RSVP form -->
+    <form id="rsvp-form" class="hidden">
+      <p id="greeting"></p>
+      <div id="people"></div>
+      <div id="plus-ones"></div>
+      <div id="room" class="hidden"></div>
+      <label for="message">Anything else we should know? (optional)</label>
+      <textarea id="message" maxlength="2000"></textarea>
+      <div id="submit-error" class="error hidden"></div>
+      <p><button type="submit" id="submit-btn">Send RSVP</button></p>
+    </form>
+
+    <!-- Step 3: done -->
+    <div id="done" class="card hidden">
+      <h3>Thank you, your RSVP is in.</h3>
+      <dl id="summary"></dl>
+      <p class="muted">You can change your answers any time before the deadline using the same link.</p>
+      <button type="button" class="secondary" id="edit-btn">Change my answers</button>
+    </div>
+  </section>
+</main>
+
+<script>
+// ---- Config ----
+// Paste the Apps Script web app URL here after deploying. Leave empty for demo mode (fake data, nothing saved).
+const API_URL = '';
+
+// ---- Demo data (used only when API_URL is empty) ----
+const DEMO = {
+  invites: {
+    DEMO01: { code:'DEMO01', guests:['Alex Smith','Jamie Smith'], plusOnesAllowed:0,
+      room:{ name:'The Garden Suite', description:'Ground-floor suite opening onto the walled garden.', nights:'Fri 4 – Sun 6 Sept', image:'rooms/garden.svg' } },
+    DEMO02: { code:'DEMO02', guests:['Sam Jones'], plusOnesAllowed:1, room:null }
+  },
+  menu:{ courses:[
+    { name:'Starter', options:[{option:'Soup',description:'Seasonal soup (v)'},{option:'Salmon',description:'Smoked salmon, dill crème fraîche'}] },
+    { name:'Main', options:[{option:'Beef',description:'Roast sirloin'},{option:'Chicken',description:'Chicken supreme'},{option:'Risotto',description:'Pea & mint risotto (v)'}] },
+    { name:'Dessert', options:[{option:'Tart',description:'Lemon tart'},{option:'Brownie',description:'Chocolate brownie'},{option:'Cheese',description:'Cheese board'}] }
+  ]},
+  saved:{}
+};
+
+async function apiGet(code) {
+  if (!API_URL) {
+    await new Promise(r => setTimeout(r, 300));
+    const inv = DEMO.invites[code];
+    return inv ? { ok:true, invite:inv, menu:DEMO.menu, existing:DEMO.saved[code] || [] } : { ok:false, error:'not_found' };
+  }
+  const res = await fetch(API_URL + '?code=' + encodeURIComponent(code));
+  return res.json();
+}
+
+async function apiPost(payload) {
+  if (!API_URL) {
+    await new Promise(r => setTimeout(r, 300));
+    DEMO.saved[payload.code] = payload.people.map(p => ({
+      guest_name:p.guest_name, is_plus_one:p.is_plus_one?'yes':'no', attending:p.attending?'yes':'no',
+      dietary:p.dietary, room_accepted: payload.room_accepted===true?'yes':payload.room_accepted===false?'no':'',
+      message: payload.message, ...p.courses }));
+    return { ok:true };
+  }
+  // text/plain avoids a CORS preflight, which Apps Script can't answer.
+  const res = await fetch(API_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body:JSON.stringify(payload) });
+  return res.json();
+}
+
+// ---- UI ----
+const $ = id => document.getElementById(id);
+const show = (el, on=true) => el.classList.toggle('hidden', !on);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let state = null; // { invite, menu, existing }
+
+function personBlock(idx, name, isPlusOne, existing) {
+  const courses = state.menu.courses.map(c => `
+    <label for="p${idx}-${esc(c.name)}">${esc(c.name)}</label>
+    <select id="p${idx}-${esc(c.name)}" data-course="${esc(c.name)}" required>
+      <option value="">Choose…</option>
+      ${c.options.map(o => `<option value="${esc(o.option)}" ${existing && existing[c.name]===o.option?'selected':''}>${esc(o.option)}${o.description?' — '+esc(o.description):''}</option>`).join('')}
+    </select>`).join('');
+  const att = existing ? existing.attending : '';
+  return `
+  <div class="card person" data-idx="${idx}" data-plus-one="${isPlusOne}">
+    ${isPlusOne
+      ? `<label for="p${idx}-name">Guest's name</label><input type="text" id="p${idx}-name" class="pname" value="${esc(name)}" maxlength="100" required>`
+      : `<h3>${esc(name)}</h3><input type="hidden" class="pname" value="${esc(name)}">`}
+    <div class="choices">
+      <label><input type="radio" name="att${idx}" value="yes" ${att==='yes'?'checked':''} required> Joyfully accepts</label>
+      <label><input type="radio" name="att${idx}" value="no" ${att==='no'?'checked':''}> Regretfully declines</label>
+    </div>
+    <div class="meal ${att==='yes'?'':'hidden'}">
+      ${courses}
+      <label for="p${idx}-diet">Dietary requirements or allergies</label>
+      <input type="text" id="p${idx}-diet" class="pdiet" maxlength="500" value="${esc(existing?.dietary)}">
+    </div>
+  </div>`;
+}
+
+function wirePerson(el) {
+  const meal = el.querySelector('.meal');
+  el.querySelectorAll('input[type=radio]').forEach(r => r.addEventListener('change', () => {
+    const on = el.querySelector('input[type=radio]:checked')?.value === 'yes';
+    show(meal, on);
+    meal.querySelectorAll('select').forEach(s => s.required = on);
+  }));
+  const on = el.querySelector('input[type=radio]:checked')?.value === 'yes';
+  meal.querySelectorAll('select').forEach(s => s.required = on);
+}
+
+function renderForm() {
+  const { invite, existing } = state;
+  const byName = Object.fromEntries(existing.filter(e => e.is_plus_one !== 'yes').map(e => [e.guest_name, e]));
+  const plusExisting = existing.filter(e => e.is_plus_one === 'yes');
+
+  $('greeting').textContent = 'Hello ' + listNames(invite.guests) + '! We’d love to know if you can make it.';
+  $('people').innerHTML = invite.guests.map((g, i) => personBlock(i, g, false, byName[g])).join('');
+
+  // Plus-ones
+  const po = $('plus-ones');
+  po.innerHTML = '';
+  if (invite.plusOnesAllowed > 0) {
+    for (let k = 0; k < invite.plusOnesAllowed; k++) {
+      const idx = invite.guests.length + k;
+      const ex = plusExisting[k];
+      const wrap = document.createElement('div');
+      wrap.innerHTML = `
+        <div class="choices"><label><input type="checkbox" class="po-toggle" ${ex?'checked':''}> I'm bringing a guest</label></div>
+        <div class="po-body ${ex?'':'hidden'}">${personBlock(idx, ex?.guest_name || '', true, ex)}</div>`;
+      po.appendChild(wrap);
+      const body = wrap.querySelector('.po-body');
+      const toggle = wrap.querySelector('.po-toggle');
+      const setReq = () => body.querySelectorAll('input,select').forEach(i => { if (!toggle.checked) i.disabled = true; else i.disabled = false; });
+      toggle.addEventListener('change', () => { show(body, toggle.checked); setReq(); });
+      setReq();
+    }
+  }
+
+  // Room
+  const roomEl = $('room');
+  if (invite.room) {
+    const r = invite.room;
+    const acc = existing[0]?.room_accepted || '';
+    roomEl.innerHTML = `
+      <div class="card room">
+        ${r.image ? `<img src="${esc(r.image)}" alt="${esc(r.name)}">` : ''}
+        <h3>We’ve saved a room for you: ${esc(r.name)}</h3>
+        ${r.nights ? `<p class="muted" style="margin:0 0 6px">${esc(r.nights)}</p>` : ''}
+        <p style="margin-top:0">${esc(r.description)}</p>
+        <div class="choices">
+          <label><input type="radio" name="room" value="yes" ${acc==='yes'?'checked':''} required> Yes please</label>
+          <label><input type="radio" name="room" value="no" ${acc==='no'?'checked':''}> No thanks</label>
+        </div>
+      </div>`;
+    show(roomEl, true);
+  } else {
+    roomEl.innerHTML = '';
+    show(roomEl, false);
+  }
+
+  $('message').value = existing[0]?.message || '';
+  document.querySelectorAll('.person').forEach(wirePerson);
+  show($('code-form'), false);
+  show($('done'), false);
+  show($('rsvp-form'), true);
+}
+
+function listNames(names) {
+  const first = names.map(n => n.split(' ')[0]);
+  return first.length <= 1 ? first.join('') : first.slice(0, -1).join(', ') + ' & ' + first.at(-1);
+}
+
+function collect() {
+  const people = [];
+  document.querySelectorAll('.person').forEach(el => {
+    if (el.closest('.po-body.hidden')) return; // plus-one not ticked
+    const attending = el.querySelector('input[type=radio]:checked')?.value === 'yes';
+    const courses = {};
+    el.querySelectorAll('select[data-course]').forEach(s => courses[s.dataset.course] = attending ? s.value : '');
+    people.push({
+      guest_name: el.querySelector('.pname').value.trim(),
+      is_plus_one: el.dataset.plusOne === 'true',
+      attending,
+      courses,
+      dietary: attending ? (el.querySelector('.pdiet')?.value.trim() || '') : ''
+    });
+  });
+  const roomVal = document.querySelector('input[name=room]:checked')?.value;
+  return {
+    code: state.invite.code,
+    people,
+    room_accepted: roomVal === 'yes' ? true : roomVal === 'no' ? false : null,
+    message: $('message').value.trim()
+  };
+}
+
+function renderSummary(payload) {
+  const rows = payload.people.map(p => `<dt>${esc(p.guest_name)}</dt><dd>${p.attending
+    ? 'Attending · ' + Object.values(p.courses).filter(Boolean).map(esc).join(' · ') + (p.dietary ? ' · ' + esc(p.dietary) : '')
+    : 'Not attending'}</dd>`);
+  if (state.invite.room) rows.push(`<dt>${esc(state.invite.room.name)}</dt><dd>${payload.room_accepted ? 'Yes please' : 'No thanks'}</dd>`);
+  $('summary').innerHTML = rows.join('');
+}
+
+async function loadInvite(code) {
+  code = code.trim().toUpperCase();
+  show($('code-error'), false);
+  show($('loading'), true);
+  try {
+    const data = await apiGet(code);
+    if (!data.ok) {
+      $('code-error').textContent = data.error === 'not_found'
+        ? 'We couldn’t find that code. Please check your invitation, or get in touch.'
+        : 'Something went wrong. Please try again in a moment.';
+      show($('code-error'), true);
+      show($('code-form'), true);
+      return;
+    }
+    state = data;
+    const url = new URL(location.href);
+    url.searchParams.set('code', code);
+    history.replaceState(null, '', url);
+    renderForm();
+  } catch (e) {
+    $('code-error').textContent = 'Couldn’t reach the RSVP service. Please try again in a moment.';
+    show($('code-error'), true);
+    show($('code-form'), true);
+  } finally {
+    show($('loading'), false);
+  }
+}
+
+$('code-form').addEventListener('submit', e => { e.preventDefault(); loadInvite($('code-input').value); });
+
+$('rsvp-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const payload = collect();
+  const btn = $('submit-btn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  show($('submit-error'), false);
+  try {
+    const res = await apiPost(payload);
+    if (!res.ok) throw new Error(res.error);
+    state.existing = payload.people.map(p => ({ ...p.courses, guest_name:p.guest_name, is_plus_one:p.is_plus_one?'yes':'no',
+      attending:p.attending?'yes':'no', dietary:p.dietary,
+      room_accepted: payload.room_accepted===true?'yes':payload.room_accepted===false?'no':'', message:payload.message }));
+    renderSummary(payload);
+    show($('rsvp-form'), false);
+    show($('done'), true);
+    $('rsvp').scrollIntoView({ behavior:'smooth' });
+  } catch (err) {
+    $('submit-error').textContent = 'Sorry, that didn’t send. Please try again.';
+    show($('submit-error'), true);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send RSVP';
+  }
+});
+
+$('edit-btn').addEventListener('click', renderForm);
+
+const initial = new URLSearchParams(location.search).get('code');
+if (initial) { show($('code-form'), false); loadInvite(initial); }
+</script>
+</body>
+</html>
