@@ -38,7 +38,7 @@ function renderItinerary() {
       ${d.items.map(it => `<li>
         <span class="time">${esc(L(it, 'time'))}</span>
         <span class="itin-body">
-          <strong>${esc(L(it, 'title'))}</strong>
+          <span class="itin-title">${esc(L(it, 'title'))}</span>
           ${it.rsvp === 'room' && itinData.invite.room ? `<span class="muted"> · ${esc(L(itinData.invite.room, 'name'))}</span>` : ''}
           ${L(it, 'details') ? `<span class="desc">${esc(L(it, 'details'))}</span>` : ''}
           ${statusBadge(it.rsvp, itinData.existing)}

@@ -94,12 +94,17 @@ html:not(.locked) #gate { display:none; }
   border-top-color:#fff; border-radius:50%; animation:spin .8s linear infinite; }
 #gate-btn:disabled { opacity:.85; cursor:wait; }
 
-/* Itinerary */
-.itin-day { margin:24px 0 4px; }
+/* Itinerary: a quiet timeline (thin line, small dots, light type) */
+.itin-day { font-weight:normal; font-size:.8rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:34px 0 10px; }
+.timeline.itin { border-left:1px solid var(--line); margin-left:6px; }
+.timeline.itin li { position:relative; border-top:0; padding:0 0 18px 22px; gap:14px; }
+.timeline.itin li::before { content:""; position:absolute; left:-4px; top:.55em; width:7px; height:7px; border-radius:50%; background:var(--bg); border:1px solid var(--accent); }
+.timeline.itin .time { flex:0 0 76px; font-weight:normal; color:var(--muted); font-variant-numeric:tabular-nums; }
 .itin .itin-body { flex:1; }
-.itin .desc { display:block; font-size:.92rem; color:var(--muted); }
-.status { display:table; margin-top:4px; font-size:.85rem; padding:1px 8px; border-radius:10px; text-decoration:none; }
-.status.yes { background:#e7f1e3; color:#2f5d27; }
-.status.no { background:#f3e8e6; color:#8a3a2c; }
-.status.todo { background:#fdf3e2; color:#8a5a12; }
-.legend { font-size:.85rem; margin-top:18px; }
+.itin .itin-title { font-size:1.05rem; }
+.itin .desc { display:block; font-size:.9rem; color:var(--muted); margin-top:2px; }
+.status { display:block; margin-top:4px; font-size:.8rem; font-style:italic; text-decoration:none; }
+.status.yes { color:#4d7a43; }
+.status.no { color:#9a5a4e; }
+.status.todo { color:#9a6a1c; text-decoration:underline; text-underline-offset:2px; }
+.legend { font-size:.8rem; margin-top:18px; }
