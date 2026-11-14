@@ -22,6 +22,10 @@
  */
 
 var SHEET_ID = '1iSff6rU6AE22U6UkYPWBx9CT-mmakGh4iSF3ndRP8QI';
+
+// Who gets an email when someone RSVPs or changes their RSVP. Leave empty to email just the
+// account that deployed the script. Add more addresses, e.g. ['you@gmail.com', 'annie@example.com'].
+var NOTIFY_EMAILS = [];
 var FIXED_RESPONSE_COLS = ['updated_at', 'code', 'guest_name', 'is_plus_one', 'attending', 'diets'];
 var TRAILING_RESPONSE_COLS = ['dietary_notes', 'room_accepted', 'message', 'night_before'];
 
@@ -66,7 +70,7 @@ function doPost(e) {
     var roomAccepted = invite.room ? (body.room_accepted === true ? 'yes' : body.room_accepted === false ? 'no' : '') : '';
     var sheet = ss_().getSheetByName('Responses');
     var header = ensureHeader_(sheet, menu.courses.map(function (c) { return c.name; }));
-    deleteRowsForCode_(sheet, header, code);
+    var isUpdate = deleteRowsForCode_(sheet, header, code) > 0;
 
     var now = new Date();
     var rows = people.map(function (p) {
@@ -95,6 +99,8 @@ function doPost(e) {
       return header.map(function (h) { return rec.hasOwnProperty(h) ? rec[h] : ''; });
     });
     if (rows.length) sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, header.length).setValues(rows);
+    SpreadsheetApp.flush();
+    notify_(invite, header, rows, isUpdate, menu);
     return json_({ ok: true });
   } catch (err) {
     return json_({ ok: false, error: 'server_error', detail: String(err) });
@@ -246,12 +252,53 @@ function ensureHeader_(sheet, courseNames) {
   return header;
 }
 
+/** Removes this invite's previous answers; returns how many rows were removed (0 = first RSVP). */
 function deleteRowsForCode_(sheet, header, code) {
   var col = header.indexOf('code') + 1;
   var last = sheet.getLastRow();
-  if (last < 2) return;
+  if (last < 2) return 0;
   var codes = sheet.getRange(2, col, last - 1, 1).getValues();
+  var removed = 0;
   for (var i = codes.length - 1; i >= 0; i--) {
-    if (normaliseCode_(codes[i][0]) === code) sheet.deleteRow(i + 2);
+    if (normaliseCode_(codes[i][0]) === code) { sheet.deleteRow(i + 2); removed++; }
   }
+  return removed;
+}
+
+/** Email a summary of the RSVP. Never lets an email problem stop the RSVP being saved. */
+function notify_(invite, header, rows, isUpdate, menu) {
+  try {
+    var to = NOTIFY_EMAILS.length ? NOTIFY_EMAILS.join(',') : Session.getEffectiveUser().getEmail();
+    if (!to) return;
+    var col = function (row, name) { var i = header.indexOf(name); return i > -1 ? String(row[i] || '') : ''; };
+    var lines = rows.map(function (r) {
+      var name = col(r, 'guest_name') + (col(r, 'is_plus_one') === 'yes' ? ' (plus-one)' : '');
+      if (col(r, 'attending') !== 'yes') return '✗ ' + name + ': not attending';
+      var meals = menu.courses.map(function (c) { return col(r, c.name); }).filter(String).join(', ');
+      var extra = [col(r, 'diets'), col(r, 'dietary_notes')].filter(String).join(' – ');
+      return '✓ ' + name + ': ' + (meals || 'no meal chosen') + (extra ? ' [' + extra + ']' : '');
+    });
+    if (invite.nightBefore) {
+      lines.push('', 'Night before:');
+      rows.forEach(function (r) { lines.push('  ' + col(r, 'guest_name') + ': ' + (col(r, 'night_before') || '–')); });
+    }
+    if (invite.room) lines.push('', 'Room (' + invite.room.name + '): ' + (col(rows[0] || [], 'room_accepted') || '–'));
+    var message = rows.length ? col(rows[0], 'message') : '';
+    if (message) lines.push('', 'Message: ' + message);
+    lines.push('', 'Sheet: ' + ss_().getUrl());
+
+    var coming = rows.filter(function (r) { return col(r, 'attending') === 'yes'; }).length;
+    var subject = (isUpdate ? 'RSVP changed: ' : 'New RSVP: ') + invite.guests.join(' & ') +
+                  ' (' + coming + ' of ' + rows.length + ' coming)';
+    MailApp.sendEmail(to, subject, lines.join('\n'));
+  } catch (err) {
+    console.error('RSVP notification failed: ' + err);
+  }
+}
+
+/** Run this once from the Apps Script editor to check emails arrive (and to grant the email permission). */
+function testNotification() {
+  var invite = { guests: ['Test Guest'], nightBefore: false, room: null };
+  var header = ['guest_name', 'is_plus_one', 'attending', 'Main', 'message'];
+  notify_(invite, header, [['Test Guest', 'no', 'yes', 'Sticky Pulled Beef Shin', 'This is a test']], false, { courses: [{ name: 'Main' }] });
 }
