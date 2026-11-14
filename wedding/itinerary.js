@@ -27,9 +27,11 @@ function tidy(value, kind) {
   const d = new Date(value);
   if (isNaN(d)) return value;
   const locale = getLang() === 'es' ? 'es-ES' : 'en-GB';
-  return kind === 'day'
-    ? d.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' })
-    : d.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit', hour12: getLang() !== 'es' }).replace(' ', '').toLowerCase();
+  if (kind === 'day') return d.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
+  // Take the clock time as written (1899 dates carry odd historical time-zone offsets).
+  const [, hh, mm] = value.match(/(\d{2}):(\d{2}):\d{2} GMT/);
+  const h = Number(hh);
+  return getLang() === 'es' ? `${hh}:${mm}` : `${h % 12 || 12}:${mm}${h < 12 ? 'am' : 'pm'}`;
 }
 
 function renderItinerary() {
