@@ -306,8 +306,13 @@ function setting_(name) {
   return '';
 }
 
-/** Run this once from the Apps Script editor to check emails arrive (and to grant the email permission). */
+/**
+ * Run this once from the Apps Script editor to grant the email permission and check emails arrive.
+ * Google's consent screen lets you tick permissions individually: make sure "Send email as you" is ticked.
+ */
 function testNotification() {
+  // Re-shows the consent screen if the email permission hasn't been granted yet.
+  ScriptApp.requireScopes(ScriptApp.AuthMode.FULL, ['https://www.googleapis.com/auth/script.send_mail']);
   var invite = { guests: ['Test Guest'], nightBefore: false, room: null };
   var header = ['guest_name', 'is_plus_one', 'attending', 'Main', 'message'];
   notify_(invite, header, [['Test Guest', 'no', 'yes', 'Sticky Pulled Beef Shin', 'This is a test']], false, { courses: [{ name: 'Main' }] });
