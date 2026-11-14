@@ -27,6 +27,15 @@
   .room img { width:100%; aspect-ratio:3/2; object-fit:cover; border-radius:4px; display:block; margin-bottom:12px; background:#eee; }
   .error { color:#a33; margin:10px 0; }
   .hidden { display:none !important; }
+  .stack label { display:flex; align-items:center; gap:8px; margin:6px 0; font-size:1rem; }
+  fieldset.course { border:0; padding:0; margin:16px 0 0; }
+  fieldset.course legend { font-size:.92rem; padding:0; margin-bottom:6px; }
+  .dish { display:flex; gap:10px; align-items:flex-start; border:1px solid var(--line); border-radius:4px; padding:10px 12px; margin:6px 0; cursor:pointer; }
+  .dish input { margin-top:5px; }
+  .dish:has(input:checked) { border-color:var(--accent); background:#f4f6f1; }
+  .dish .desc { display:block; font-size:.9rem; color:var(--muted); }
+  .dish .tags { display:block; font-size:.85rem; color:var(--accent); margin-top:2px; }
+  .none-fit { margin:4px 0 0; font-size:.9rem; }
   .row { display:flex; gap:10px; }
   .row > * { flex:1; }
   dl { margin:0; } dt { font-weight:bold; margin-top:8px; } dd { margin:0; }
@@ -94,10 +103,10 @@ const DEMO = {
       room:{ name:'The Garden Suite', description:'Ground-floor suite opening onto the walled garden.', nights:'Fri 4 – Sun 6 Sept', image:'rooms/garden.svg' } },
     DEMO02: { code:'DEMO02', guests:['Sam Jones'], plusOnesAllowed:1, room:null }
   },
-  menu:{ diets:['Vegetarian','Pescatarian','Gluten-free'], courses:[
+  menu:{ diets:['Vegan','Vegetarian','Gluten-free'], courses:[
     { name:'Starter', options:[
-      {option:'Scottish Salmon Three Ways',description:'Heritage Beetroot',diets:{Pescatarian:'','Gluten-free':'on request'}},
-      {option:'Goats Cheese Arancini',description:'Rocket & Red Onion | Beetroot',diets:{Vegetarian:'',Pescatarian:'','Gluten-free':'on request'}}] },
+      {option:'Scottish Salmon Three Ways',description:'Heritage Beetroot',diets:{'Gluten-free':'on request'}},
+      {option:'Goats Cheese Arancini',description:'Rocket & Red Onion | Beetroot',diets:{Vegetarian:'','Gluten-free':'on request'}}] },
     { name:'Main', options:[
       {option:'Sticky Pulled Beef Shin',description:'Beer Braised Shallot | Creamed Potato | Tender Stem | Beef Jus',diets:{'Gluten-free':''}},
       {option:'Chicken Balmoral Roulade',description:'Creamed Potato | Glazed Carrot | Whisky Sauce',diets:{}}] },
@@ -139,18 +148,20 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 let state = null; // { invite, menu, existing }
 
 const splitList = s => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
+const OTHER = 'Other';
 
 function personBlock(idx, name, isPlusOne, existing) {
   const ticked = splitList(existing?.diets);
-  const diets = (state.menu.diets || []).map(d => `
+  const dietNames = [...(state.menu.diets || []), OTHER];
+  const diets = dietNames.map(d => `
       <label><input type="checkbox" class="pdiet-tick" value="${esc(d)}" ${ticked.includes(d)?'checked':''}> ${esc(d)}</label>`).join('');
-  // Options are filled in by refreshOptions() so they can be filtered by the ticked diets.
+  // Dish lists are filled in by refreshOptions() so they can be filtered by the ticked diets.
   const courses = state.menu.courses.map((c, ci) => `
-    <div class="course" data-ci="${ci}">
-      <label for="p${idx}-c${ci}">${esc(c.name)}</label>
-      <select id="p${idx}-c${ci}" data-course="${esc(c.name)}" data-initial="${esc(existing?.[c.name])}"></select>
-      <p class="muted none-fit hidden" style="margin:4px 0 0;font-size:.9rem">None of our ${esc(c.name.toLowerCase())} options suit those requirements yet. We'll speak to the venue and be in touch.</p>
-    </div>`).join('');
+    <fieldset class="course" data-ci="${ci}" data-course="${esc(c.name)}" data-initial="${esc(existing?.[c.name])}">
+      <legend>${esc(c.name)}</legend>
+      <div class="dishes"></div>
+      <p class="muted none-fit hidden">None of our ${esc(c.name.toLowerCase())} options suit those requirements yet. We'll speak to the venue and be in touch.</p>
+    </fieldset>`).join('');
   const att = existing ? existing.attending : '';
   return `
   <div class="card person" data-idx="${idx}" data-plus-one="${isPlusOne}">
@@ -158,13 +169,16 @@ function personBlock(idx, name, isPlusOne, existing) {
       ? `<label for="p${idx}-name">Guest's name</label><input type="text" id="p${idx}-name" class="pname" value="${esc(name)}" maxlength="100" required>`
       : `<h3>${esc(name)}</h3><input type="hidden" class="pname" value="${esc(name)}">`}
     <div class="choices">
-      <label><input type="radio" name="att${idx}" value="yes" ${att==='yes'?'checked':''} required> Joyfully accepts</label>
-      <label><input type="radio" name="att${idx}" value="no" ${att==='no'?'checked':''}> Regretfully declines</label>
+      <label><input type="radio" class="att" name="att${idx}" value="yes" ${att==='yes'?'checked':''} required> Joyfully accepts</label>
+      <label><input type="radio" class="att" name="att${idx}" value="no" ${att==='no'?'checked':''}> Regretfully declines</label>
     </div>
     <div class="meal ${att==='yes'?'':'hidden'}">
-      ${diets ? `<label>Dietary requirements (we'll only show dishes that suit)</label><div class="choices">${diets}</div>` : ''}
-      <label for="p${idx}-diet">Allergies or anything else the kitchen should know</label>
-      <input type="text" id="p${idx}-diet" class="pdiet" maxlength="500" value="${esc(existing?.dietary_notes)}">
+      <label>Dietary requirements</label>
+      <div class="stack">${diets}</div>
+      <div class="other-wrap ${ticked.includes(OTHER)?'':'hidden'}">
+        <label for="p${idx}-diet">Please tell us your requirements</label>
+        <input type="text" id="p${idx}-diet" class="pdiet" maxlength="500" value="${esc(existing?.dietary_notes)}">
+      </div>
       ${courses}
     </div>
   </div>`;
@@ -174,32 +188,40 @@ function tickedDiets(el) {
   return [...el.querySelectorAll('.pdiet-tick:checked')].map(c => c.value);
 }
 
-/** Rebuild each course dropdown to show only dishes that suit every ticked diet. */
+/** Rebuild each course's dish list to show only dishes that suit every ticked diet. */
 function refreshOptions(el) {
-  const attending = el.querySelector('input[type=radio]:checked')?.value === 'yes';
-  const diets = tickedDiets(el);
-  el.querySelectorAll('.course').forEach(div => {
-    const course = state.menu.courses[div.dataset.ci];
-    const sel = div.querySelector('select');
-    const current = sel.value || sel.dataset.initial || '';
-    sel.dataset.initial = '';
+  // A plus-one whose "bringing a guest" box is unticked counts as not attending (so nothing is required).
+  const attending = !el.closest('.po-body.hidden') && el.querySelector('input.att:checked')?.value === 'yes';
+  const ticked = tickedDiets(el);
+  const otherOn = ticked.includes(OTHER);
+  show(el.querySelector('.other-wrap'), otherOn);
+  el.querySelector('.pdiet').required = attending && otherOn;
+  const diets = ticked.filter(d => d !== OTHER); // "Other" is free text, so it doesn't filter dishes
+  const idx = el.dataset.idx;
+  el.querySelectorAll('.course').forEach(fs => {
+    const course = state.menu.courses[fs.dataset.ci];
+    const current = fs.querySelector('input:checked')?.value || fs.dataset.initial || '';
+    fs.dataset.initial = '';
     const fits = course.options.filter(o => diets.every(d => o.diets && d in o.diets));
-    sel.innerHTML = '<option value="">Choose…</option>' + fits.map(o => {
-      // e.g. "(gluten-free on request)" when the sheet cell holds a note rather than "x"
-      const notes = diets.filter(d => o.diets[d]).map(d => d.toLowerCase() + ' ' + o.diets[d]);
-      return `<option value="${esc(o.option)}">${esc(o.option)}${o.description ? ' — ' + esc(o.description) : ''}${notes.length ? ' (' + esc(notes.join(', ')) + ')' : ''}</option>`;
+    const name = `p${idx}-c${fs.dataset.ci}`;
+    fs.querySelector('.dishes').innerHTML = fits.map((o, oi) => {
+      // e.g. "✓ Vegetarian · ✓ Gluten-free (on request)" for the diets this guest ticked
+      const tags = diets.map(d => '✓ ' + esc(d) + (o.diets[d] ? ' (' + esc(o.diets[d]) + ')' : '')).join(' · ');
+      return `<label class="dish">
+        <input type="radio" name="${name}" value="${esc(o.option)}" ${o.option === current ? 'checked' : ''} ${attending && oi === 0 ? 'required' : ''}>
+        <span><strong>${esc(o.option)}</strong>
+          ${o.description ? `<span class="desc">${esc(o.description)}</span>` : ''}
+          ${tags ? `<span class="tags">${tags}</span>` : ''}</span>
+      </label>`;
     }).join('');
-    if (fits.some(o => o.option === current)) sel.value = current;
-    show(sel, fits.length > 0);
-    show(div.querySelector('.none-fit'), fits.length === 0);
-    sel.required = attending && fits.length > 0;
+    show(fs.querySelector('.none-fit'), fits.length === 0);
   });
 }
 
 function wirePerson(el) {
   const meal = el.querySelector('.meal');
-  el.querySelectorAll('input[type=radio]').forEach(r => r.addEventListener('change', () => {
-    show(meal, el.querySelector('input[type=radio]:checked')?.value === 'yes');
+  el.querySelectorAll('input.att').forEach(r => r.addEventListener('change', () => {
+    show(meal, el.querySelector('input.att:checked')?.value === 'yes');
     refreshOptions(el);
   }));
   el.querySelectorAll('.pdiet-tick').forEach(c => c.addEventListener('change', () => refreshOptions(el)));
@@ -229,7 +251,7 @@ function renderForm() {
       const body = wrap.querySelector('.po-body');
       const toggle = wrap.querySelector('.po-toggle');
       const setReq = () => body.querySelectorAll('input,select').forEach(i => { if (!toggle.checked) i.disabled = true; else i.disabled = false; });
-      toggle.addEventListener('change', () => { show(body, toggle.checked); setReq(); });
+      toggle.addEventListener('change', () => { show(body, toggle.checked); setReq(); refreshOptions(body.querySelector('.person')); });
       setReq();
     }
   }
@@ -272,16 +294,17 @@ function collect() {
   const people = [];
   document.querySelectorAll('.person').forEach(el => {
     if (el.closest('.po-body.hidden')) return; // plus-one not ticked
-    const attending = el.querySelector('input[type=radio]:checked')?.value === 'yes';
+    const attending = el.querySelector('input.att:checked')?.value === 'yes';
+    const diets = attending ? tickedDiets(el) : [];
     const courses = {};
-    el.querySelectorAll('select[data-course]').forEach(s => courses[s.dataset.course] = attending ? s.value : '');
+    el.querySelectorAll('.course').forEach(fs => courses[fs.dataset.course] = attending ? (fs.querySelector('input:checked')?.value || '') : '');
     people.push({
       guest_name: el.querySelector('.pname').value.trim(),
       is_plus_one: el.dataset.plusOne === 'true',
       attending,
       courses,
-      diets: attending ? tickedDiets(el) : [],
-      dietary: attending ? (el.querySelector('.pdiet')?.value.trim() || '') : ''
+      diets,
+      dietary: diets.includes(OTHER) ? el.querySelector('.pdiet').value.trim() : ''
     });
   });
   const roomVal = document.querySelector('input[name=room]:checked')?.value;
@@ -295,7 +318,7 @@ function collect() {
 
 function renderSummary(payload) {
   const rows = payload.people.map(p => `<dt>${esc(p.guest_name)}</dt><dd>${p.attending
-    ? 'Attending · ' + [...p.diets, ...Object.values(p.courses).filter(Boolean), p.dietary].filter(Boolean).map(esc).join(' · ')
+    ? 'Attending · ' + [...p.diets.filter(d => d !== OTHER), ...Object.values(p.courses).filter(Boolean), p.dietary].filter(Boolean).map(esc).join(' · ')
     : 'Not attending'}</dd>`);
   if (state.invite.room) rows.push(`<dt>${esc(state.invite.room.name)}</dt><dd>${payload.room_accepted ? 'Yes please' : 'No thanks'}</dd>`);
   $('summary').innerHTML = rows.join('');

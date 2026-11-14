@@ -62,15 +62,17 @@ function doPost(e) {
 
     var now = new Date();
     var rows = people.map(function (p) {
-      var diets = (Array.isArray(p.diets) ? p.diets : []).filter(function (d) { return menu.diets.indexOf(d) !== -1; });
+      var ticked = (Array.isArray(p.diets) ? p.diets : []);
+      var diets = ticked.filter(function (d) { return menu.diets.indexOf(d) !== -1; }); // these filter dishes
+      var hasOther = ticked.indexOf('Other') !== -1; // free-text requirement in dietary_notes
       var rec = {
         updated_at: now,
         code: code,
         guest_name: String(p.guest_name || '').slice(0, 100),
         is_plus_one: p.is_plus_one ? 'yes' : 'no',
         attending: p.attending ? 'yes' : 'no',
-        diets: p.attending ? diets.join(', ') : '',
-        dietary_notes: p.attending ? String(p.dietary || '').slice(0, 500) : '',
+        diets: p.attending ? diets.concat(hasOther ? ['Other'] : []).join(', ') : '',
+        dietary_notes: p.attending && hasOther ? String(p.dietary || '').slice(0, 500) : '',
         room_accepted: roomAccepted,
         message: String(body.message || '').slice(0, 2000)
       };
