@@ -43,6 +43,11 @@
   .nb-row { padding:8px 0; border-top:1px solid var(--line); }
   .nb-row .nb-name { display:block; font-weight:bold; font-size:.95rem; }
   .nb-row.invalid { outline-offset:2px; }
+  .loading { display:flex; align-items:center; gap:12px; color:var(--muted); padding:18px 0; }
+  .spinner { width:22px; height:22px; border:3px solid var(--line); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; flex:0 0 auto; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  #loading-text { animation:fadein .4s ease; }
+  @keyframes fadein { from { opacity:0; } }
   .row { display:flex; gap:10px; }
   .row > * { flex:1; }
   dl { margin:0; } dt { font-weight:bold; margin-top:8px; } dd { margin:0; }
@@ -74,7 +79,10 @@
       <div id="code-error" class="error hidden"></div>
     </form>
 
-    <div id="loading" class="muted hidden">Loading your invite…</div>
+    <div id="loading" class="loading hidden" role="status">
+      <span class="spinner" aria-hidden="true"></span>
+      <span id="loading-text">Finding your invite…</span>
+    </div>
 
     <!-- Step 2: RSVP form -->
     <form id="rsvp-form" class="hidden" novalidate>
@@ -424,10 +432,30 @@ function renderSummary(payload) {
   $('summary').innerHTML = rows.join('');
 }
 
+const LOADING_MESSAGES = [
+  [0, 'Finding your invite…'],
+  [2500, 'Fetching the menu…'],
+  [5000, 'Nearly there…'],
+  [9000, 'Still going, thanks for your patience…']
+];
+let loadingTimers = [];
+function setLoading(on) {
+  loadingTimers.forEach(clearTimeout);
+  loadingTimers = [];
+  show($('loading'), on);
+  if (!on) return;
+  LOADING_MESSAGES.forEach(([ms, text]) => loadingTimers.push(setTimeout(() => {
+    const el = $('loading-text');
+    el.textContent = text;
+    el.style.animation = 'none'; el.offsetHeight; el.style.animation = ''; // replay fade-in
+  }, ms)));
+}
+
 async function loadInvite(code) {
   code = code.trim().toUpperCase();
   show($('code-error'), false);
-  show($('loading'), true);
+  show($('code-form'), false);
+  setLoading(true);
   try {
     const data = await apiGet(code);
     if (!data.ok) {
@@ -448,7 +476,7 @@ async function loadInvite(code) {
     show($('code-error'), true);
     show($('code-form'), true);
   } finally {
-    show($('loading'), false);
+    setLoading(false);
   }
 }
 
