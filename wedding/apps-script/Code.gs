@@ -23,9 +23,8 @@
 
 var SHEET_ID = '1iSff6rU6AE22U6UkYPWBx9CT-mmakGh4iSF3ndRP8QI';
 
-// Who gets an email when someone RSVPs or changes their RSVP. Leave empty to email just the
-// account that deployed the script. Add more addresses, e.g. ['you@gmail.com', 'annie@example.com'].
-var NOTIFY_EMAILS = [];
+// Who gets an email when someone RSVPs: set in the sheet's "Settings" tab (row "notify_emails",
+// comma-separated). Kept in the sheet rather than here because this file is public on GitHub.
 var FIXED_RESPONSE_COLS = ['updated_at', 'code', 'guest_name', 'is_plus_one', 'attending', 'diets'];
 var TRAILING_RESPONSE_COLS = ['dietary_notes', 'room_accepted', 'message', 'night_before'];
 
@@ -268,8 +267,8 @@ function deleteRowsForCode_(sheet, header, code) {
 /** Email a summary of the RSVP. Never lets an email problem stop the RSVP being saved. */
 function notify_(invite, header, rows, isUpdate, menu) {
   try {
-    var to = NOTIFY_EMAILS.length ? NOTIFY_EMAILS.join(',') : Session.getEffectiveUser().getEmail();
-    if (!to) return;
+    var to = setting_('notify_emails');
+    if (!to) { console.warn('No notify_emails set in the Settings tab, so no RSVP email was sent.'); return; }
     var col = function (row, name) { var i = header.indexOf(name); return i > -1 ? String(row[i] || '') : ''; };
     var lines = rows.map(function (r) {
       var name = col(r, 'guest_name') + (col(r, 'is_plus_one') === 'yes' ? ' (plus-one)' : '');
@@ -294,6 +293,17 @@ function notify_(invite, header, rows, isUpdate, menu) {
   } catch (err) {
     console.error('RSVP notification failed: ' + err);
   }
+}
+
+/** Reads a value from the Settings tab (column A = name, column B = value). */
+function setting_(name) {
+  var sheet = ss_().getSheetByName('Settings');
+  if (!sheet) return '';
+  var rows = sheet.getDataRange().getValues();
+  for (var i = 0; i < rows.length; i++) {
+    if (String(rows[i][0]).trim().toLowerCase() === name) return String(rows[i][1] || '').trim();
+  }
+  return '';
 }
 
 /** Run this once from the Apps Script editor to check emails arrive (and to grant the email permission). */
