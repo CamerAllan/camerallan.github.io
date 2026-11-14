@@ -4,70 +4,100 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Partner A &amp; Partner B — Wedding</title>
+<title>Cameron &amp; Annie — 12.06.27</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Pinyon+Script&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <style>
-  :root { --ink:#222; --muted:#6b6b6b; --line:#ddd; --accent:#5a6b4f; --bg:#fdfcfa; }
+  /* Palette and type taken from the save the date */
+  :root {
+    --red:#7f1110; --cream:#fdfef4; --paper:#fffffa;
+    --ink:#3a1514; --muted:#8a5a58; --line:rgba(127,17,16,.22); --tint:rgba(127,17,16,.05);
+    --accent:var(--red); --warn:#b4531a;
+    --display:"Playfair Display", Georgia, serif;
+    --script:"Pinyon Script", cursive;
+    --body:"EB Garamond", Georgia, serif;
+  }
   * { box-sizing:border-box; }
-  body { margin:0; font:17px/1.55 Georgia, "Times New Roman", serif; color:var(--ink); background:var(--bg); }
-  main { max-width:640px; margin:0 auto; padding:48px 20px 80px; }
-  header { text-align:center; margin-bottom:40px; }
-  h1 { font-weight:normal; font-size:2.2rem; margin:0 0 8px; letter-spacing:.02em; }
-  h2 { font-weight:normal; font-size:1.4rem; margin:40px 0 12px; border-bottom:1px solid var(--line); padding-bottom:6px; }
-  h3 { font-size:1.05rem; margin:0 0 10px; }
+  html { background:var(--cream); }
+  body { margin:0; font:19px/1.55 var(--body); color:var(--ink); background:var(--cream); accent-color:var(--red); }
+  /* thin frame around the page, like the card */
+  body::before { content:""; position:fixed; inset:10px; border:2px solid var(--red); pointer-events:none; z-index:10; }
+  main { max-width:620px; margin:0 auto; padding:56px 28px 90px; }
+
+  header { text-align:center; margin-bottom:48px; color:var(--red); }
+  header .eyebrow { font:700 clamp(2rem, 8vw, 3rem)/1 var(--display); letter-spacing:.01em; margin:0 0 28px; }
+  header img { width:110px; height:auto; display:block; margin:0 auto 26px; }
+  h1 { font:400 clamp(2.4rem, 10vw, 3.4rem)/1.1 var(--script); margin:0 0 10px; }
+  .date { font:700 clamp(1.8rem, 7vw, 2.4rem)/1 var(--display); display:flex; justify-content:center; align-items:center; gap:14px; margin:0 0 10px; }
+  .date i { width:1px; height:1.1em; background:var(--red); display:inline-block; }
+  .venue { font:700 1.35rem/1.2 var(--display); }
+
+  h2 { font:700 1.5rem/1.2 var(--display); color:var(--red); text-transform:uppercase; letter-spacing:.04em; text-align:center; margin:56px 0 18px; }
+  h3 { font:700 1.1rem/1.3 var(--display); color:var(--red); margin:0 0 10px; }
+  section > p { text-align:center; }
   .muted { color:var(--muted); }
-  .card { border:1px solid var(--line); border-radius:6px; padding:18px; margin:14px 0; background:#fff; }
-  label { display:block; margin:10px 0 4px; font-size:.92rem; }
-  input[type=text], select, textarea { width:100%; padding:9px 10px; font:inherit; font-size:.95rem; border:1px solid #ccc; border-radius:4px; background:#fff; }
-  textarea { min-height:80px; resize:vertical; }
-  .choices { display:flex; gap:18px; flex-wrap:wrap; }
-  .choices label { display:flex; align-items:center; gap:6px; margin:4px 0; font-size:1rem; }
-  button { font:inherit; padding:10px 22px; border:0; border-radius:4px; background:var(--accent); color:#fff; cursor:pointer; }
-  button.secondary { background:none; color:var(--accent); border:1px solid var(--accent); }
+  .card { border:1px solid var(--line); padding:20px; margin:16px 0; background:var(--paper); }
+  label { display:block; margin:12px 0 4px; font-size:1rem; }
+  input[type=text], select, textarea { width:100%; padding:10px 12px; font:inherit; font-size:1rem; color:var(--ink); border:1px solid var(--line); border-radius:0; background:#fff; }
+  input[type=text]:focus, textarea:focus { outline:2px solid var(--red); outline-offset:-1px; }
+  textarea { min-height:90px; resize:vertical; }
+  .choices { display:flex; gap:20px; flex-wrap:wrap; }
+  .choices label { display:flex; align-items:center; gap:8px; margin:4px 0; }
+  button { font:700 .95rem/1 var(--display); text-transform:uppercase; letter-spacing:.08em; padding:14px 26px; border:0; border-radius:0; background:var(--red); color:var(--cream); cursor:pointer; }
+  button.secondary { background:none; color:var(--red); border:1px solid var(--red); }
   button:disabled { opacity:.6; cursor:wait; }
-  .room img { width:100%; aspect-ratio:3/2; object-fit:cover; border-radius:4px; display:block; margin-bottom:12px; background:#eee; }
-  .error { color:#a33; margin:10px 0; }
+  #submit-btn { display:block; width:100%; }
+  .room img { width:100%; aspect-ratio:3/2; object-fit:cover; display:block; margin-bottom:14px; background:var(--tint); }
+  .error { color:var(--warn); margin:10px 0; }
   .hidden { display:none !important; }
-  .stack label { display:flex; align-items:center; gap:8px; margin:6px 0; font-size:1rem; }
-  fieldset.course { border:0; padding:0; margin:16px 0 0; }
-  fieldset.course legend { font-size:.92rem; padding:0; margin-bottom:6px; }
-  .dish { display:flex; gap:10px; align-items:flex-start; border:1px solid var(--line); border-radius:4px; padding:10px 12px; margin:6px 0; cursor:pointer; }
-  .dish input { margin-top:5px; }
-  .dish:has(input:checked) { border-color:var(--accent); background:#f4f6f1; }
-  .dish .desc { display:block; font-size:.9rem; color:var(--muted); }
-  .dish .tags { display:block; font-size:.85rem; color:var(--accent); margin-top:2px; }
-  .none-fit { margin:4px 0 0; font-size:.9rem; }
-  .invalid { outline:2px solid #c0392b; outline-offset:4px; border-radius:4px; }
-  .notice { border:1px solid #e3b4b4; background:#fbeeee; color:#7a2020; padding:12px 16px; border-radius:6px; margin:14px 0; }
+  .stack label { display:flex; align-items:center; gap:10px; margin:6px 0; }
+  fieldset.course { border:0; padding:0; margin:18px 0 0; }
+  fieldset.course legend { font:700 .85rem/1 var(--display); text-transform:uppercase; letter-spacing:.08em; color:var(--red); padding:0; margin-bottom:8px; }
+  .dish { display:flex; gap:12px; align-items:flex-start; border:1px solid var(--line); padding:12px 14px; margin:8px 0; cursor:pointer; background:#fff; }
+  .dish input { margin-top:6px; }
+  .dish:has(input:checked) { border-color:var(--red); background:var(--tint); box-shadow:inset 3px 0 0 var(--red); }
+  .dish strong { font-family:var(--display); font-weight:700; color:var(--red); font-size:1rem; }
+  .dish .desc { display:block; font-size:.95rem; color:var(--muted); }
+  .dish .tags { display:block; font-size:.9rem; font-style:italic; color:var(--red); margin-top:2px; }
+  .none-fit { margin:4px 0 0; font-size:.95rem; font-style:italic; }
+  .invalid { outline:2px dashed var(--warn); outline-offset:4px; }
+  .notice { border:1px solid var(--warn); border-left-width:4px; background:#fdf3ea; color:#7a3510; padding:14px 18px; margin:16px 0; }
   .notice ul { margin:6px 0 0; padding-left:20px; }
   .notice a { color:inherit; }
-  .nb-row { padding:8px 0; border-top:1px solid var(--line); }
-  .nb-row .nb-name { display:block; font-weight:bold; font-size:.95rem; }
+  .nb-row { padding:10px 0; border-top:1px solid var(--line); }
+  .nb-row .nb-name { display:block; font-weight:600; }
   .nb-row.invalid { outline-offset:2px; }
-  .loading { display:flex; align-items:center; gap:12px; color:var(--muted); padding:18px 0; }
-  .spinner { width:22px; height:22px; border:3px solid var(--line); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; flex:0 0 auto; }
+  .loading { display:flex; align-items:center; justify-content:center; gap:12px; color:var(--muted); font-style:italic; padding:22px 0; }
+  .spinner { width:22px; height:22px; border:2px solid var(--line); border-top-color:var(--red); border-radius:50%; animation:spin .8s linear infinite; flex:0 0 auto; }
   @keyframes spin { to { transform:rotate(360deg); } }
   #loading-text { animation:fadein .4s ease; }
   @keyframes fadein { from { opacity:0; } }
   .row { display:flex; gap:10px; }
   .row > * { flex:1; }
-  dl { margin:0; } dt { font-weight:bold; margin-top:8px; } dd { margin:0; }
+  #code-input { text-transform:uppercase; letter-spacing:.1em; }
+  dl { margin:0; } dt { font:700 1rem/1.3 var(--display); color:var(--red); margin-top:12px; } dd { margin:0; }
+  .script-sign { font:400 1.6rem/1 var(--script); color:var(--red); text-align:center; margin-top:56px; }
 </style>
 </head>
 <body>
 <main>
   <header>
-    <h1>Partner A &amp; Partner B</h1>
-    <div class="muted">Saturday 5 September 2027 · The Venue, Somewhere</div>
+    <p class="eyebrow">You're invited</p>
+    <img src="glass.png" alt="">
+    <h1>Cameron &amp; Annie</h1>
+    <p class="date">12 <i></i> 06 <i></i> 27</p>
+    <div class="venue">at Rowallan Castle</div>
   </header>
 
   <section>
     <h2>The day</h2>
-    <p>Placeholder details: ceremony at 2pm, drinks and canapés on the lawn, dinner at 5pm, dancing until late.</p>
+    <p>Saturday 12 June 2027 at Rowallan Castle.<br>Placeholder: ceremony at 2pm, drinks and canapés, dinner at 5pm, dancing until late.</p>
   </section>
 
   <section id="rsvp">
     <h2>RSVP</h2>
-    <p class="muted">Please reply by 1 June 2027.</p>
+    <p class="muted">Please reply by [date TBC].</p>
 
     <!-- Step 1: enter code -->
     <form id="code-form" class="card">
@@ -106,6 +136,7 @@
       <button type="button" class="secondary" id="edit-btn">Change my answers</button>
     </div>
   </section>
+  <p class="script-sign">Cameron &amp; Annie</p>
 </main>
 
 <script>
@@ -117,8 +148,8 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxII2fMqqJvL2AdopDELxpD
 const DEMO = {
   invites: {
     DEMO01: { code:'DEMO01', guests:['Alex Smith','Jamie Smith'], plusOnesAllowed:0,
-      room:{ name:'The Garden Suite', description:'Ground-floor suite opening onto the walled garden.', nights:'Fri 4 – Sun 6 Sept', image:'rooms/garden.svg' },
-      nightBefore:{ title:'Night-before party', when:'Friday 4 September 2027, from 7pm', where:'Placeholder pub, Somewhere', details:'Casual drinks and food.' } },
+      room:{ name:'The Garden Suite', description:'Ground-floor suite opening onto the walled garden.', nights:'Fri 11 – Sun 13 June', image:'rooms/garden.svg' },
+      nightBefore:{ title:'Night-before party', when:'Friday 11 June 2027, from 7pm', where:'Placeholder pub, Somewhere', details:'Casual drinks and food.' } },
     DEMO02: { code:'DEMO02', guests:['Sam Jones'], plusOnesAllowed:1, room:null }
   },
   menu:{ diets:['Vegan','Vegetarian','Gluten-free'], courses:[
