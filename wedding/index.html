@@ -94,10 +94,16 @@ const DEMO = {
       room:{ name:'The Garden Suite', description:'Ground-floor suite opening onto the walled garden.', nights:'Fri 4 – Sun 6 Sept', image:'rooms/garden.svg' } },
     DEMO02: { code:'DEMO02', guests:['Sam Jones'], plusOnesAllowed:1, room:null }
   },
-  menu:{ courses:[
-    { name:'Starter', options:[{option:'Soup',description:'Seasonal soup (v)'},{option:'Salmon',description:'Smoked salmon, dill crème fraîche'}] },
-    { name:'Main', options:[{option:'Beef',description:'Roast sirloin'},{option:'Chicken',description:'Chicken supreme'},{option:'Risotto',description:'Pea & mint risotto (v)'}] },
-    { name:'Dessert', options:[{option:'Tart',description:'Lemon tart'},{option:'Brownie',description:'Chocolate brownie'},{option:'Cheese',description:'Cheese board'}] }
+  menu:{ diets:['Vegetarian','Pescatarian','Gluten-free'], courses:[
+    { name:'Starter', options:[
+      {option:'Scottish Salmon Three Ways',description:'Heritage Beetroot',diets:{Pescatarian:'','Gluten-free':'on request'}},
+      {option:'Goats Cheese Arancini',description:'Rocket & Red Onion | Beetroot',diets:{Vegetarian:'',Pescatarian:'','Gluten-free':'on request'}}] },
+    { name:'Main', options:[
+      {option:'Sticky Pulled Beef Shin',description:'Beer Braised Shallot | Creamed Potato | Tender Stem | Beef Jus',diets:{'Gluten-free':''}},
+      {option:'Chicken Balmoral Roulade',description:'Creamed Potato | Glazed Carrot | Whisky Sauce',diets:{}}] },
+    { name:'Dessert', options:[
+      {option:'Rowallan Bakery Sticky Toffee Pudding',description:'Vanilla Ice Cream | Toffee Sauce',diets:{}},
+      {option:'Blueberry Bakewell Tart',description:'Lavender Anglaise | Madagascan Vanilla Ice Cream',diets:{}}] }
   ]},
   saved:{}
 };
@@ -117,7 +123,7 @@ async function apiPost(payload) {
     await new Promise(r => setTimeout(r, 300));
     DEMO.saved[payload.code] = payload.people.map(p => ({
       guest_name:p.guest_name, is_plus_one:p.is_plus_one?'yes':'no', attending:p.attending?'yes':'no',
-      dietary:p.dietary, room_accepted: payload.room_accepted===true?'yes':payload.room_accepted===false?'no':'',
+      diets:p.diets.join(', '), dietary_notes:p.dietary, room_accepted: payload.room_accepted===true?'yes':payload.room_accepted===false?'no':'',
       message: payload.message, ...p.courses }));
     return { ok:true };
   }
@@ -132,13 +138,19 @@ const show = (el, on=true) => el.classList.toggle('hidden', !on);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let state = null; // { invite, menu, existing }
 
+const splitList = s => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
+
 function personBlock(idx, name, isPlusOne, existing) {
-  const courses = state.menu.courses.map(c => `
-    <label for="p${idx}-${esc(c.name)}">${esc(c.name)}</label>
-    <select id="p${idx}-${esc(c.name)}" data-course="${esc(c.name)}" required>
-      <option value="">Choose…</option>
-      ${c.options.map(o => `<option value="${esc(o.option)}" ${existing && existing[c.name]===o.option?'selected':''}>${esc(o.option)}${o.description?' — '+esc(o.description):''}</option>`).join('')}
-    </select>`).join('');
+  const ticked = splitList(existing?.diets);
+  const diets = (state.menu.diets || []).map(d => `
+      <label><input type="checkbox" class="pdiet-tick" value="${esc(d)}" ${ticked.includes(d)?'checked':''}> ${esc(d)}</label>`).join('');
+  // Options are filled in by refreshOptions() so they can be filtered by the ticked diets.
+  const courses = state.menu.courses.map((c, ci) => `
+    <div class="course" data-ci="${ci}">
+      <label for="p${idx}-c${ci}">${esc(c.name)}</label>
+      <select id="p${idx}-c${ci}" data-course="${esc(c.name)}" data-initial="${esc(existing?.[c.name])}"></select>
+      <p class="muted none-fit hidden" style="margin:4px 0 0;font-size:.9rem">None of our ${esc(c.name.toLowerCase())} options suit those requirements yet. We'll speak to the venue and be in touch.</p>
+    </div>`).join('');
   const att = existing ? existing.attending : '';
   return `
   <div class="card person" data-idx="${idx}" data-plus-one="${isPlusOne}">
@@ -150,22 +162,48 @@ function personBlock(idx, name, isPlusOne, existing) {
       <label><input type="radio" name="att${idx}" value="no" ${att==='no'?'checked':''}> Regretfully declines</label>
     </div>
     <div class="meal ${att==='yes'?'':'hidden'}">
+      ${diets ? `<label>Dietary requirements (we'll only show dishes that suit)</label><div class="choices">${diets}</div>` : ''}
+      <label for="p${idx}-diet">Allergies or anything else the kitchen should know</label>
+      <input type="text" id="p${idx}-diet" class="pdiet" maxlength="500" value="${esc(existing?.dietary_notes)}">
       ${courses}
-      <label for="p${idx}-diet">Dietary requirements or allergies</label>
-      <input type="text" id="p${idx}-diet" class="pdiet" maxlength="500" value="${esc(existing?.dietary)}">
     </div>
   </div>`;
+}
+
+function tickedDiets(el) {
+  return [...el.querySelectorAll('.pdiet-tick:checked')].map(c => c.value);
+}
+
+/** Rebuild each course dropdown to show only dishes that suit every ticked diet. */
+function refreshOptions(el) {
+  const attending = el.querySelector('input[type=radio]:checked')?.value === 'yes';
+  const diets = tickedDiets(el);
+  el.querySelectorAll('.course').forEach(div => {
+    const course = state.menu.courses[div.dataset.ci];
+    const sel = div.querySelector('select');
+    const current = sel.value || sel.dataset.initial || '';
+    sel.dataset.initial = '';
+    const fits = course.options.filter(o => diets.every(d => o.diets && d in o.diets));
+    sel.innerHTML = '<option value="">Choose…</option>' + fits.map(o => {
+      // e.g. "(gluten-free on request)" when the sheet cell holds a note rather than "x"
+      const notes = diets.filter(d => o.diets[d]).map(d => d.toLowerCase() + ' ' + o.diets[d]);
+      return `<option value="${esc(o.option)}">${esc(o.option)}${o.description ? ' — ' + esc(o.description) : ''}${notes.length ? ' (' + esc(notes.join(', ')) + ')' : ''}</option>`;
+    }).join('');
+    if (fits.some(o => o.option === current)) sel.value = current;
+    show(sel, fits.length > 0);
+    show(div.querySelector('.none-fit'), fits.length === 0);
+    sel.required = attending && fits.length > 0;
+  });
 }
 
 function wirePerson(el) {
   const meal = el.querySelector('.meal');
   el.querySelectorAll('input[type=radio]').forEach(r => r.addEventListener('change', () => {
-    const on = el.querySelector('input[type=radio]:checked')?.value === 'yes';
-    show(meal, on);
-    meal.querySelectorAll('select').forEach(s => s.required = on);
+    show(meal, el.querySelector('input[type=radio]:checked')?.value === 'yes');
+    refreshOptions(el);
   }));
-  const on = el.querySelector('input[type=radio]:checked')?.value === 'yes';
-  meal.querySelectorAll('select').forEach(s => s.required = on);
+  el.querySelectorAll('.pdiet-tick').forEach(c => c.addEventListener('change', () => refreshOptions(el)));
+  refreshOptions(el);
 }
 
 function renderForm() {
@@ -242,6 +280,7 @@ function collect() {
       is_plus_one: el.dataset.plusOne === 'true',
       attending,
       courses,
+      diets: attending ? tickedDiets(el) : [],
       dietary: attending ? (el.querySelector('.pdiet')?.value.trim() || '') : ''
     });
   });
@@ -256,7 +295,7 @@ function collect() {
 
 function renderSummary(payload) {
   const rows = payload.people.map(p => `<dt>${esc(p.guest_name)}</dt><dd>${p.attending
-    ? 'Attending · ' + Object.values(p.courses).filter(Boolean).map(esc).join(' · ') + (p.dietary ? ' · ' + esc(p.dietary) : '')
+    ? 'Attending · ' + [...p.diets, ...Object.values(p.courses).filter(Boolean), p.dietary].filter(Boolean).map(esc).join(' · ')
     : 'Not attending'}</dd>`);
   if (state.invite.room) rows.push(`<dt>${esc(state.invite.room.name)}</dt><dd>${payload.room_accepted ? 'Yes please' : 'No thanks'}</dd>`);
   $('summary').innerHTML = rows.join('');
@@ -302,7 +341,7 @@ $('rsvp-form').addEventListener('submit', async e => {
     const res = await apiPost(payload);
     if (!res.ok) throw new Error(res.error);
     state.existing = payload.people.map(p => ({ ...p.courses, guest_name:p.guest_name, is_plus_one:p.is_plus_one?'yes':'no',
-      attending:p.attending?'yes':'no', dietary:p.dietary,
+      attending:p.attending?'yes':'no', diets:p.diets.join(', '), dietary_notes:p.dietary,
       room_accepted: payload.room_accepted===true?'yes':payload.room_accepted===false?'no':'', message:payload.message }));
     renderSummary(payload);
     show($('rsvp-form'), false);

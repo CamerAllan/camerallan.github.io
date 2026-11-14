@@ -4,7 +4,9 @@
  * Tabs:
  *   Guests     code | guest_names (comma-separated) | plus_ones_allowed | room_id | notes (private)
  *   Rooms      room_id | name | description | nights | image
- *   Menu       course | option | description
+ *   Menu       course | option | description | <one column per dietary requirement, e.g. Vegetarian | Gluten-free ...>
+ *              Mark a dish "x" if it suits that requirement. Any other text (e.g. "on request") also counts as
+ *              suitable and is shown to guests next to the dish. Guests only see dishes that suit everything they tick.
  *   Responses  written by this script, one row per person (re-submitting replaces that invite's rows)
  *
  * Deploy: Deploy → New deployment → Web app → Execute as: Me, Who has access: Anyone.
@@ -12,8 +14,8 @@
  */
 
 var SHEET_ID = '1iSff6rU6AE22U6UkYPWBx9CT-mmakGh4iSF3ndRP8QI';
-var FIXED_RESPONSE_COLS = ['updated_at', 'code', 'guest_name', 'is_plus_one', 'attending'];
-var TRAILING_RESPONSE_COLS = ['dietary', 'room_accepted', 'message'];
+var FIXED_RESPONSE_COLS = ['updated_at', 'code', 'guest_name', 'is_plus_one', 'attending', 'diets'];
+var TRAILING_RESPONSE_COLS = ['dietary_notes', 'room_accepted', 'message'];
 
 function doGet(e) {
   try {
@@ -60,19 +62,23 @@ function doPost(e) {
 
     var now = new Date();
     var rows = people.map(function (p) {
+      var diets = (Array.isArray(p.diets) ? p.diets : []).filter(function (d) { return menu.diets.indexOf(d) !== -1; });
       var rec = {
         updated_at: now,
         code: code,
         guest_name: String(p.guest_name || '').slice(0, 100),
         is_plus_one: p.is_plus_one ? 'yes' : 'no',
         attending: p.attending ? 'yes' : 'no',
-        dietary: String(p.dietary || '').slice(0, 500),
+        diets: p.attending ? diets.join(', ') : '',
+        dietary_notes: p.attending ? String(p.dietary || '').slice(0, 500) : '',
         room_accepted: roomAccepted,
         message: String(body.message || '').slice(0, 2000)
       };
       menu.courses.forEach(function (c) {
         var choice = p.attending && p.courses ? p.courses[c.name] : '';
-        var valid = c.options.some(function (o) { return o.option === choice; });
+        var valid = c.options.some(function (o) {
+          return o.option === choice && diets.every(function (d) { return o.diets.hasOwnProperty(d); });
+        });
         rec[c.name] = valid ? choice : '';
       });
       return header.map(function (h) { return rec.hasOwnProperty(h) ? rec[h] : ''; });
@@ -137,17 +143,28 @@ function publicInvite_(inv) {
   };
 }
 
+/** Menu: first three columns are course/option/description; every later column is a dietary requirement. */
 function readMenu_() {
+  var values = ss_().getSheetByName('Menu').getDataRange().getValues();
+  var header = values.shift().map(function (h) { return String(h).trim(); });
+  var dietCols = [];
+  for (var i = 3; i < header.length; i++) if (header[i]) dietCols.push({ idx: i, name: header[i] });
+
   var courses = [];
   var byName = {};
-  rows_('Menu').forEach(function (r) {
-    var name = String(r.course || '').trim();
-    var option = String(r.option || '').trim();
+  values.forEach(function (r) {
+    var name = String(r[0] || '').trim();
+    var option = String(r[1] || '').trim();
     if (!name || !option) return;
+    var diets = {}; // diet name -> note ('' when simply marked "x")
+    dietCols.forEach(function (d) {
+      var cell = String(r[d.idx] || '').trim();
+      if (cell) diets[d.name] = cell.toLowerCase() === 'x' ? '' : cell;
+    });
     if (!byName[name]) { byName[name] = { name: name, options: [] }; courses.push(byName[name]); }
-    byName[name].options.push({ option: option, description: String(r.description || '') });
+    byName[name].options.push({ option: option, description: String(r[2] || ''), diets: diets });
   });
-  return { courses: courses };
+  return { diets: dietCols.map(function (d) { return d.name; }), courses: courses };
 }
 
 function readExisting_(code) {
