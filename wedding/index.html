@@ -13,7 +13,7 @@ try {
   if (!v || (c && c !== v.code)) document.documentElement.classList.add('locked');
 } catch (e) { document.documentElement.classList.add('locked'); }
 </script>
-<title>The Day · Cameron &amp; Annie</title>
+<title>Home · Cameron &amp; Annie</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,7 +21,7 @@ try {
   <header>
     <h1><a href="index.html">Cameron &amp; Annie</a></h1>
     <div class="muted"><span data-lang="en">Saturday 12 June 2027</span><span data-lang="es">Sábado, 12 de junio de 2027</span> · Rowallan Castle</div>
-    <nav class="site-nav"><a href="index.html" aria-current="page"><span data-lang="en">The Day</span><span data-lang="es">El día</span></a><a href="itinerary.html"><span data-lang="en">Your itinerary</span><span data-lang="es">Vuestro itinerario</span></a><a href="rsvp.html"><span data-lang="en">RSVP</span><span data-lang="es">Confirmar asistencia</span></a><a href="travel.html"><span data-lang="en">Travel &amp; Stay</span><span data-lang="es">Viaje y alojamiento</span></a><a href="faqs.html"><span data-lang="en">FAQs</span><span data-lang="es">Preguntas frecuentes</span></a></nav>
+    <nav class="site-nav"><a href="index.html" aria-current="page"><span data-lang="en">Home</span><span data-lang="es">Inicio</span></a><a href="itinerary.html"><span data-lang="en">Your itinerary</span><span data-lang="es">Vuestro itinerario</span></a><a href="rsvp.html"><span data-lang="en">RSVP</span><span data-lang="es">Confirmar asistencia</span></a><a href="travel.html"><span data-lang="en">Travel &amp; Stay</span><span data-lang="es">Viaje y alojamiento</span></a><a href="faqs.html"><span data-lang="en">FAQs</span><span data-lang="es">Preguntas frecuentes</span></a></nav>
     <div class="lang-switch"><a href="#" data-set-lang="es" data-lang="en" title="Ver en español" aria-label="Ver en español">🇪🇸</a><a href="#" data-set-lang="en" data-lang="es" title="View in English" aria-label="View in English">🇬🇧</a></div>
   </header>
 
@@ -30,56 +30,35 @@ try {
   <section>
     <p class="blurb"><span data-lang="en">We’re so excited to be getting married, and we can’t wait to celebrate with our favourite people.</span><span data-lang="es">Estamos muy ilusionados por casarnos y deseando celebrarlo con nuestras personas favoritas.</span></p>
     <p class="blurb"><span data-lang="en">Please RSVP by <strong>1 February 2027</strong>.</span><span data-lang="es">Por favor, confirmad vuestra asistencia antes del <strong>1 de febrero de 2027</strong>.</span></p>
-    <p style="text-align:center"><a class="btn-link" href="rsvp.html" data-keep-code><span data-lang="en">RSVP</span><span data-lang="es">Confirmar asistencia</span></a></p>
+    <p style="text-align:center"><a class="btn-link" href="rsvp.html"><span data-lang="en">RSVP</span><span data-lang="es">Confirmar asistencia</span></a></p>
   </section>
 
   <section>
-    <h2><span data-lang="en">The day</span><span data-lang="es">El día</span></h2>
-    <p><strong><span data-lang="en">Saturday 12 June 2027</span><span data-lang="es">Sábado, 12 de junio de 2027</span></strong><br><span data-lang="en">Rowallan Castle, Kilmaurs, Ayrshire, Scotland KA3 2LP</span><span data-lang="es">Rowallan Castle, Kilmaurs, Ayrshire, Escocia KA3 2LP</span></p>
+    <h2><span data-lang="en">Your events</span><span data-lang="es">Vuestros eventos</span></h2>
+    <div id="events"><div class="loading" role="status"><span class="spinner" aria-hidden="true"></span></div></div>
+    <p style="text-align:center"><a href="itinerary.html"><span data-lang="en">See your full itinerary →</span><span data-lang="es">Ver vuestro itinerario completo →</span></a></p>
   </section>
-
-  <section>
-    <h2><span data-lang="en">Timings</span><span data-lang="es">Horario</span></h2>
-    <ul class="timeline">
-      <li><span class="time"><span data-lang="en">1:00pm</span><span data-lang="es">13:00</span></span><span><span data-lang="en">Guests arrive</span><span data-lang="es">Llegada de los invitados</span></span></li>
-      <li><span class="time"><span data-lang="en">1:30pm</span><span data-lang="es">13:30</span></span><span><span data-lang="en">Ceremony</span><span data-lang="es">Ceremonia</span></span></li>
-      <li><span class="time"><span data-lang="en">1:00am</span><span data-lang="es">01:00</span></span><span><span data-lang="en">Carriages</span><span data-lang="es">Fin de la celebración</span></span></li>
-    </ul>
-  </section>
-
-  <section>
-    <h2><span data-lang="en">The venue</span><span data-lang="es">El lugar</span></h2>
-    <p><span data-lang="en">[Placeholder: a few lines about Rowallan Castle.]</span><span data-lang="es">[Texto provisional: unas líneas sobre Rowallan Castle.]</span></p>
-    <p><span data-lang="en">Rowallan Castle, Kilmaurs, Ayrshire, Scotland KA3 2LP</span><span data-lang="es">Rowallan Castle, Kilmaurs, Ayrshire, Escocia KA3 2LP</span><br><a href="https://www.google.com/maps/search/?api=1&amp;query=Rowallan+Castle+Kilmaurs+KA3+2LP" target="_blank" rel="noopener"><span data-lang="en">Open in Google Maps</span><span data-lang="es">Abrir en Google Maps</span></a></p>
-  </section>
-
-  <!-- Only filled in when the visitor's invite includes someone in the bridal party -->
-  <section id="bridal" class="hidden"></section>
 </main>
 <script src="common.js"></script>
+<script src="events.js"></script>
 <script>
-// Bridal party info: only shown if this browser has an invite code with someone in the bridal party.
-let bridalData = null;
-function renderBridal() {
-  const bp = bridalData;
-  if (!bp) return;
-  const names = bp.names.map(n => n.split(' ')[0]).join(' & ');
-  $('bridal').innerHTML = `
-    <h2>${t('bridalTitle')}</h2>
-    <div class="card bridal">
-      <p style="margin-top:0">${esc(t('bridalIntro', { names }))}</p>
-      <dl>${bp.info.map(i => `<dt>${esc(L(i, 'heading'))}</dt><dd>${esc(L(i, 'details'))}</dd>`).join('')}</dl>
-    </div>`;
-  show($('bridal'), true);
-}
-document.addEventListener('langchange', renderBridal);
-whenUnlocked(async () => {
-  try {
-    const data = await getInvite(getCode());
-    bridalData = data.ok && data.invite.bridalParty;
-    renderBridal();
-  } catch (e) { /* the rest of the page still works without it */ }
-});
+// One card per event this household is invited to: date, place, and their RSVP status.
+const PLACES = { night_before: null, wedding: 'Rowallan Castle', morning_after: 'Rowallan Castle' };
+withInvite(data => {
+  $('events').innerHTML = householdEvents(data).map(id => {
+    const rows = rowsFor(data, id);
+    const day = rows.length ? dayOf(rows[0]) : '';
+    const place = id === 'night_before' ? L(data.invite.nightBefore, 'where') : PLACES[id];
+    return `<a class="card event-card" href="${EVENTS[id].page}">
+      <span class="event-title">${esc(eventTitle(id))}</span>
+      <span class="muted">${esc([day, place].filter(Boolean).join(' · '))}</span>
+      ${rsvpStatus(EVENTS[id].status, data.existing) === 'yes' ? `<span class="status yes">✓ ${t('stYes')}</span>`
+        : rsvpStatus(EVENTS[id].status, data.existing) === 'no' ? `<span class="status no">✗ ${t('stNo')}</span>`
+        : `<span class="status todo">● ${t('stTodo')}</span>`}
+    </a>`;
+  }).join('');
+}, 'events');
 </script>
+
 </body>
 </html>

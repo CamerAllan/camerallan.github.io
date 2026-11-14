@@ -7,7 +7,8 @@
  *   Night Before   field | value  (rows: title, when, where, details). Only shown to invited households.
  *   Guests.bridal_party   names from that household who are in the bridal party (comma-separated), or "all".
  *   Bridal Party   heading | details  — only sent to households with someone in the bridal party.
- *   Itinerary      day | time | title | details | for | rsvp (+ *_es). "for" decides who sees a row
+ *   Itinerary      day | time | title | details | for | rsvp | event (+ *_es). "event" (night_before / wedding /
+ *                  morning_after) groups rows onto their event page. "for" decides who sees a row
  *                  (everyone / night_before / room / bridal_party); only matching rows are sent to a household.
  *   Rooms.price    free text, e.g. "£180 per night".
  *   Guests.room_price  optional per-household override: blank = the suite's price, "free" = no charge,
@@ -229,7 +230,7 @@ function readItinerary_(invite) {
     .filter(function (r) { return String(r.title || '').trim() && invitedTo[String(r['for'] || '').trim().toLowerCase()]; })
     .map(function (r) {
       var out = {};
-      ['day', 'time', 'title', 'details', 'rsvp', 'day_es', 'time_es', 'title_es', 'details_es'].forEach(function (k) {
+      ['day', 'time', 'title', 'details', 'rsvp', 'event', 'day_es', 'time_es', 'title_es', 'details_es'].forEach(function (k) {
         out[k] = String(r[k] == null ? '' : r[k]).trim();
       });
       return out;
