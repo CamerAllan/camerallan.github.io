@@ -63,6 +63,17 @@
 /* Language: show only the text for the current <html lang> */
 html:not([lang=es]) [data-lang=es], html[lang=es] [data-lang=en] { display:none !important; }
 .lang-switch { position:absolute; top:10px; right:14px; }
-.lang-switch a { font-size:1.6rem; line-height:1; text-decoration:none; }
+.lang-switch a { font-size:3.2rem; line-height:1; text-decoration:none !important; border:0; }
 .hero { width:100%; aspect-ratio:4/3; object-fit:cover; object-position:50% 25%; display:block; margin:0 0 24px; border-radius:6px; background:#eee; }
 .blurb { font-size:1.1rem; text-align:center; }
+
+/* RSVP steps: numbered automatically, skipping any step that's hidden for this household */
+#rsvp-form { counter-reset:step; }
+.rsvp-step { margin:32px 0 0; }
+.step-title { display:flex; align-items:center; gap:10px; font-size:1.2rem; font-weight:normal; margin:0 0 4px; }
+.rsvp-step:not(.hidden) .step-title::before { counter-increment:step; content:counter(step); display:inline-flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:50%; background:var(--accent); color:#fff; font-size:.95rem; flex:0 0 auto; }
+.who-row { padding:10px 0; border-top:1px solid var(--line); }
+.who-row:first-child { border-top:0; padding-top:0; }
+.who-row .who-name { display:block; font-weight:bold; }
+.meals-empty { margin:6px 0 0; }

@@ -39,12 +39,27 @@
     <!-- Step 2: RSVP form -->
     <form id="rsvp-form" class="hidden" novalidate>
       <p id="greeting"></p>
-      <div id="people"></div>
-      <div id="plus-ones"></div>
-      <div id="night-before" class="hidden"></div>
-      <div id="room" class="hidden"></div>
-      <label for="message"><span data-lang="en">Anything else we should know? (optional)</span><span data-lang="es">¿Algo más que debamos saber? (opcional)</span></label>
-      <textarea id="message" maxlength="2000"></textarea>
+
+      <section class="rsvp-step" id="step-who">
+        <h3 class="step-title" id="title-who"></h3>
+        <div class="card" id="who"></div>
+      </section>
+
+      <section class="rsvp-step" id="step-meals">
+        <h3 class="step-title" id="title-meals"></h3>
+        <div id="meals"></div>
+      </section>
+
+      <!-- Only for households invited to the night-before party / offered a room -->
+      <section class="rsvp-step hidden" id="night-before"></section>
+      <section class="rsvp-step hidden" id="room"></section>
+
+      <section class="rsvp-step" id="step-message">
+        <h3 class="step-title"><span data-lang="en">Anything else?</span><span data-lang="es">¿Algo más?</span></h3>
+        <label for="message" class="muted" style="margin-top:0"><span data-lang="en">Anything we should know (optional)</span><span data-lang="es">Cualquier cosa que debamos saber (opcional)</span></label>
+        <textarea id="message" maxlength="2000"></textarea>
+      </section>
+
       <div id="form-notice" class="notice hidden" role="alert"></div>
       <div id="submit-error" class="error hidden"></div>
       <p><button type="submit" id="submit-btn"></button></p>
