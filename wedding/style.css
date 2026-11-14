@@ -65,5 +65,5 @@ html:not([lang=es]) [data-lang=es], html[lang=es] [data-lang=en] { display:none 
 .lang-switch { font-size:.85rem; color:var(--muted); }
 .lang-switch a { color:var(--muted); }
 html:not([lang=es]) .lang-switch a[data-set-lang=en], html[lang=es] .lang-switch a[data-set-lang=es] { color:var(--ink); font-weight:bold; text-decoration:none; }
-.hero { width:100%; aspect-ratio:4/3; object-fit:cover; display:block; margin:0 0 24px; border-radius:6px; background:#eee; }
+.hero { width:100%; aspect-ratio:4/3; object-fit:cover; object-position:50% 25%; display:block; margin:0 0 24px; border-radius:6px; background:#eee; }
 .blurb { font-size:1.1rem; text-align:center; }
