@@ -118,6 +118,7 @@ function term(s) { return (getLang() === 'es' && TERMS_ES[s]) || s; }
 
 const STR = {
   en: {
+    doneNew: 'Thank you, your RSVP is in.', doneExisting: 'You’ve already replied. Here’s your RSVP:',
     whosComing: 'Who’s coming', mealChoices: 'Meal choices', alsoInvitedShort: 'You’re also invited to the night before!',
     greeting: 'Hello {names}! We’d love to know if you can make it.',
     guestName: 'Guest’s name', yourGuest: 'Your guest', accepts: 'Joyfully accepts', declines: 'Regretfully declines',
@@ -141,6 +142,7 @@ const STR = {
     changeAnswer: 'Change your answer', letUsKnowRoom: 'Let us know if you’d like it'
   },
   es: {
+    doneNew: '¡Gracias! Hemos recibido vuestra respuesta.', doneExisting: 'Ya nos habéis respondido. Esta es vuestra respuesta:',
     whosComing: '¿Quién viene?', mealChoices: 'Menú', alsoInvitedShort: '¡También estáis invitados a la noche anterior!',
     greeting: '¡Hola, {names}! Nos encantaría saber si podéis venir.',
     guestName: 'Nombre de tu acompañante', yourGuest: 'Tu acompañante', accepts: 'Sí, asistiré', declines: 'Lamentablemente, no podré asistir',

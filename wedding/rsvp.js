@@ -297,9 +297,9 @@ function renderSummary(payload) {
     : t('notAttending')}</dd>`);
   if (state.invite.nightBefore) {
     const title = L(state.invite.nightBefore, 'title') || t('nightBefore');
-    rows.push(`<dt>${esc(title)}</dt><dd>${payload.people.map(p => esc(p.guest_name) + ': ' + (p.night_before ? t('willBeThereLc') : t('cantMakeLc'))).join('<br>')}</dd>`);
+    rows.push(`<dt>${esc(title)}</dt><dd>${payload.people.map(p => esc(p.guest_name) + ': ' + (p.night_before === true ? t('willBeThereLc') : p.night_before === false ? t('cantMakeLc') : '–')).join('<br>')}</dd>`);
   }
-  if (state.invite.room) rows.push(`<dt>${esc(L(state.invite.room, 'name'))}</dt><dd>${payload.room_accepted ? t('yesPlease') : t('noThanks')}</dd>`);
+  if (state.invite.room) rows.push(`<dt>${esc(L(state.invite.room, 'name'))}</dt><dd>${payload.room_accepted === true ? t('yesPlease') : payload.room_accepted === false ? t('noThanks') : '–'}</dd>`);
   $('summary').innerHTML = rows.join('');
 }
 
@@ -337,7 +337,9 @@ async function loadInvite(code) {
     const url = new URL(location.href);
     url.searchParams.set('code', code);
     history.replaceState(null, '', url);
-    renderForm();
+    // Already replied? Show what they told us, with a button to change it.
+    if (data.existing && data.existing.length) showDone(fromExisting(data.existing), false);
+    else renderForm();
   } catch (e) {
     $('code-error').textContent = t('unreachable');
     show($('code-error'), true);
@@ -363,9 +365,7 @@ $('rsvp-form').addEventListener('submit', async e => {
     state.existing = toExisting(payload);
     lastPayload = payload;
     cacheInvite(state.invite.code, state);
-    renderSummary(payload);
-    show($('rsvp-form'), false);
-    show($('done'), true);
+    showDone(payload, true);
     $('rsvp').scrollIntoView({ behavior:'smooth' });
   } catch (err) {
     $('submit-error').textContent = t('sendFailed');
@@ -385,6 +385,36 @@ function toExisting(payload) {
     room_accepted: yn(payload.room_accepted), message:payload.message, night_before: yn(p.night_before) }));
 }
 let lastPayload = null;
+let doneIsNew = true;
+
+function showDone(payload, isNew) {
+  lastPayload = payload;
+  doneIsNew = isNew;
+  renderSummary(payload);
+  $('done-title').textContent = t(isNew ? 'doneNew' : 'doneExisting');
+  show($('code-form'), false);
+  show($('rsvp-form'), false);
+  show($('done'), true);
+}
+
+/** Saved rows → the same shape the form submits, so the confirmation can be shown for an earlier RSVP. */
+function fromExisting(existing) {
+  const yn = v => v === 'yes' ? true : v === 'no' ? false : null;
+  return {
+    code: state.invite.code,
+    people: existing.map(e => ({
+      guest_name: e.guest_name,
+      is_plus_one: e.is_plus_one === 'yes',
+      attending: e.attending === 'yes',
+      courses: Object.fromEntries(state.menu.courses.map(c => [c.name, e[c.name] || ''])),
+      diets: splitList(e.diets),
+      dietary: e.dietary_notes || '',
+      night_before: yn(e.night_before)
+    })),
+    room_accepted: yn(existing[0]?.room_accepted),
+    message: existing[0]?.message || ''
+  };
+}
 
 // Switching language re-draws the form in place, keeping anything already filled in.
 document.addEventListener('langchange', () => {
@@ -395,7 +425,7 @@ document.addEventListener('langchange', () => {
     renderForm();
     if (wasAttempted) { attempted = true; validate(); }
   } else if (!$('done').classList.contains('hidden') && lastPayload) {
-    renderSummary(lastPayload);
+    showDone(lastPayload, doneIsNew);
   }
 });
 
