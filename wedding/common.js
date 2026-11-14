@@ -179,10 +179,10 @@ function showGate() {
 }
 
 // Cache the invite for this browser session so moving between pages doesn't wait on Google each time.
-function cacheInvite(code, data) { try { sessionStorage.setItem('invite:' + code, JSON.stringify(data)); } catch (e) {} }
+function cacheInvite(code, data) { try { sessionStorage.setItem('invite2:' + code, JSON.stringify(data)); } catch (e) {} }
 const invitePromises = {};
 function getInvite(code) {
-  try { const hit = sessionStorage.getItem('invite:' + code); if (hit) return Promise.resolve(JSON.parse(hit)); } catch (e) {}
+  try { const hit = sessionStorage.getItem('invite2:' + code); if (hit) return Promise.resolve(JSON.parse(hit)); } catch (e) {}
   if (!invitePromises[code]) {
     invitePromises[code] = apiGet(code, getVerified()?.name).then(data => { if (data.ok) cacheInvite(code, data); else delete invitePromises[code]; return data; },
                                               err => { delete invitePromises[code]; throw err; });

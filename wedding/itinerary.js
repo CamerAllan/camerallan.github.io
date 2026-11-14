@@ -21,6 +21,17 @@ function statusBadge(kind, existing) {
   return `<a class="status todo" href="rsvp.html">● ${t('stTodo')}</a>`;
 }
 
+// If a cell ever arrives as a full date string ("Fri Jun 11 2027 19:00:00 GMT+0100 …"), show just the useful part.
+function tidy(value, kind) {
+  if (!/\d{2}:\d{2}:\d{2} GMT/.test(value)) return value;
+  const d = new Date(value);
+  if (isNaN(d)) return value;
+  const locale = getLang() === 'es' ? 'es-ES' : 'en-GB';
+  return kind === 'day'
+    ? d.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' })
+    : d.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit', hour12: getLang() !== 'es' }).replace(' ', '').toLowerCase();
+}
+
 function renderItinerary() {
   if (!itinData) return;
   const items = itinData.itinerary;
@@ -28,7 +39,7 @@ function renderItinerary() {
   // Group consecutive rows by day, keeping the sheet's order.
   const days = [];
   items.forEach(it => {
-    const day = L(it, 'day');
+    const day = tidy(L(it, 'day'), 'day');
     if (!days.length || days.at(-1).day !== day) days.push({ day, items: [] });
     days.at(-1).items.push(it);
   });
@@ -36,7 +47,7 @@ function renderItinerary() {
     <h3 class="itin-day">${esc(d.day)}</h3>
     <ul class="timeline itin">
       ${d.items.map(it => `<li>
-        <span class="time">${esc(L(it, 'time'))}</span>
+        <span class="time">${esc(tidy(L(it, 'time'), 'time'))}</span>
         <span class="itin-body">
           <span class="itin-title">${esc(L(it, 'title'))}</span>
           ${it.rsvp === 'room' && itinData.invite.room ? `<span class="muted"> · ${esc(L(itinData.invite.room, 'name'))}</span>` : ''}
