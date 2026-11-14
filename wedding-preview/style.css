@@ -1,5 +1,7 @@
-:root { --wine:#611415; --cream:#f3ede4; --paper:#f8f4ee; --page:#e9e1d6;
-  --ink:#3f1a19; --muted:#8a6460; --line:rgba(97,20,21,.28); --accent:#611415; --bg:#f8f4ee;
+:root { /* Duck egg blue (#91b7c4) for the frame, panels and rules; a deeper shade of the same blue for text,
+     because text in the light blue itself would be too faint to read. ("--wine" is just the name the styles use.) */
+  --duck:#91b7c4; --wine:#2c4a56; --cream:#f3efe8; --paper:#f8f6f1; --page:#e7e6e0;
+  --ink:#2b3a40; --muted:#6c8189; --line:rgba(145,183,196,.75); --accent:#2c4a56; --bg:#f8f6f1;
   --display:"Instrument Serif", "Bodoni Moda", Didot, Georgia, serif; --script:"Pinyon Script", "Snell Roundhand", cursive;
   --sans:"Jost", "Futura", "Avenir Next", "Helvetica Neue", Arial, sans-serif; }
   * { box-sizing:border-box; }
@@ -209,3 +211,12 @@ input[type=radio], input[type=checkbox] { accent-color:var(--wine); }
 html:not(.locked) #gate { display:none; }
 .step-title { letter-spacing:.01em; }
 .lang-switch a { font-size:1.9rem; }
+
+/* Duck egg blue accents */
+main, #gate { border-color:var(--duck); box-shadow:inset 0 0 0 7px var(--paper), inset 0 0 0 8px var(--duck); }
+.panel-wine { background:var(--duck); color:#20363f; }
+.btn-link.btn-light { background:var(--wine); color:var(--cream); }
+.site-nav { border-color:var(--line); }
+.dish:has(input:checked) { background:#eef4f6; border-color:var(--duck); box-shadow:inset 3px 0 0 var(--duck); }
+.timeline.itin li::before { border-color:var(--duck); }
+.status.no { color:#9a5f52; }
