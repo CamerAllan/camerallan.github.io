@@ -122,3 +122,8 @@ html:not(.locked) #gate { display:none; }
 
 /* Links in the site colour rather than browser blue */
 a { color:var(--accent); }
+
+.event-card .event-more { display:block; margin-top:8px; font-size:.9rem; color:var(--accent); }
+.extras-title { font-weight:normal; font-size:.8rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:28px 0 6px; }
+.event-card.small { padding:14px 18px; }
+.event-card.small .event-title { font-size:1.05rem; }
