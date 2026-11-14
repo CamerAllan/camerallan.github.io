@@ -36,6 +36,13 @@
   .dish .desc { display:block; font-size:.9rem; color:var(--muted); }
   .dish .tags { display:block; font-size:.85rem; color:var(--accent); margin-top:2px; }
   .none-fit { margin:4px 0 0; font-size:.9rem; }
+  .invalid { outline:2px solid #c0392b; outline-offset:4px; border-radius:4px; }
+  .notice { border:1px solid #e3b4b4; background:#fbeeee; color:#7a2020; padding:12px 16px; border-radius:6px; margin:14px 0; }
+  .notice ul { margin:6px 0 0; padding-left:20px; }
+  .notice a { color:inherit; }
+  .nb-row { padding:8px 0; border-top:1px solid var(--line); }
+  .nb-row .nb-name { display:block; font-weight:bold; font-size:.95rem; }
+  .nb-row.invalid { outline-offset:2px; }
   .row { display:flex; gap:10px; }
   .row > * { flex:1; }
   dl { margin:0; } dt { font-weight:bold; margin-top:8px; } dd { margin:0; }
@@ -70,13 +77,15 @@
     <div id="loading" class="muted hidden">Loading your invite…</div>
 
     <!-- Step 2: RSVP form -->
-    <form id="rsvp-form" class="hidden">
+    <form id="rsvp-form" class="hidden" novalidate>
       <p id="greeting"></p>
       <div id="people"></div>
       <div id="plus-ones"></div>
+      <div id="night-before" class="hidden"></div>
       <div id="room" class="hidden"></div>
       <label for="message">Anything else we should know? (optional)</label>
       <textarea id="message" maxlength="2000"></textarea>
+      <div id="form-notice" class="notice hidden" role="alert"></div>
       <div id="submit-error" class="error hidden"></div>
       <p><button type="submit" id="submit-btn">Send RSVP</button></p>
     </form>
@@ -100,7 +109,8 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxII2fMqqJvL2AdopDELxpD
 const DEMO = {
   invites: {
     DEMO01: { code:'DEMO01', guests:['Alex Smith','Jamie Smith'], plusOnesAllowed:0,
-      room:{ name:'The Garden Suite', description:'Ground-floor suite opening onto the walled garden.', nights:'Fri 4 – Sun 6 Sept', image:'rooms/garden.svg' } },
+      room:{ name:'The Garden Suite', description:'Ground-floor suite opening onto the walled garden.', nights:'Fri 4 – Sun 6 Sept', image:'rooms/garden.svg' },
+      nightBefore:{ title:'Night-before party', when:'Friday 4 September 2027, from 7pm', where:'Placeholder pub, Somewhere', details:'Casual drinks and food.' } },
     DEMO02: { code:'DEMO02', guests:['Sam Jones'], plusOnesAllowed:1, room:null }
   },
   menu:{ diets:['Vegan','Vegetarian','Gluten-free'], courses:[
@@ -133,7 +143,7 @@ async function apiPost(payload) {
     DEMO.saved[payload.code] = payload.people.map(p => ({
       guest_name:p.guest_name, is_plus_one:p.is_plus_one?'yes':'no', attending:p.attending?'yes':'no',
       diets:p.diets.join(', '), dietary_notes:p.dietary, room_accepted: payload.room_accepted===true?'yes':payload.room_accepted===false?'no':'',
-      message: payload.message, ...p.courses }));
+      message: payload.message, night_before: p.night_before===true?'yes':p.night_before===false?'no':'', ...p.courses }));
     return { ok:true };
   }
   // text/plain avoids a CORS preflight, which Apps Script can't answer.
@@ -168,11 +178,11 @@ function personBlock(idx, name, isPlusOne, existing) {
     ${isPlusOne
       ? `<label for="p${idx}-name">Guest's name</label><input type="text" id="p${idx}-name" class="pname" value="${esc(name)}" maxlength="100" required>`
       : `<h3>${esc(name)}</h3><input type="hidden" class="pname" value="${esc(name)}">`}
-    <div class="choices">
-      <label><input type="radio" class="att" name="att${idx}" value="yes" ${att==='yes'?'checked':''} required> Joyfully accepts</label>
+    ${isPlusOne ? '' : `<div class="choices att-choices">
+      <label><input type="radio" class="att" name="att${idx}" value="yes" ${att==='yes'?'checked':''}> Joyfully accepts</label>
       <label><input type="radio" class="att" name="att${idx}" value="no" ${att==='no'?'checked':''}> Regretfully declines</label>
-    </div>
-    <div class="meal ${att==='yes'?'':'hidden'}">
+    </div>`}
+    <div class="meal ${isPlusOne || att==='yes'?'':'hidden'}">
       <label>Dietary requirements</label>
       <div class="stack">${diets}</div>
       <div class="other-wrap ${ticked.includes(OTHER)?'':'hidden'}">
@@ -184,18 +194,20 @@ function personBlock(idx, name, isPlusOne, existing) {
   </div>`;
 }
 
+// Plus-ones are only on the form when "I'm bringing a guest" is ticked, so they're always attending.
+function isPlusOne(el) { return el.dataset.plusOne === 'true'; }
+function isActive(el) { return !el.closest('.po-body.hidden'); }
+function isAttending(el) { return isPlusOne(el) ? isActive(el) : el.querySelector('input.att:checked')?.value === 'yes'; }
+function personName(el) { return isPlusOne(el) ? (el.querySelector('.pname').value.trim() || 'Your guest') : el.querySelector('.pname').value; }
+
 function tickedDiets(el) {
   return [...el.querySelectorAll('.pdiet-tick:checked')].map(c => c.value);
 }
 
 /** Rebuild each course's dish list to show only dishes that suit every ticked diet. */
 function refreshOptions(el) {
-  // A plus-one whose "bringing a guest" box is unticked counts as not attending (so nothing is required).
-  const attending = !el.closest('.po-body.hidden') && el.querySelector('input.att:checked')?.value === 'yes';
   const ticked = tickedDiets(el);
-  const otherOn = ticked.includes(OTHER);
-  show(el.querySelector('.other-wrap'), otherOn);
-  el.querySelector('.pdiet').required = attending && otherOn;
+  show(el.querySelector('.other-wrap'), ticked.includes(OTHER));
   const diets = ticked.filter(d => d !== OTHER); // "Other" is free text, so it doesn't filter dishes
   const idx = el.dataset.idx;
   el.querySelectorAll('.course').forEach(fs => {
@@ -208,7 +220,7 @@ function refreshOptions(el) {
       // e.g. "✓ Vegetarian · ✓ Gluten-free (on request)" for the diets this guest ticked
       const tags = diets.map(d => '✓ ' + esc(d) + (o.diets[d] ? ' (' + esc(o.diets[d]) + ')' : '')).join(' · ');
       return `<label class="dish">
-        <input type="radio" name="${name}" value="${esc(o.option)}" ${o.option === current ? 'checked' : ''} ${attending && oi === 0 ? 'required' : ''}>
+        <input type="radio" name="${name}" value="${esc(o.option)}" ${o.option === current ? 'checked' : ''}>
         <span><strong>${esc(o.option)}</strong>
           ${o.description ? `<span class="desc">${esc(o.description)}</span>` : ''}
           ${tags ? `<span class="tags">${tags}</span>` : ''}</span>
@@ -251,9 +263,39 @@ function renderForm() {
       const body = wrap.querySelector('.po-body');
       const toggle = wrap.querySelector('.po-toggle');
       const setReq = () => body.querySelectorAll('input,select').forEach(i => { if (!toggle.checked) i.disabled = true; else i.disabled = false; });
-      toggle.addEventListener('change', () => { show(body, toggle.checked); setReq(); refreshOptions(body.querySelector('.person')); });
+      toggle.addEventListener('change', () => { show(body, toggle.checked); setReq(); refreshOptions(body.querySelector('.person')); syncNightBefore(); });
+      body.querySelector('.pname').addEventListener('input', syncNightBefore);
       setReq();
     }
+  }
+
+  // Night-before party (details only come back from the server for invited households)
+  const nbEl = $('night-before');
+  if (invite.nightBefore) {
+    const n = invite.nightBefore;
+    const nbExisting = Object.fromEntries(existing.map(e => [e.guest_name, e.night_before]));
+    const rows = [...invite.guests.map((g, i) => ({ idx:i, name:g })),
+                  ...Array.from({ length: invite.plusOnesAllowed }, (_, k) => ({ idx: invite.guests.length + k, name: plusExisting[k]?.guest_name || '', plus:true }))];
+    nbEl.innerHTML = `
+      <div class="card">
+        <h3>You’re also invited: ${esc(n.title || 'Night-before party')}</h3>
+        ${n.when ? `<p style="margin:0">${esc(n.when)}</p>` : ''}
+        ${n.where ? `<p style="margin:0">${esc(n.where)}</p>` : ''}
+        ${n.details ? `<p>${esc(n.details)}</p>` : ''}
+        ${rows.map(r => {
+          const v = nbExisting[r.name] || '';
+          return `<div class="nb-row" data-idx="${r.idx}" ${r.plus ? 'data-plus-one="true"' : ''}>
+            <span class="nb-name">${esc(r.name)}</span>
+            <span class="choices">
+              <label><input type="radio" name="nb${r.idx}" value="yes" ${v==='yes'?'checked':''}> Will be there</label>
+              <label><input type="radio" name="nb${r.idx}" value="no" ${v==='no'?'checked':''}> Can’t make it</label>
+            </span></div>`;
+        }).join('')}
+      </div>`;
+    show(nbEl, true);
+  } else {
+    nbEl.innerHTML = '';
+    show(nbEl, false);
   }
 
   // Room
@@ -268,7 +310,7 @@ function renderForm() {
         ${r.nights ? `<p class="muted" style="margin:0 0 6px">${esc(r.nights)}</p>` : ''}
         <p style="margin-top:0">${esc(r.description)}</p>
         <div class="choices">
-          <label><input type="radio" name="room" value="yes" ${acc==='yes'?'checked':''} required> Yes please</label>
+          <label><input type="radio" name="room" value="yes" ${acc==='yes'?'checked':''}> Yes please</label>
           <label><input type="radio" name="room" value="no" ${acc==='no'?'checked':''}> No thanks</label>
         </div>
       </div>`;
@@ -280,10 +322,62 @@ function renderForm() {
 
   $('message').value = existing[0]?.message || '';
   document.querySelectorAll('.person').forEach(wirePerson);
+  syncNightBefore();
+  attempted = false;
+  show($('form-notice'), false);
   show($('code-form'), false);
   show($('done'), false);
   show($('rsvp-form'), true);
 }
+
+/** Show the plus-one's night-before row only when they're coming, labelled with their name. */
+function syncNightBefore() {
+  document.querySelectorAll('.nb-row[data-plus-one]').forEach(row => {
+    const person = document.querySelector(`.person[data-idx="${row.dataset.idx}"]`);
+    const on = person && isActive(person);
+    show(row, on);
+    if (on) row.querySelector('.nb-name').textContent = personName(person);
+  });
+}
+
+let attempted = false;
+
+/** Returns a list of { el, msg } for everything still missing, and marks those parts of the form. */
+function validate() {
+  const problems = [];
+  const add = (el, msg) => problems.push({ el, msg });
+  document.querySelectorAll('.person').forEach(el => {
+    if (!isActive(el)) return;
+    const who = personName(el);
+    if (isPlusOne(el) && !el.querySelector('.pname').value.trim()) add(el.querySelector('.pname'), 'Please enter your guest’s name');
+    if (!isPlusOne(el) && !el.querySelector('input.att:checked')) { add(el.querySelector('.att-choices'), `${who}: please let us know if you can come`); return; }
+    if (!isAttending(el)) return;
+    if (tickedDiets(el).includes(OTHER) && !el.querySelector('.pdiet').value.trim()) add(el.querySelector('.pdiet'), `${who}: please tell us your dietary requirements`);
+    el.querySelectorAll('.course').forEach(fs => {
+      if (fs.querySelector('.dish') && !fs.querySelector('input:checked')) add(fs, `${who}: please choose a ${fs.dataset.course.toLowerCase()}`);
+    });
+  });
+  document.querySelectorAll('.nb-row').forEach(row => {
+    if (row.classList.contains('hidden') || row.querySelector('input:checked')) return;
+    add(row, `${row.querySelector('.nb-name').textContent}: will you be at the ${state.invite.nightBefore.title || 'night-before party'}?`);
+  });
+  if (state.invite.room && !document.querySelector('input[name=room]:checked')) add($('room').firstElementChild, `Please let us know if you’d like ${state.invite.room.name}`);
+
+  document.querySelectorAll('.invalid').forEach(x => x.classList.remove('invalid'));
+  problems.forEach(p => p.el.classList.add('invalid'));
+  const notice = $('form-notice');
+  notice.innerHTML = problems.length ? `<strong>A few things still need an answer:</strong><ul>${problems.map((p, i) => `<li><a href="#" data-i="${i}">${esc(p.msg)}</a></li>`).join('')}</ul>` : '';
+  notice.querySelectorAll('a').forEach(a => a.addEventListener('click', ev => {
+    ev.preventDefault();
+    problems[a.dataset.i].el.scrollIntoView({ behavior:'smooth', block:'center' });
+  }));
+  show(notice, problems.length > 0);
+  return problems;
+}
+
+// Once they've tried to submit, keep the notice up to date as they fix things.
+$('rsvp-form').addEventListener('input', () => { if (attempted) validate(); });
+$('rsvp-form').addEventListener('change', () => { if (attempted) validate(); });
 
 function listNames(names) {
   const first = names.map(n => n.split(' ')[0]);
@@ -294,8 +388,9 @@ function collect() {
   const people = [];
   document.querySelectorAll('.person').forEach(el => {
     if (el.closest('.po-body.hidden')) return; // plus-one not ticked
-    const attending = el.querySelector('input.att:checked')?.value === 'yes';
+    const attending = isAttending(el);
     const diets = attending ? tickedDiets(el) : [];
+    const nb = document.querySelector(`input[name="nb${el.dataset.idx}"]:checked`)?.value;
     const courses = {};
     el.querySelectorAll('.course').forEach(fs => courses[fs.dataset.course] = attending ? (fs.querySelector('input:checked')?.value || '') : '');
     people.push({
@@ -304,7 +399,8 @@ function collect() {
       attending,
       courses,
       diets,
-      dietary: diets.includes(OTHER) ? el.querySelector('.pdiet').value.trim() : ''
+      dietary: diets.includes(OTHER) ? el.querySelector('.pdiet').value.trim() : '',
+      night_before: nb === 'yes' ? true : nb === 'no' ? false : null
     });
   });
   const roomVal = document.querySelector('input[name=room]:checked')?.value;
@@ -320,6 +416,10 @@ function renderSummary(payload) {
   const rows = payload.people.map(p => `<dt>${esc(p.guest_name)}</dt><dd>${p.attending
     ? 'Attending · ' + [...p.diets.filter(d => d !== OTHER), ...Object.values(p.courses).filter(Boolean), p.dietary].filter(Boolean).map(esc).join(' · ')
     : 'Not attending'}</dd>`);
+  if (state.invite.nightBefore) {
+    const t = state.invite.nightBefore.title || 'Night-before party';
+    rows.push(`<dt>${esc(t)}</dt><dd>${payload.people.map(p => esc(p.guest_name) + ': ' + (p.night_before ? 'will be there' : 'can’t make it')).join('<br>')}</dd>`);
+  }
   if (state.invite.room) rows.push(`<dt>${esc(state.invite.room.name)}</dt><dd>${payload.room_accepted ? 'Yes please' : 'No thanks'}</dd>`);
   $('summary').innerHTML = rows.join('');
 }
@@ -356,6 +456,8 @@ $('code-form').addEventListener('submit', e => { e.preventDefault(); loadInvite(
 
 $('rsvp-form').addEventListener('submit', async e => {
   e.preventDefault();
+  attempted = true;
+  if (validate().length) return;
   const payload = collect();
   const btn = $('submit-btn');
   btn.disabled = true; btn.textContent = 'Sending…';
@@ -365,7 +467,8 @@ $('rsvp-form').addEventListener('submit', async e => {
     if (!res.ok) throw new Error(res.error);
     state.existing = payload.people.map(p => ({ ...p.courses, guest_name:p.guest_name, is_plus_one:p.is_plus_one?'yes':'no',
       attending:p.attending?'yes':'no', diets:p.diets.join(', '), dietary_notes:p.dietary,
-      room_accepted: payload.room_accepted===true?'yes':payload.room_accepted===false?'no':'', message:payload.message }));
+      room_accepted: payload.room_accepted===true?'yes':payload.room_accepted===false?'no':'', message:payload.message,
+      night_before: p.night_before===true?'yes':p.night_before===false?'no':'' }));
     renderSummary(payload);
     show($('rsvp-form'), false);
     show($('done'), true);

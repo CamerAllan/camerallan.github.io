@@ -2,7 +2,9 @@
  * Wedding RSVP backend — Google Apps Script bound to the "Wedding Website Backend" sheet.
  *
  * Tabs:
- *   Guests     code | guest_names (comma-separated) | plus_ones_allowed | room_id | notes (private)
+ *   Guests     code | guest_names (comma-separated) | plus_ones_allowed | room_id | notes (private) | night_before
+ *              Put anything (e.g. "x") in night_before to invite that household to the night-before party.
+ *   Night Before   field | value  (rows: title, when, where, details). Only shown to invited households.
  *   Rooms      room_id | name | description | nights | image
  *   Menu       course | option | description | <one column per dietary requirement, e.g. Vegetarian | Gluten-free ...>
  *              Mark a dish "x" if it suits that requirement. Any other text (e.g. "on request") also counts as
@@ -15,7 +17,7 @@
 
 var SHEET_ID = '1iSff6rU6AE22U6UkYPWBx9CT-mmakGh4iSF3ndRP8QI';
 var FIXED_RESPONSE_COLS = ['updated_at', 'code', 'guest_name', 'is_plus_one', 'attending', 'diets'];
-var TRAILING_RESPONSE_COLS = ['dietary_notes', 'room_accepted', 'message'];
+var TRAILING_RESPONSE_COLS = ['dietary_notes', 'room_accepted', 'message', 'night_before'];
 
 function doGet(e) {
   try {
@@ -74,7 +76,8 @@ function doPost(e) {
         diets: p.attending ? diets.concat(hasOther ? ['Other'] : []).join(', ') : '',
         dietary_notes: p.attending && hasOther ? String(p.dietary || '').slice(0, 500) : '',
         room_accepted: roomAccepted,
-        message: String(body.message || '').slice(0, 2000)
+        message: String(body.message || '').slice(0, 2000),
+        night_before: invite.nightBefore ? (p.night_before === true ? 'yes' : p.night_before === false ? 'no' : '') : ''
       };
       menu.courses.forEach(function (c) {
         var choice = p.attending && p.courses ? p.courses[c.name] : '';
@@ -126,7 +129,8 @@ function findInvite_(code) {
     code: code,
     guests: String(g.guest_names).split(',').map(function (s) { return s.trim(); }).filter(String),
     plusOnesAllowed: Number(g.plus_ones_allowed) || 0,
-    room: room
+    room: room,
+    nightBefore: String(g.night_before || '').trim() !== ''
   };
 }
 
@@ -141,8 +145,21 @@ function publicInvite_(inv) {
       description: inv.room.description,
       nights: inv.room.nights,
       image: inv.room.image
-    }
+    },
+    // Party details are only sent to invited households, so they never appear in the public page.
+    nightBefore: inv.nightBefore ? readNightBefore_() : null
   };
+}
+
+function readNightBefore_() {
+  var out = {};
+  var sheet = ss_().getSheetByName('Night Before');
+  if (!sheet) return { title: 'Night-before party' };
+  sheet.getDataRange().getValues().slice(1).forEach(function (r) {
+    var k = String(r[0] || '').trim().toLowerCase();
+    if (k) out[k] = String(r[1] || '');
+  });
+  return out;
 }
 
 /** Menu: first three columns are course/option/description; every later column is a dietary requirement. */
