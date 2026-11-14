@@ -4,39 +4,45 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>The Day · Partner A &amp; Partner B</title>
+<script>try { if (localStorage.getItem('weddingLang') === 'es') document.documentElement.lang = 'es'; } catch (e) {}</script>
+<title>The Day · Cameron &amp; Annie</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <main>
   <header>
-    <h1><a href="index.html">Partner A &amp; Partner B</a></h1>
-    <div class="muted">Saturday 12 June 2027 · Rowallan Castle</div>
-    <nav class="site-nav"><a href="index.html" aria-current="page">The Day</a><a href="rsvp.html">RSVP</a><a href="travel.html">Travel &amp; Stay</a><a href="faqs.html">FAQs</a></nav>
+    <h1><a href="index.html">Cameron &amp; Annie</a></h1>
+    <div class="muted"><span data-lang="en">Saturday 12 June 2027</span><span data-lang="es">Sábado, 12 de junio de 2027</span> · Rowallan Castle</div>
+    <nav class="site-nav"><a href="index.html" aria-current="page"><span data-lang="en">The Day</span><span data-lang="es">El día</span></a><a href="rsvp.html"><span data-lang="en">RSVP</span><span data-lang="es">Confirmar asistencia</span></a><a href="travel.html"><span data-lang="en">Travel &amp; Stay</span><span data-lang="es">Viaje y alojamiento</span></a><a href="faqs.html"><span data-lang="en">FAQs</span><span data-lang="es">Preguntas frecuentes</span></a></nav>
+    <div class="lang-switch"><a href="#" data-set-lang="en">English</a> · <a href="#" data-set-lang="es">Español</a></div>
   </header>
 
+  <img class="hero" src="us.svg" alt="Cameron &amp; Annie">
+
   <section>
-    <h2>The day</h2>
-    <p><strong>Saturday 12 June 2027</strong><br>Rowallan Castle, [address placeholder]</p>
-    <p><a class="btn-link" href="rsvp.html">RSVP</a></p>
+    <p class="blurb"><span data-lang="en">We’re so excited to be getting married, and we can’t wait to celebrate with our favourite people.</span><span data-lang="es">Estamos muy ilusionados por casarnos y deseando celebrarlo con nuestras personas favoritas.</span></p>
+    <p class="blurb"><span data-lang="en">Please RSVP by <strong>[date TBC]</strong>.</span><span data-lang="es">Por favor, confirmad vuestra asistencia antes del <strong>[fecha por confirmar]</strong>.</span></p>
+    <p style="text-align:center"><a class="btn-link" href="rsvp.html" data-keep-code><span data-lang="en">RSVP</span><span data-lang="es">Confirmar asistencia</span></a></p>
   </section>
 
   <section>
-    <h2>Timings</h2>
+    <h2><span data-lang="en">The day</span><span data-lang="es">El día</span></h2>
+    <p><strong><span data-lang="en">Saturday 12 June 2027</span><span data-lang="es">Sábado, 12 de junio de 2027</span></strong><br><span data-lang="en">Rowallan Castle, Kilmaurs, Ayrshire, Scotland KA3 2LP</span><span data-lang="es">Rowallan Castle, Kilmaurs, Ayrshire, Escocia KA3 2LP</span></p>
+  </section>
+
+  <section>
+    <h2><span data-lang="en">Timings</span><span data-lang="es">Horario</span></h2>
     <ul class="timeline">
-      <li><span class="time">1:30pm</span><span>Guests arrive (placeholder)</span></li>
-      <li><span class="time">2:00pm</span><span>Ceremony</span></li>
-      <li><span class="time">2:45pm</span><span>Drinks &amp; canapés</span></li>
-      <li><span class="time">5:00pm</span><span>Dinner &amp; speeches</span></li>
-      <li><span class="time">8:00pm</span><span>Evening reception &amp; dancing</span></li>
-      <li><span class="time">12:00am</span><span>Carriages</span></li>
+      <li><span class="time"><span data-lang="en">1:00pm</span><span data-lang="es">13:00</span></span><span><span data-lang="en">Guests arrive</span><span data-lang="es">Llegada de los invitados</span></span></li>
+      <li><span class="time"><span data-lang="en">1:30pm</span><span data-lang="es">13:30</span></span><span><span data-lang="en">Ceremony</span><span data-lang="es">Ceremonia</span></span></li>
+      <li><span class="time"><span data-lang="en">1:00am</span><span data-lang="es">01:00</span></span><span><span data-lang="en">Carriages</span><span data-lang="es">Fin de la celebración</span></span></li>
     </ul>
   </section>
 
   <section>
-    <h2>The venue</h2>
-    <p>Placeholder: a few lines about Rowallan Castle, where the ceremony and reception are, and anything guests should know about the grounds.</p>
-    <p><a href="https://www.google.com/maps/search/?api=1&query=Rowallan+Castle" target="_blank" rel="noopener">Open in Google Maps</a></p>
+    <h2><span data-lang="en">The venue</span><span data-lang="es">El lugar</span></h2>
+    <p><span data-lang="en">[Placeholder: a few lines about Rowallan Castle.]</span><span data-lang="es">[Texto provisional: unas líneas sobre Rowallan Castle.]</span></p>
+    <p><span data-lang="en">Rowallan Castle, Kilmaurs, Ayrshire, Scotland KA3 2LP</span><span data-lang="es">Rowallan Castle, Kilmaurs, Ayrshire, Escocia KA3 2LP</span><br><a href="https://www.google.com/maps/search/?api=1&amp;query=Rowallan+Castle+Kilmaurs+KA3+2LP" target="_blank" rel="noopener"><span data-lang="en">Open in Google Maps</span><span data-lang="es">Abrir en Google Maps</span></a></p>
   </section>
 
   <!-- Only filled in when the visitor's invite includes someone in the bridal party -->
@@ -44,23 +50,29 @@
 </main>
 <script src="common.js"></script>
 <script>
-// Bridal party info: only fetched/shown if this browser has an invite code with someone in the bridal party.
+// Bridal party info: only shown if this browser has an invite code with someone in the bridal party.
+let bridalData = null;
+function renderBridal() {
+  const bp = bridalData;
+  if (!bp) return;
+  const names = bp.names.map(n => n.split(' ')[0]).join(' & ');
+  $('bridal').innerHTML = `
+    <h2>${t('bridalTitle')}</h2>
+    <div class="card bridal">
+      <p style="margin-top:0">${esc(t('bridalIntro', { names }))}</p>
+      <dl>${bp.info.map(i => `<dt>${esc(L(i, 'heading'))}</dt><dd>${esc(L(i, 'details'))}</dd>`).join('')}</dl>
+    </div>`;
+  show($('bridal'), true);
+}
+document.addEventListener('langchange', renderBridal);
 (async () => {
   const code = getCode();
   if (!code) return;
   try {
     const data = await getInvite(code);
-    const bp = data.ok && data.invite.bridalParty;
-    if (!bp) return;
-    const names = bp.names.map(n => n.split(' ')[0]);
-    $('bridal').innerHTML = `
-      <h2>For the bridal party</h2>
-      <div class="card bridal">
-        <p style="margin-top:0">${esc(names.join(' & '))}, here’s what you need to know.</p>
-        <dl>${bp.info.map(i => `<dt>${esc(i.heading)}</dt><dd>${esc(i.details)}</dd>`).join('')}</dl>
-      </div>`;
-    show($('bridal'), true);
-  } catch (e) { /* public page still works without it */ }
+    bridalData = data.ok && data.invite.bridalParty;
+    renderBridal();
+  } catch (e) { /* the public page still works without it */ }
 })();
 </script>
 </body>

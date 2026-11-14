@@ -4,58 +4,66 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Travel & Stay · Partner A &amp; Partner B</title>
+<script>try { if (localStorage.getItem('weddingLang') === 'es') document.documentElement.lang = 'es'; } catch (e) {}</script>
+<title>Travel & Stay · Cameron &amp; Annie</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <main>
   <header>
-    <h1><a href="index.html">Partner A &amp; Partner B</a></h1>
-    <div class="muted">Saturday 12 June 2027 · Rowallan Castle</div>
-    <nav class="site-nav"><a href="index.html">The Day</a><a href="rsvp.html">RSVP</a><a href="travel.html" aria-current="page">Travel &amp; Stay</a><a href="faqs.html">FAQs</a></nav>
+    <h1><a href="index.html">Cameron &amp; Annie</a></h1>
+    <div class="muted"><span data-lang="en">Saturday 12 June 2027</span><span data-lang="es">Sábado, 12 de junio de 2027</span> · Rowallan Castle</div>
+    <nav class="site-nav"><a href="index.html"><span data-lang="en">The Day</span><span data-lang="es">El día</span></a><a href="rsvp.html"><span data-lang="en">RSVP</span><span data-lang="es">Confirmar asistencia</span></a><a href="travel.html" aria-current="page"><span data-lang="en">Travel &amp; Stay</span><span data-lang="es">Viaje y alojamiento</span></a><a href="faqs.html"><span data-lang="en">FAQs</span><span data-lang="es">Preguntas frecuentes</span></a></nav>
+    <div class="lang-switch"><a href="#" data-set-lang="en">English</a> · <a href="#" data-set-lang="es">Español</a></div>
   </header>
 
   <section>
-    <h2>Getting there</h2>
-    <p><strong>Rowallan Castle</strong><br>[Address placeholder]</p>
-    <p><strong>By car:</strong> Placeholder: parking details, and whether cars can be left overnight.</p>
-    <p><strong>By train:</strong> Placeholder: nearest station and how far it is.</p>
-    <p><strong>Taxis:</strong> Placeholder: local taxi numbers. Book your journey home in advance!</p>
-    <p><a href="https://www.google.com/maps/search/?api=1&query=Rowallan+Castle" target="_blank" rel="noopener">Open in Google Maps</a></p>
+    <h2><span data-lang="en">Getting there</span><span data-lang="es">Cómo llegar</span></h2>
+    <p><strong>Rowallan Castle</strong><br>Kilmaurs, Ayrshire<br><span data-lang="en">Scotland</span><span data-lang="es">Escocia</span> KA3 2LP<br><a href="https://www.google.com/maps/search/?api=1&amp;query=Rowallan+Castle+Kilmaurs+KA3+2LP" target="_blank" rel="noopener"><span data-lang="en">Open in Google Maps</span><span data-lang="es">Abrir en Google Maps</span></a></p>
+    <p><strong><span data-lang="en">By plane:</span><span data-lang="es">En avión:</span></strong> <span data-lang="en">[Placeholder: nearest airports are Glasgow (GLA) and Glasgow Prestwick (PIK). How to get from the airport.]</span><span data-lang="es">[Texto provisional: los aeropuertos más cercanos son Glasgow (GLA) y Glasgow Prestwick (PIK). Cómo llegar desde el aeropuerto.]</span></p>
+    <p><strong><span data-lang="en">By car:</span><span data-lang="es">En coche:</span></strong> <span data-lang="en">[Placeholder: parking details, and whether cars can be left overnight.]</span><span data-lang="es">[Texto provisional: aparcamiento, y si se puede dejar el coche durante la noche.]</span></p>
+    <p><strong><span data-lang="en">By train:</span><span data-lang="es">En tren:</span></strong> <span data-lang="en">[Placeholder: nearest station and how far it is.]</span><span data-lang="es">[Texto provisional: estación más cercana y a qué distancia está.]</span></p>
+    <p><strong><span data-lang="en">Taxis:</span><span data-lang="es">Taxis:</span></strong> <span data-lang="en">[Placeholder: local taxi numbers.] Book your journey home in advance!</span><span data-lang="es">[Texto provisional: teléfonos de taxis.] ¡Reservad la vuelta con antelación!</span></p>
   </section>
 
   <!-- Only filled in when this household has been offered a room -->
   <section id="your-room" class="hidden"></section>
 
   <section>
-    <h2>Places to stay</h2>
-    <p>Placeholder: rooms at the castle are limited and we’ve offered them directly. If you’d like to stay nearby, here are some options:</p>
-    <div class="card"><h3>Hotel one (placeholder)</h3><p style="margin:0">10 minutes away · from £xx per night · <a href="#">Website</a></p></div>
-    <div class="card"><h3>Hotel two (placeholder)</h3><p style="margin:0">15 minutes away · from £xx per night · <a href="#">Website</a></p></div>
+    <h2><span data-lang="en">Places to stay</span><span data-lang="es">Dónde alojarse</span></h2>
+    <p><span data-lang="en">Rooms at the castle are limited and we’ve offered them directly. If you’d like to stay nearby, here are some options:</span><span data-lang="es">Las habitaciones del castillo son limitadas y las hemos ofrecido directamente. Si queréis alojaros cerca, aquí tenéis algunas opciones:</span></p>
+    <div class="card"><h3><span data-lang="en">Hotel one (placeholder)</span><span data-lang="es">Hotel uno (provisional)</span></h3><p style="margin:0"><span data-lang="en">10 minutes away · from £xx per night</span><span data-lang="es">A 10 minutos · desde xx £ por noche</span> · <a href="#">Web</a></p></div>
+    <div class="card"><h3><span data-lang="en">Hotel two (placeholder)</span><span data-lang="es">Hotel dos (provisional)</span></h3><p style="margin:0"><span data-lang="en">15 minutes away · from £xx per night</span><span data-lang="es">A 15 minutos · desde xx £ por noche</span> · <a href="#">Web</a></p></div>
   </section>
 </main>
 <script src="common.js"></script>
 <script>
 // If this household has been offered a room, show it here too.
+let roomData = null;
+function renderRoom() {
+  if (!roomData) return;
+  const r = roomData.invite.room;
+  const answer = roomData.existing?.[0]?.room_accepted;
+  $('your-room').innerHTML = `
+    <h2>${t('yourRoom')}</h2>
+    <div class="card room">
+      ${r.image ? `<img src="${esc(r.image)}" alt="${esc(r.name)}">` : ''}
+      <h3>${esc(L(r, 'name'))}</h3>
+      ${L(r, 'nights') ? `<p class="muted" style="margin:0 0 6px">${esc(L(r, 'nights'))}</p>` : ''}
+      ${L(r, 'price') ? `<p class="price">${esc(L(r, 'price'))}</p>` : ''}
+      <p>${esc(L(r, 'description'))}</p>
+      <p class="muted">${t('breakfast')}</p>
+      <p style="margin-bottom:0">${answer === 'yes' ? t('accepted') + ' ' : answer === 'no' ? t('declined') + ' ' : ''}<a href="rsvp.html?code=${encodeURIComponent(roomData.invite.code)}">${answer ? t('changeAnswer') : t('letUsKnowRoom')}</a></p>
+    </div>`;
+  show($('your-room'), true);
+}
+document.addEventListener('langchange', renderRoom);
 (async () => {
   const code = getCode();
   if (!code) return;
   try {
     const data = await getInvite(code);
-    const r = data.ok && data.invite.room;
-    if (!r) return;
-    const answer = data.existing?.[0]?.room_accepted;
-    $('your-room').innerHTML = `
-      <h2>Your room</h2>
-      <div class="card room">
-        ${r.image ? `<img src="${esc(r.image)}" alt="${esc(r.name)}">` : ''}
-        <h3>${esc(r.name)}</h3>
-        ${r.nights ? `<p class="muted" style="margin:0 0 6px">${esc(r.nights)}</p>` : ''}
-        ${r.price ? `<p class="price">${esc(r.price)}</p>` : ''}
-        <p>${esc(r.description)}</p>
-        <p style="margin-bottom:0">${answer === 'yes' ? 'You’ve accepted this room. ' : answer === 'no' ? 'You’ve declined this room. ' : ''}<a href="rsvp.html" data-keep-code>${answer ? 'Change your answer' : 'Let us know if you’d like it'}</a></p>
-      </div>`;
-    show($('your-room'), true);
+    if (data.ok && data.invite.room) { roomData = data; renderRoom(); }
   } catch (e) {}
 })();
 </script>

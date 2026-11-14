@@ -8,6 +8,9 @@
  *   Guests.bridal_party   names from that household who are in the bridal party (comma-separated), or "all".
  *   Bridal Party   heading | details  — only sent to households with someone in the bridal party.
  *   Rooms.price    free text, e.g. "£180 per night".
+ *   Guests.language   "es" to show that household the site in Spanish (blank = English).
+ *   Spanish text: any column ending in _es (e.g. Rooms.description_es, Menu.description_es) is used in place of
+ *   the English column when the site is in Spanish. Night Before / Bridal Party have Spanish in columns C (and D).
  *   Rooms      room_id | name | description | nights | image
  *   Menu       course | option | description | <one column per dietary requirement, e.g. Vegetarian | Gluten-free ...>
  *              Mark a dish "x" if it suits that requirement. Any other text (e.g. "on request") also counts as
@@ -134,6 +137,7 @@ function findInvite_(code) {
     plusOnesAllowed: Number(g.plus_ones_allowed) || 0,
     room: room,
     nightBefore: String(g.night_before || '').trim() !== '',
+    lang: String(g.language || '').trim().toLowerCase().indexOf('es') === 0 ? 'es' : 'en',
     bridalParty: bridalNames_(String(g.bridal_party || ''), String(g.guest_names).split(',').map(function (s) { return s.trim(); }).filter(String))
   };
 }
@@ -144,18 +148,20 @@ function publicInvite_(inv) {
     code: inv.code,
     guests: inv.guests,
     plusOnesAllowed: inv.plusOnesAllowed,
-    room: inv.room && {
-      name: inv.room.name,
-      description: inv.room.description,
-      nights: inv.room.nights,
-      image: inv.room.image,
-      price: String(inv.room.price || '')
-    },
+    lang: inv.lang,
+    room: inv.room && roomPublic_(inv.room),
     // Bridal party info is only sent when someone in this household is in the bridal party.
     bridalParty: inv.bridalParty.length ? { names: inv.bridalParty, info: readBridalInfo_() } : null,
     // Party details are only sent to invited households, so they never appear in the public page.
     nightBefore: inv.nightBefore ? readNightBefore_() : null
   };
+}
+
+/** All Rooms columns (name, description, nights, image, price, and any *_es translations) except room_id. */
+function roomPublic_(room) {
+  var out = {};
+  Object.keys(room).forEach(function (k) { if (k && k !== 'room_id') out[k] = String(room[k] == null ? '' : room[k]); });
+  return out;
 }
 
 function bridalNames_(cell, guests) {
@@ -170,7 +176,9 @@ function readBridalInfo_() {
   if (!sheet) return [];
   return sheet.getDataRange().getValues().slice(1)
     .filter(function (r) { return String(r[0] || r[1] || '').trim(); })
-    .map(function (r) { return { heading: String(r[0] || ''), details: String(r[1] || '') }; });
+    .map(function (r) {
+      return { heading: String(r[0] || ''), details: String(r[1] || ''), heading_es: String(r[2] || ''), details_es: String(r[3] || '') };
+    });
 }
 
 function readNightBefore_() {
@@ -179,7 +187,7 @@ function readNightBefore_() {
   if (!sheet) return { title: 'Night-before party' };
   sheet.getDataRange().getValues().slice(1).forEach(function (r) {
     var k = String(r[0] || '').trim().toLowerCase();
-    if (k) out[k] = String(r[1] || '');
+    if (k) { out[k] = String(r[1] || ''); out[k + '_es'] = String(r[2] || ''); }
   });
   return out;
 }
@@ -188,8 +196,12 @@ function readNightBefore_() {
 function readMenu_() {
   var values = ss_().getSheetByName('Menu').getDataRange().getValues();
   var header = values.shift().map(function (h) { return String(h).trim(); });
+  // Every column after description is a dietary requirement, except translations (ending in _es).
   var dietCols = [];
-  for (var i = 3; i < header.length; i++) if (header[i]) dietCols.push({ idx: i, name: header[i] });
+  for (var i = 3; i < header.length; i++) {
+    if (header[i] && !/_es$/i.test(header[i])) dietCols.push({ idx: i, name: header[i] });
+  }
+  var descEs = header.indexOf('description_es');
 
   var courses = [];
   var byName = {};
@@ -203,7 +215,12 @@ function readMenu_() {
       if (cell) diets[d.name] = cell.toLowerCase() === 'x' ? '' : cell;
     });
     if (!byName[name]) { byName[name] = { name: name, options: [] }; courses.push(byName[name]); }
-    byName[name].options.push({ option: option, description: String(r[2] || ''), diets: diets });
+    byName[name].options.push({
+      option: option,
+      description: String(r[2] || ''),
+      description_es: descEs > -1 ? String(r[descEs] || '') : '',
+      diets: diets
+    });
   });
   return { diets: dietCols.map(function (d) { return d.name; }), courses: courses };
 }
