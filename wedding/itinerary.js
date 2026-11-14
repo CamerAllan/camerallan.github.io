@@ -50,7 +50,12 @@ function renderItinerary() {
 document.addEventListener('langchange', renderItinerary);
 whenUnlocked(async () => {
   try {
-    const data = await getInvite(getCode());
+    let data = await getInvite(getCode());
+    // Data saved earlier in this browser session may predate the itinerary: fetch a fresh copy.
+    if (data.ok && !Array.isArray(data.itinerary)) {
+      data = await apiGet(getCode(), getVerified()?.name);
+      if (data.ok) cacheInvite(getCode(), data);
+    }
     if (data.ok) { itinData = data; renderItinerary(); }
     else $('itinerary').innerHTML = `<p>${t('wentWrong')}</p>`;
   } catch (e) { $('itinerary').innerHTML = `<p>${t('unreachable')}</p>`; }
