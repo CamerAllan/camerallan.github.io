@@ -13,7 +13,7 @@ const DEMO = {
       bridalParty:{ names:['Alex Smith'], info:[{heading:'Morning prep',details:'Hair & makeup from 9am.',heading_es:'Preparativos',details_es:'Peluquería y maquillaje desde las 9:00.'},{heading:'Photos',details:'Group photos after the ceremony.'}] } },
     DEMO02: { code:'DEMO02', guests:['Sam Jones'], plusOnesAllowed:1, room:null },
     DEMO03: { code:'DEMO03', lang:'es', guests:['Lucía García','Javier Ruiz'], plusOnesAllowed:0,
-      room:{ name:'The Loft Room', description:'Cosy room in the eaves.', description_es:'Acogedora habitación abuhardillada.', nights:'Sat 12 June', nights_es:'Sábado 12 de junio', image:'rooms/loft.svg', price:'£140', price_es:'140 £' },
+      room:{ name:'The Loft Room', description:'Cosy room in the eaves.', description_es:'Acogedora habitación abuhardillada.', nights:'Sat 12 June', nights_es:'Sábado 12 de junio', image:'rooms/loft.svg', price:'', price_es:'', free:true },
       nightBefore:{ title:'Night-before party', title_es:'Fiesta de la noche anterior', when:'Friday 11 June 2027, from 7pm', when_es:'Viernes 11 de junio de 2027, a partir de las 19:00', where:'Placeholder pub', where_es:'Pub provisional' } }
   },
   menu:{ diets:['Vegan','Vegetarian','Gluten-free'], courses:[
@@ -215,6 +215,7 @@ function term(s) { return (getLang() === 'es' && TERMS_ES[s]) || s; }
 
 const STR = {
   en: {
+    roomFree: 'There’s no charge for your room. It’s on us!',
     checking: 'Checking…',
     gateNeedCode: 'Please enter your invite code.', gateNeedName: 'Please enter your surname.', gateWrongName: 'That surname doesn’t match this invitation. Please try again.',
     doneNew: 'Thank you, your RSVP is in.', doneExisting: 'You’ve already replied. Here’s your RSVP:',
@@ -241,6 +242,7 @@ const STR = {
     changeAnswer: 'Change your answer', letUsKnowRoom: 'Let us know if you’d like it'
   },
   es: {
+    roomFree: 'La habitación no tiene coste para vosotros. ¡Invitamos nosotros!',
     checking: 'Comprobando…',
     gateNeedCode: 'Escribe tu código de invitación.', gateNeedName: 'Escribe tu apellido.', gateWrongName: 'Ese apellido no coincide con esta invitación. Inténtalo de nuevo.',
     doneNew: '¡Gracias! Hemos recibido vuestra respuesta.', doneExisting: 'Ya nos habéis respondido. Esta es vuestra respuesta:',

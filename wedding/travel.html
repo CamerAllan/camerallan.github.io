@@ -69,7 +69,7 @@ function renderRoom() {
       ${r.image ? `<img src="${esc(r.image)}" alt="${esc(r.name)}">` : ''}
       <h3>${esc(L(r, 'name'))}</h3>
       ${L(r, 'nights') ? `<p class="muted" style="margin:0 0 6px">${esc(L(r, 'nights'))}</p>` : ''}
-      ${L(r, 'price') ? `<p class="price">${esc(L(r, 'price'))}</p>` : ''}
+      ${r.free ? `<p class="price">${t('roomFree')}</p>` : L(r, 'price') ? `<p class="price">${esc(L(r, 'price'))}</p>` : ''}
       <p>${esc(L(r, 'description'))}</p>
       <p class="muted">${t('breakfast')}</p>
       <p style="margin-bottom:0">${answer === 'yes' ? t('accepted') + ' ' : answer === 'no' ? t('declined') + ' ' : ''}<a href="rsvp.html?code=${encodeURIComponent(roomData.invite.code)}">${answer ? t('changeAnswer') : t('letUsKnowRoom')}</a></p>

@@ -8,6 +8,9 @@
  *   Guests.bridal_party   names from that household who are in the bridal party (comma-separated), or "all".
  *   Bridal Party   heading | details  — only sent to households with someone in the bridal party.
  *   Rooms.price    free text, e.g. "£180 per night".
+ *   Guests.room_price  optional per-household override: blank = the suite's price, "free" = no charge,
+ *                  anything else is shown instead (e.g. a share of a suite that several households use).
+ *                  Several households can be given the same room_id; each answers for itself.
  *   Guests.language   "es" to show that household the site in Spanish (blank = English).
  *   Spanish text: any column ending in _es (e.g. Rooms.description_es, Menu.description_es) is used in place of
  *   the English column when the site is in Spanish. Night Before / Bridal Party have Spanish in columns C (and D).
@@ -148,6 +151,7 @@ function findInvite_(code) {
     guests: String(g.guest_names).split(',').map(function (s) { return s.trim(); }).filter(String),
     plusOnesAllowed: Number(g.plus_ones_allowed) || 0,
     room: room,
+    roomPrice: String(g.room_price || '').trim(),
     nightBefore: String(g.night_before || '').trim() !== '',
     lang: String(g.language || '').trim().toLowerCase().indexOf('es') === 0 ? 'es' : 'en',
     bridalParty: bridalNames_(String(g.bridal_party || ''), String(g.guest_names).split(',').map(function (s) { return s.trim(); }).filter(String))
@@ -161,7 +165,7 @@ function publicInvite_(inv) {
     guests: inv.guests,
     plusOnesAllowed: inv.plusOnesAllowed,
     lang: inv.lang,
-    room: inv.room && roomPublic_(inv.room),
+    room: inv.room && roomForHousehold_(inv.room, inv.roomPrice),
     // Bridal party info is only sent when someone in this household is in the bridal party.
     bridalParty: inv.bridalParty.length ? { names: inv.bridalParty, info: readBridalInfo_() } : null,
     // Party details are only sent to invited households, so they never appear in the public page.
@@ -173,6 +177,17 @@ function publicInvite_(inv) {
 function roomPublic_(room) {
   var out = {};
   Object.keys(room).forEach(function (k) { if (k && k !== 'room_id') out[k] = String(room[k] == null ? '' : room[k]); });
+  return out;
+}
+
+/** The suite as this household sees it: their own price (or free) replaces the suite's price. */
+function roomForHousehold_(room, override) {
+  var out = roomPublic_(room);
+  if (/^(free|0|£?0(\.00)?|none|n\/a)$/i.test(override)) {
+    out.free = true; out.price = ''; out.price_es = '';
+  } else if (override) {
+    out.price = override; out.price_es = override;
+  }
   return out;
 }
 

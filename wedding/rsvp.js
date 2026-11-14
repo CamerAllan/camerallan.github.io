@@ -172,7 +172,7 @@ function renderForm() {
         ${r.image ? `<img src="${esc(r.image)}" alt="${esc(r.name)}">` : ''}
         <h3>${esc(t('roomSaved', { room: L(r, 'name') }))}</h3>
         ${L(r, 'nights') ? `<p class="muted" style="margin:0 0 6px">${esc(L(r, 'nights'))}</p>` : ''}
-        ${L(r, 'price') ? `<p class="price">${esc(L(r, 'price'))}</p>` : ''}
+        ${r.free ? `<p class="price">${t('roomFree')}</p>` : L(r, 'price') ? `<p class="price">${esc(L(r, 'price'))}</p>` : ''}
         <p style="margin-top:0">${esc(L(r, 'description'))}</p>
         <p class="muted" style="margin-top:0">${t('breakfast')}</p>
         <div class="choices">
