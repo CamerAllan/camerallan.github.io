@@ -10,5 +10,4 @@ withInvite(data => {
     </div>`;
   }).join('');
   $('itinerary').innerHTML = html || `<p>${t('itinEmpty')}</p>`;
-  $('legend').textContent = t('itinLegend');
 }, 'itinerary');

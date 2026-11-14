@@ -50,9 +50,9 @@ function rsvpStatus(kind, existing) {
 function statusBadge(kind, existing) {
   if (!kind) return '';
   const s = rsvpStatus(kind, existing);
-  if (s === 'yes') return `<span class="status yes">✓ ${t('stYes')}</span>`;
-  if (s === 'no') return `<span class="status no">✗ ${t('stNo')}</span>`;
-  return `<a class="status todo" href="rsvp.html">● ${t('stTodo')}</a>`;
+  if (s === 'yes') return `<span class="status yes">${t('stYes')}</span>`;
+  if (s === 'no') return `<span class="status no">${t('stNo')}</span>`;
+  return `<a class="status todo" href="rsvp.html">${t('stTodo')}</a>`;
 }
 
 // If a cell ever arrives as a full date string ("Fri Jun 11 2027 19:00:00 GMT+0100 …"), show just the useful part.

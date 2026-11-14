@@ -60,9 +60,9 @@ try {
 // also get those listed underneath; everyone else simply doesn't see that part.
 function badge(kind, data) {
   const s = rsvpStatus(kind, data.existing);
-  return s === 'yes' ? `<span class="status yes">✓ ${t('stYes')}</span>`
-       : s === 'no' ? `<span class="status no">✗ ${t('stNo')}</span>`
-       : `<span class="status todo">● ${t('stTodo')}</span>`;
+  return s === 'yes' ? `<span class="status yes">${t('stYes')}</span>`
+       : s === 'no' ? `<span class="status no">${t('stNo')}</span>`
+       : `<span class="status todo">${t('stTodo')}</span>`;
 }
 withInvite(data => {
   $('wedding-status').innerHTML = badge('wedding', data);
