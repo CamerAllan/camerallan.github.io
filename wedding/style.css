@@ -240,3 +240,9 @@ main, #gate { border-color:var(--duck); box-shadow:inset 0 0 0 7px var(--paper),
 .names .last { font-size:.74em; margin:-.26em 0 .1em; }
 /* Surnames sit just below the capitals without touching them */
 .names .last { margin:.02em 0 .12em; }
+
+/* Home photo: portrait, set slightly to the left, with a frame offset behind it in the page-border style */
+.hero-wrap { position:relative; width:min(74%, 330px); margin:8px 0 52px 3%; isolation:isolate; }
+.hero-wrap::before { content:""; position:absolute; inset:0; transform:translate(18px, 18px); z-index:-1;
+  border:6px solid var(--duck); box-shadow:inset 0 0 0 5px var(--paper), inset 0 0 0 6px var(--duck); }
+.hero-wrap .hero { display:block; width:100%; height:auto; aspect-ratio:auto; margin:0; outline:0; }
