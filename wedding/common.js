@@ -30,19 +30,23 @@ const DEMO = {
   saved:{}
 };
 
-async function apiGet(code) {
+async function apiGet(code, name) {
   if (!API_URL) {
     await new Promise(r => setTimeout(r, 300));
     const inv = DEMO.invites[code];
-    return inv ? { ok:true, invite:inv, menu:DEMO.menu, existing:DEMO.saved[code] || [] } : { ok:false, error:'not_found' };
+    if (!inv) return { ok:false, error:'not_found' };
+    if (!nameMatches(inv.guests, name)) return { ok:false, error: name ? 'name_mismatch' : 'name_required', lang: inv.lang || 'en' };
+    return { ok:true, invite:inv, menu:DEMO.menu, existing:DEMO.saved[code] || [] };
   }
-  const res = await fetch(API_URL + '?code=' + encodeURIComponent(code));
+  const res = await fetch(API_URL + '?code=' + encodeURIComponent(code) + '&name=' + encodeURIComponent(name || ''));
   return res.json();
 }
 
 async function apiPost(payload) {
+  payload = { ...payload, name: getVerified()?.name || '' };
   if (!API_URL) {
     await new Promise(r => setTimeout(r, 300));
+    if (!nameMatches(DEMO.invites[payload.code].guests, payload.name)) return { ok:false, error:'name_mismatch' };
     DEMO.saved[payload.code] = payload.people.map(p => ({
       guest_name:p.guest_name, is_plus_one:p.is_plus_one?'yes':'no', attending:p.attending?'yes':'no',
       diets:p.diets.join(', '), dietary_notes:p.dietary, room_accepted: payload.room_accepted===true?'yes':payload.room_accepted===false?'no':'',
@@ -61,12 +65,103 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 
 // ---- Remembered invite code (shared by all pages) ----
 // Any page opened with ?code=XXXX remembers it, so the other pages can show that household's details.
-const CODE_KEY = 'weddingInviteCode';
+const CODE_KEY = 'weddingInviteCode', VERIFIED_KEY = 'weddingVerified';
 function storeCode(code) { try { localStorage.setItem(CODE_KEY, code); } catch (e) {} }
 function getCode() {
   const fromUrl = new URLSearchParams(location.search).get('code');
   if (fromUrl) { storeCode(fromUrl.trim().toUpperCase()); return fromUrl.trim().toUpperCase(); }
   try { return localStorage.getItem(CODE_KEY) || ''; } catch (e) { return ''; }
+}
+
+// ---- Lock: the whole site needs an invite code + a surname from that invite ----
+// Once passed, this browser remembers it ({ code, name }). The backend checks the surname too.
+function getVerified() { try { return JSON.parse(localStorage.getItem(VERIFIED_KEY) || 'null'); } catch (e) { return null; } }
+function setVerified(code, name) { try { localStorage.setItem(VERIFIED_KEY, JSON.stringify({ code, name })); } catch (e) {} }
+function clearVerified() { try { localStorage.removeItem(VERIFIED_KEY); } catch (e) {} }
+function isUnlocked() { const v = getVerified(); return !!v && v.code === getCode(); }
+/** Run fn now if the site is unlocked, otherwise as soon as the guest gets past the lock. */
+function whenUnlocked(fn) {
+  if (isUnlocked()) fn();
+  else document.addEventListener('inviteunlocked', () => fn(), { once: true });
+}
+
+// Same forgiving check as the backend (used in demo mode): case, accents and small typos don't matter,
+// and any surname in the household works.
+function nameTokens(s) { return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/[^a-z]+/).filter(Boolean); }
+function editDistance(a, b) {
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[b.length];
+}
+function nameMatches(guests, input) {
+  const typed = nameTokens(input);
+  if (!typed.length) return false;
+  typed.push(typed.join(''));
+  const known = [];
+  guests.forEach(g => { const p = nameTokens(g); const s = p.length > 1 ? p.slice(1) : p; known.push(...s); if (s.length > 1) known.push(s.join('')); });
+  return typed.some(t => known.some(k => editDistance(t, k) <= (k.length >= 8 ? 2 : k.length >= 4 ? 1 : 0)));
+}
+
+function showGate() {
+  const code = getCode();
+  const gate = document.createElement('div');
+  gate.id = 'gate';
+  gate.innerHTML = `
+    <h1>Cameron &amp; Annie</h1>
+    <form class="card" id="gate-form" novalidate>
+      <p style="margin-top:0">${code
+        ? '<span data-lang="en">To see the website, please enter your surname.</span><span data-lang="es">Para ver la web, escribe tu apellido.</span>'
+        : '<span data-lang="en">To see the website, please enter the invite code from your invitation and your surname.</span><span data-lang="es">Para ver la web, escribe el código de tu invitación y tu apellido.</span>'}</p>
+      ${code ? '' : `<label for="gate-code"><span data-lang="en">Invite code</span><span data-lang="es">Código de invitación</span></label>
+      <input type="text" id="gate-code" autocomplete="off" autocapitalize="characters">`}
+      <label for="gate-name"><span data-lang="en">Surname</span><span data-lang="es">Apellido</span></label>
+      <input type="text" id="gate-name" autocomplete="family-name">
+      <div id="gate-error" class="error hidden"></div>
+      <p style="margin-bottom:0"><button type="submit" id="gate-btn"><span data-lang="en">Continue</span><span data-lang="es">Continuar</span></button></p>
+    </form>
+    <div class="lang-switch"><a href="#" data-set-lang="es" data-lang="en" title="Ver en español" aria-label="Ver en español">🇪🇸</a><a href="#" data-set-lang="en" data-lang="es" title="View in English" aria-label="View in English">🇬🇧</a></div>`;
+  document.body.prepend(gate);
+  gate.querySelectorAll('[data-set-lang]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); setLang(a.dataset.setLang, true); }));
+  (code ? $('gate-name') : $('gate-code')).focus();
+
+  $('gate-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const c = code || $('gate-code').value.trim().toUpperCase();
+    const name = $('gate-name').value.trim();
+    const err = msg => { $('gate-error').textContent = msg; show($('gate-error'), true); };
+    if (!c) return err(t('gateNeedCode'));
+    if (!name) return err(t('gateNeedName'));
+    show($('gate-error'), false);
+    $('gate-btn').disabled = true;
+    try {
+      const data = await apiGet(c, name);
+      if (!data.ok) {
+        if (data.lang) adoptInviteLang({ lang: data.lang });
+        return err(data.error === 'not_found' ? t('notFound') : data.error === 'name_mismatch' ? t('gateWrongName') : t('wentWrong'));
+      }
+      storeCode(c);
+      setVerified(c, name);
+      cacheInvite(c, data);
+      adoptInviteLang(data.invite);
+      if (!new URLSearchParams(location.search).get('code')) {
+        const u = new URL(location.href); u.searchParams.set('code', c); history.replaceState(null, '', u);
+      }
+      document.documentElement.classList.remove('locked');
+      gate.remove();
+      document.dispatchEvent(new CustomEvent('inviteunlocked', { detail: data }));
+    } catch (e2) {
+      err(t('unreachable'));
+    } finally {
+      if ($('gate-btn')) $('gate-btn').disabled = false; // gone once unlocked
+    }
+  });
+
+  // Find out the household's language (returned even before the surname is given) so the prompt can switch.
+  if (code) apiGet(code, '').then(d => { if (d.lang) adoptInviteLang({ lang: d.lang }); }).catch(() => {});
 }
 
 // Cache the invite for this browser session so moving between pages doesn't wait on Google each time.
@@ -75,7 +170,7 @@ const invitePromises = {};
 function getInvite(code) {
   try { const hit = sessionStorage.getItem('invite:' + code); if (hit) return Promise.resolve(JSON.parse(hit)); } catch (e) {}
   if (!invitePromises[code]) {
-    invitePromises[code] = apiGet(code).then(data => { if (data.ok) cacheInvite(code, data); else delete invitePromises[code]; return data; },
+    invitePromises[code] = apiGet(code, getVerified()?.name).then(data => { if (data.ok) cacheInvite(code, data); else delete invitePromises[code]; return data; },
                                               err => { delete invitePromises[code]; throw err; });
   }
   return invitePromises[code];
@@ -118,6 +213,7 @@ function term(s) { return (getLang() === 'es' && TERMS_ES[s]) || s; }
 
 const STR = {
   en: {
+    gateNeedCode: 'Please enter your invite code.', gateNeedName: 'Please enter your surname.', gateWrongName: 'That surname doesn’t match this invitation. Please try again.',
     doneNew: 'Thank you, your RSVP is in.', doneExisting: 'You’ve already replied. Here’s your RSVP:',
     whosComing: 'Who’s coming', mealChoices: 'Meal choices', alsoInvitedShort: 'You’re also invited to the night before!',
     greeting: 'Hello {names}! We’d love to know if you can make it.',
@@ -142,6 +238,7 @@ const STR = {
     changeAnswer: 'Change your answer', letUsKnowRoom: 'Let us know if you’d like it'
   },
   es: {
+    gateNeedCode: 'Escribe tu código de invitación.', gateNeedName: 'Escribe tu apellido.', gateWrongName: 'Ese apellido no coincide con esta invitación. Inténtalo de nuevo.',
     doneNew: '¡Gracias! Hemos recibido vuestra respuesta.', doneExisting: 'Ya nos habéis respondido. Esta es vuestra respuesta:',
     whosComing: '¿Quién viene?', mealChoices: 'Menú', alsoInvitedShort: '¡También estáis invitados a la noche anterior!',
     greeting: '¡Hola, {names}! Nos encantaría saber si podéis venir.',
@@ -178,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     setLang(a.dataset.setLang, true);
   }));
-  const code = getCode();
-  if (code) getInvite(code).then(d => { if (d.ok) adoptInviteLang(d.invite); }).catch(() => {});
+  if (!isUnlocked()) { document.documentElement.classList.add('locked'); showGate(); return; }
+  document.documentElement.classList.remove('locked');
+  getInvite(getCode()).then(d => { if (d.ok) adoptInviteLang(d.invite); }).catch(() => {});
 });

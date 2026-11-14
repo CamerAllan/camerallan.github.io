@@ -81,3 +81,10 @@ html:not([lang=es]) [data-lang=es], html[lang=es] [data-lang=en] { display:none 
 /* Bridesmaid colour swatch: set the colour here once chosen */
 .swatch { display:inline-block; width:1.4em; height:1.4em; vertical-align:middle; border-radius:50%; border:1px solid var(--line);
   background:repeating-linear-gradient(45deg, #eee 0 4px, #ddd 4px 8px); }
+
+/* Lock screen: while locked, only the surname prompt (and the language flag) is shown */
+html.locked main { display:none; }
+#gate { max-width:420px; margin:0 auto; padding:72px 20px; text-align:center; }
+#gate form { text-align:left; }
+#gate button { width:100%; }
+html:not(.locked) #gate { display:none; }

@@ -34,6 +34,12 @@ function doGet(e) {
     if (!code) return json_({ ok: false, error: 'missing_code' });
     var invite = findInvite_(code);
     if (!invite) return json_({ ok: false, error: 'not_found' });
+    // Guests must give a surname from their invite (like an airline's "manage booking").
+    // The household's language is still returned so the surname prompt can be shown in Spanish.
+    var name = e.parameter.name || '';
+    if (!nameMatches_(invite.guests, name)) {
+      return json_({ ok: false, error: name ? 'name_mismatch' : 'name_required', lang: invite.lang });
+    }
     return json_({
       ok: true,
       invite: publicInvite_(invite),
@@ -53,6 +59,7 @@ function doPost(e) {
     var code = normaliseCode_(body.code);
     var invite = code && findInvite_(code);
     if (!invite) return json_({ ok: false, error: 'not_found' });
+    if (!nameMatches_(invite.guests, body.name)) return json_({ ok: false, error: 'name_mismatch' });
 
     var menu = readMenu_();
     var people = Array.isArray(body.people) ? body.people : [];
@@ -316,4 +323,53 @@ function testNotification() {
   var invite = { guests: ['Test Guest'], nightBefore: false, room: null };
   var header = ['guest_name', 'is_plus_one', 'attending', 'Main', 'message'];
   notify_(invite, header, [['Test Guest', 'no', 'yes', 'Sticky Pulled Beef Shin', 'This is a test']], false, { courses: [{ name: 'Main' }] });
+}
+
+
+// ---------- Surname check ----------
+// Deliberately forgiving: ignores case, accents and punctuation, accepts any surname in the household
+// (e.g. either of a Spanish guest's two surnames), and allows small typos. It's there to stop a forwarded
+// link being used by someone else, not to be a password.
+
+function normName_(s) {
+  return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
+function nameTokens_(s) {
+  return normName_(s).split(/[^a-z]+/).filter(String);
+}
+/** Surnames for everyone on the invite: every word after the first name, plus the surname run together
+ *  (so "Mac Donald" also matches "macdonald"). Guests listed with only one name use that name. */
+function surnameTokens_(guests) {
+  var out = [];
+  guests.forEach(function (g) {
+    var parts = nameTokens_(g);
+    var surnames = parts.length > 1 ? parts.slice(1) : parts;
+    out = out.concat(surnames);
+    if (surnames.length > 1) out.push(surnames.join(''));
+  });
+  return out;
+}
+function editDistance_(a, b) {
+  var prev = [], cur, i, j;
+  for (j = 0; j <= b.length; j++) prev[j] = j;
+  for (i = 1; i <= a.length; i++) {
+    cur = [i];
+    for (j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+    prev = cur;
+  }
+  return prev[b.length];
+}
+function nameMatches_(guests, input) {
+  var typed = nameTokens_(input);
+  if (!typed.length) return false;
+  typed.push(typed.join(''));
+  var known = surnameTokens_(guests);
+  return typed.some(function (t) {
+    return known.some(function (k) {
+      var allowed = k.length >= 8 ? 2 : k.length >= 4 ? 1 : 0; // typos allowed, scaled to name length
+      return editDistance_(t, k) <= allowed;
+    });
+  });
 }

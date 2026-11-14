@@ -317,13 +317,19 @@ function setLoading(on) {
   }, ms)));
 }
 
-async function loadInvite(code) {
+async function loadInvite(code, prefetched) {
   code = code.trim().toUpperCase();
   show($('code-error'), false);
   show($('code-form'), false);
   setLoading(true);
   try {
-    const data = await apiGet(code);
+    const data = prefetched || await apiGet(code, getVerified()?.name);
+    if (!data.ok && (data.error === 'name_mismatch' || data.error === 'name_required')) {
+      // The remembered surname no longer matches (e.g. the guest list changed): ask again.
+      clearVerified();
+      location.reload();
+      return;
+    }
     if (!data.ok) {
       $('code-error').textContent = data.error === 'not_found' ? t('notFound') : t('wentWrong');
       show($('code-error'), true);
@@ -429,6 +435,7 @@ document.addEventListener('langchange', () => {
   }
 });
 
-// Load straight away if we know their code (from the link, or remembered from another page).
-const initial = getCode();
-if (initial) { show($('code-form'), false); loadInvite(initial); }
+// Load as soon as the guest is past the lock. If they've just unlocked on this page,
+// reuse what the lock screen fetched rather than asking Google again.
+if (isUnlocked()) loadInvite(getCode());
+else document.addEventListener('inviteunlocked', e => loadInvite(getCode(), e.detail), { once: true });
