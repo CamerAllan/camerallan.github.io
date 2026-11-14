@@ -1,0 +1,157 @@
+
+/* ==========================================================================
+   EMBOSSED WEDDING THEME
+   1. Change the look in the CONFIG block below.
+   2. Copy this <style> block and the <svg class="invite-sprite"> block
+      (just inside <body>) into your site.
+   3. Wrap any page or section in the .invite markup shown in the examples.
+   ========================================================================== */
+
+/* ---------- CONFIG: everything you are likely to change ------------------ */
+:root {
+  /* Colour */
+  --paper:        #ebe4d9;   /* card colour; the florals pick this up too      */
+  --page:         #ebe4d9;   /* colour behind the card (same = seamless)       */
+  --ink:          #4b4844;   /* names and headings                             */
+  --ink-soft:     #8a8279;   /* small caps body text                           */
+  --frame-color:  #c6b7a3;   /* the double-line border                         */
+  --frame-shine:  #fbf8f3;   /* thin highlight that makes the border look pressed */
+
+  /* Border */
+  --frame-inset:  clamp(14px, 4cqw, 44px);   /* gap between card edge and border */
+  --frame-corner: clamp(30px, 7cqw, 64px);   /* size of the curved corners       */
+  --frame-weight: 1.25px;                    /* line thickness                   */
+
+  /* Florals */
+  --floral-size:    clamp(190px, 46cqw, 520px);  /* size of each corner spray   */
+  --floral-offset:  clamp(-6px, -1cqw, 0px);     /* nudge toward / away from corner */
+  --floral-opacity: 1;                           /* lower for a fainter emboss  */
+  --floral-line:    #b3a48f;                     /* fine outline around petals and leaves */
+  --floral-line-strength: 0.4;                   /* 0 = relief only, 1 = strong outline   */
+
+  /* Paper texture: 0 = flat colour, 0.5 = quite grainy */
+  --grain: 0.22;
+
+  /* Type */
+  --font-serif:  "Cormorant Garamond", "Cormorant", Garamond, "Times New Roman", serif;
+  --font-script: "Pinyon Script", "Snell Roundhand", "Apple Chancery", cursive;
+}
+/* ---------- end of CONFIG ------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--page); }
+
+.invite-sprite { position: absolute; }
+.invite-sprite feDiffuseLighting { lighting-color: var(--paper); }
+.invite-sprite .floral-line { flood-color: var(--floral-line); flood-opacity: var(--floral-line-strength); }
+
+/* The card. It grows with its content and with whatever width you give it. */
+.invite {
+  container-type: inline-size;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-serif);
+}
+.invite--page { min-height: 100vh; min-height: 100svh; display: grid; }
+
+/* Paper grain */
+.invite::before {
+  content: "";
+  position: absolute; inset: 0; z-index: -1;
+  opacity: var(--grain);
+  mix-blend-mode: multiply;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5  0 0 0 0 .45  0 0 0 0 .4  0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* Border: four stretchy edges (gradients) + four fixed-shape corners (SVG) */
+.invite__frame {
+  --c: var(--frame-corner);
+  --w: var(--frame-weight);
+  --g: calc(var(--c) * 0.09);            /* distance between the two lines */
+  --l: linear-gradient(var(--frame-color), var(--frame-color));
+  position: absolute; inset: var(--frame-inset); z-index: 0;
+  pointer-events: none;
+  background:
+    var(--l) var(--c) 0 / calc(100% - 2 * var(--c)) var(--w),
+    var(--l) var(--c) 100% / calc(100% - 2 * var(--c)) var(--w),
+    var(--l) 0 var(--c) / var(--w) calc(100% - 2 * var(--c)),
+    var(--l) 100% var(--c) / var(--w) calc(100% - 2 * var(--c)),
+    var(--l) var(--c) var(--g) / calc(100% - 2 * var(--c)) var(--w),
+    var(--l) var(--c) calc(100% - var(--g)) / calc(100% - 2 * var(--c)) var(--w),
+    var(--l) var(--g) var(--c) / var(--w) calc(100% - 2 * var(--c)),
+    var(--l) calc(100% - var(--g)) var(--c) / var(--w) calc(100% - 2 * var(--c));
+  background-repeat: no-repeat;
+  filter: drop-shadow(0.6px 0.9px 0 var(--frame-shine));
+}
+.invite__frame svg {
+  position: absolute; width: var(--c); height: var(--c); overflow: visible;
+  fill: none; stroke: var(--frame-color); stroke-width: var(--w);
+}
+.invite__frame svg * { vector-effect: non-scaling-stroke; }
+.invite__frame svg circle { fill: var(--frame-color); stroke: none; }
+.invite__frame svg:nth-child(1) { top: calc(var(--w) / 2);    left: calc(var(--w) / 2); }
+.invite__frame svg:nth-child(2) { top: calc(var(--w) / 2);    right: calc(var(--w) / 2);  transform: scaleX(-1); }
+.invite__frame svg:nth-child(3) { bottom: calc(var(--w) / 2); right: calc(var(--w) / 2);  transform: scale(-1); }
+.invite__frame svg:nth-child(4) { bottom: calc(var(--w) / 2); left: calc(var(--w) / 2);   transform: scaleY(-1); }
+
+/* Florals: one drawing, mirrored into whichever corners you ask for */
+.invite__floral {
+  position: absolute; z-index: 1;
+  width: var(--floral-size); height: var(--floral-size);
+  overflow: visible; pointer-events: none;
+  opacity: var(--floral-opacity);
+  fill: #fff; stroke: #fff;              /* only the shapes matter; the filter recolours them */
+}
+.invite__floral { filter: url(#emboss); }
+.invite__floral use { transform-origin: 50% 50%; }   /* flip the drawing, not the lighting */
+.invite__floral--tl { top: var(--floral-offset);    left: var(--floral-offset); }
+.invite__floral--tr { top: var(--floral-offset);    right: var(--floral-offset); }
+.invite__floral--br { bottom: var(--floral-offset); right: var(--floral-offset); }
+.invite__floral--bl { bottom: var(--floral-offset); left: var(--floral-offset); }
+.invite__floral--tr use { transform: scaleX(-1); }
+.invite__floral--br use { transform: scale(-1); }
+.invite__floral--bl use { transform: scaleY(-1); }
+.invite-sprite .p { stroke-width: 1.5; stroke-opacity: .8; stroke-linejoin: round; }
+.invite-sprite .v { fill: none; stroke-width: 1; stroke-opacity: .4; stroke-linecap: round; }
+.invite-sprite .s { fill: none; stroke-opacity: .8; stroke-linecap: round; }
+.invite-sprite .d { stroke: none; fill-opacity: .8; }
+.invite__floral--small { --floral-size: clamp(120px, 26cqw, 300px); }
+
+/* Content area: padded so text clears the border and the corner florals */
+.invite__content {
+  position: relative; z-index: 2;
+  align-self: center;
+  padding:
+    calc(var(--frame-inset) + var(--floral-size) * 0.52)
+    calc(var(--frame-inset) + var(--frame-corner) * 0.6 + 4cqw)
+    calc(var(--frame-inset) + var(--floral-size) * 0.52);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Type helpers (optional) */
+.invite__eyebrow, .invite__text {
+  margin: 0; color: var(--ink-soft);
+  font-size: clamp(0.7rem, 0.55rem + 1cqw, 1rem);
+  letter-spacing: 0.24em; line-height: 2; text-transform: uppercase;
+}
+.invite__text + .invite__text { margin-top: 2.2em; }
+.invite__names {
+  margin: 1.1em 0 1em; font-weight: 400; color: var(--ink);
+  font-size: clamp(1.7rem, 1rem + 5cqw, 4rem);
+  letter-spacing: 0.16em; line-height: 1.15; text-transform: uppercase;
+}
+.invite__names span { display: block; }
+.invite__names .invite__and {
+  font-family: var(--font-script); font-size: 0.8em;
+  letter-spacing: 0.02em; text-transform: none; line-height: 1.3; color: var(--ink-soft);
+}
+.invite__heading {
+  margin: 0 0 1em; font-weight: 400; color: var(--ink);
+  font-size: clamp(1.3rem, 1rem + 2.4cqw, 2.2rem);
+  letter-spacing: 0.18em; text-transform: uppercase;
+}

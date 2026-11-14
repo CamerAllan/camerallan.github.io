@@ -122,8 +122,13 @@ function showGate() {
   const code = getCode();
   const gate = document.createElement('div');
   gate.id = 'gate';
+  gate.className = 'invite invite--page';
   gate.innerHTML = `
-    <h1>Cameron &amp; Annie</h1>
+    <div class="invite__frame" aria-hidden="true"><svg><use href="#frame-corner"/></svg><svg><use href="#frame-corner"/></svg><svg><use href="#frame-corner"/></svg><svg><use href="#frame-corner"/></svg></div>
+    <svg class="invite__floral invite__floral--tl" aria-hidden="true"><use href="#floral-spray"/></svg>
+    <svg class="invite__floral invite__floral--br" aria-hidden="true"><use href="#floral-spray"/></svg>
+    <div class="invite__content">
+    <h1 class="invite__names"><span>Cameron</span><span class="invite__and">and</span><span>Annie</span></h1>
     <form class="card" id="gate-form" novalidate>
       <p style="margin-top:0">${code
         ? '<span data-lang="en">To see the website, please enter your surname.</span><span data-lang="es">Para ver la web, escribe tu apellido.</span>'
@@ -135,8 +140,9 @@ function showGate() {
       <div id="gate-error" class="error hidden"></div>
       <p style="margin-bottom:0"><button type="submit" id="gate-btn"><span data-lang="en">Continue</span><span data-lang="es">Continuar</span></button></p>
     </form>
+    </div>
     <div class="lang-switch"><a href="#" data-set-lang="es" data-lang="en" title="Ver en español" aria-label="Ver en español">🇪🇸</a><a href="#" data-set-lang="en" data-lang="es" title="View in English" aria-label="View in English">🇬🇧</a></div>`;
-  document.body.prepend(gate);
+  document.querySelector('.invite-sprite').after(gate);
   gate.querySelectorAll('[data-set-lang]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); setLang(a.dataset.setLang, true); }));
   (code ? $('gate-name') : $('gate-code')).focus();
 
