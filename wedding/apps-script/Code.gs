@@ -221,7 +221,11 @@ function readItinerary_(invite) {
     room: !!invite.room,
     bridal_party: invite.bridalParty.length > 0
   };
-  return rows_('Itinerary')
+  // Display values, so times/dates Sheets has auto-converted come through as shown (not "Sat Dec 30 1899 …").
+  var values = sheet.getDataRange().getDisplayValues();
+  var header = values.shift().map(function (h) { return String(h).trim(); });
+  var rows = values.map(function (r) { var o = {}; header.forEach(function (h, i) { o[h] = r[i]; }); return o; });
+  return rows
     .filter(function (r) { return String(r.title || '').trim() && invitedTo[String(r['for'] || '').trim().toLowerCase()]; })
     .map(function (r) {
       var out = {};
