@@ -1,3 +1,9 @@
+/** The dish name in the current language (answers are stored by the English name). */
+function optionLabel(course, value) {
+  const o = (course.options || []).find(o => o.option === value);
+  return o ? (L(o, 'option') || value) : value;
+}
+
 // ---- RSVP form ----
 // Steps: 1 Who's coming → 2 Meal choices (one card per attending person) → Night-before (if invited)
 //        → Room (if offered) → Anything else. Step numbers come from CSS and skip hidden steps.
@@ -96,7 +102,7 @@ function refreshOptions(el) {
       const tags = diets.map(d => '✓ ' + esc(term(d)) + (o.diets[d] ? ' (' + esc(term(o.diets[d])) + ')' : '')).join(' · ');
       return `<label class="dish">
         <input type="radio" name="${name}" value="${esc(o.option)}" ${o.option === current ? 'checked' : ''}>
-        <span><strong>${esc(o.option)}</strong>
+        <span><strong>${esc(L(o, 'option'))}</strong>
           ${L(o, 'description') ? `<span class="desc">${esc(L(o, 'description'))}</span>` : ''}
           ${tags ? `<span class="tags">${tags}</span>` : ''}</span>
       </label>`;
@@ -297,7 +303,7 @@ function renderSummary(payload) {
     if (!p.attending) return `<dt>${esc(p.guest_name)}</dt><dd><span class="status no">${t('notAttending')}</span></dd>`;
     const meals = state.menu.courses
       .filter(c => p.courses[c.name])
-      .map(c => `<li><span class="course-name">${esc(term(c.name))}</span>${esc(p.courses[c.name])}</li>`).join('');
+      .map(c => `<li><span class="course-name">${esc(term(c.name))}</span>${esc(optionLabel(c, p.courses[c.name]))}</li>`).join('');
     const diet = [...p.diets.filter(d => d !== OTHER).map(term), p.dietary].filter(Boolean).map(esc).join(', ');
     return `<dt>${esc(p.guest_name)}</dt><dd>
       <span class="status yes">${t('attending')}</span>

@@ -17,14 +17,14 @@ const DEMO = {
   },
   menu:{ diets:['Vegan','Vegetarian','Gluten-free'], courses:[
     { name:'Starter', options:[
-      {option:'Scottish Salmon Three Ways',description:'Heritage Beetroot',description_es:'Remolacha tradicional',diets:{'Gluten-free':'on request'}},
-      {option:'Goats Cheese Arancini',description:'Rocket & Red Onion | Beetroot',diets:{Vegetarian:'','Gluten-free':'on request'}}] },
+      {option:'Scottish Salmon Three Ways',option_es:'Salmón escocés en tres versiones',description:'Heritage Beetroot',description_es:'Remolacha tradicional',diets:{'Gluten-free':'on request'}},
+      {option:'Goats Cheese Arancini',option_es:'Arancini de queso de cabra',description:'Rocket & Red Onion | Beetroot',diets:{Vegetarian:'','Gluten-free':'on request'}}] },
     { name:'Main', options:[
-      {option:'Sticky Pulled Beef Shin',description:'Beer Braised Shallot | Creamed Potato | Tender Stem | Beef Jus',diets:{'Gluten-free':''}},
-      {option:'Chicken Balmoral Roulade',description:'Creamed Potato | Glazed Carrot | Whisky Sauce',diets:{}}] },
+      {option:'Sticky Pulled Beef Shin',option_es:'Jarrete de ternera desmenuzado y glaseado',description:'Beer Braised Shallot | Creamed Potato | Tender Stem | Beef Jus',diets:{'Gluten-free':''}},
+      {option:'Chicken Balmoral Roulade',option_es:'Rollito de pollo Balmoral',description:'Creamed Potato | Glazed Carrot | Whisky Sauce',diets:{}}] },
     { name:'Dessert', options:[
-      {option:'Rowallan Bakery Sticky Toffee Pudding',description:'Vanilla Ice Cream | Toffee Sauce',description_es:'Helado de vainilla | Salsa de toffee',diets:{}},
-      {option:'Blueberry Bakewell Tart',description:'Lavender Anglaise | Madagascan Vanilla Ice Cream',diets:{}}] }
+      {option:'Rowallan Bakery Sticky Toffee Pudding',option_es:'Sticky toffee pudding de la panadería de Rowallan',description:'Vanilla Ice Cream | Toffee Sauce',description_es:'Helado de vainilla | Salsa de toffee',diets:{}},
+      {option:'Blueberry Bakewell Tart',option_es:'Tarta Bakewell de arándanos',description:'Lavender Anglaise | Madagascan Vanilla Ice Cream',diets:{}}] }
   ]},
   saved:{},
   itinerary:[
@@ -36,6 +36,12 @@ const DEMO = {
     {day:'Sunday 13th June',day_es:'Domingo 13 de junio',time:'9:30am',time_es:'9:30',title:'Breakfast',title_es:'Desayuno',details:'Included with your room.',for:'room',rsvp:'room'}
   ]
 };
+DEMO.events = [
+  { event:'night_before', title:'Night-before party', title_es:'Fiesta de la noche anterior', when:'Friday 11th June 2027, from 7pm', when_es:'Viernes 11 de junio de 2027, a partir de las 19:00', location:'Placeholder pub, Glasgow', details:'Casual drinks the night before.', details_es:'Unas copas informales la noche antes.' },
+  { event:'wedding', title:'The wedding', title_es:'La boda', when:'Saturday 12th June 2027', when_es:'Sábado, 12 de junio de 2027', location:'Rowallan Castle, Kilmaurs, Ayrshire KA3 2LP', location_es:'Rowallan Castle, Kilmaurs, Ayrshire, Escocia KA3 2LP',
+    details:'[Placeholder: a few lines about Rowallan Castle.]\nDress code: cocktail attire. Highland dress is very welcome!', details_es:'[Texto provisional: unas líneas sobre Rowallan Castle.]\nVestimenta: cóctel. ¡El kilt es más que bienvenido!' },
+  { event:'morning_after', title:'The morning after', title_es:'La mañana siguiente', when:'Sunday 13th June 2027', when_es:'Domingo, 13 de junio de 2027', location:'Rowallan Castle', details:'Breakfast is included for everyone staying at the castle.', details_es:'El desayuno está incluido para quienes se alojen en el castillo.' }
+];
 function demoItinerary(inv) {
   const ok = { everyone:true, night_before:!!inv.nightBefore, room:!!inv.room, bridal_party:inv.code === 'DEMO01' };
   return DEMO.itinerary.filter(r => ok[r.for]);
@@ -47,7 +53,8 @@ async function apiGet(code, name) {
     const inv = DEMO.invites[code];
     if (!inv) return { ok:false, error:'not_found' };
     if (!nameMatches(inv.guests, name)) return { ok:false, error: name ? 'name_mismatch' : 'name_required', lang: inv.lang || 'en' };
-    return { ok:true, invite:inv, menu:DEMO.menu, existing:DEMO.saved[code] || [], itinerary: demoItinerary(inv) };
+    return { ok:true, invite:inv, menu:DEMO.menu, existing:DEMO.saved[code] || [], itinerary: demoItinerary(inv),
+      events: DEMO.events.filter(e => e.event === 'wedding' || (e.event === 'night_before' && inv.nightBefore) || (e.event === 'morning_after' && inv.room)) };
   }
   const res = await fetch(API_URL + '?code=' + encodeURIComponent(code) + '&name=' + encodeURIComponent(name || ''));
   return res.json();
@@ -242,7 +249,7 @@ function term(s) { return (getLang() === 'es' && TERMS_ES[s]) || s; }
 
 const STR = {
   en: {
-    parkingLink: 'Getting there &amp; parking →',
+    when: 'When', where: 'Where', openMap: 'Open in Google Maps',
     alsoForYou: 'Also for you',
     notInvitedNb: 'The night-before party isn’t part of your invitation, but we can’t wait to see you at the wedding!', backHome: '← Back to home', timings: 'Timings', nothingMorning: 'Nothing’s planned for you the morning after. Safe travels home!',
     stYes: 'Confirmed', stNo: 'Declined', stTodo: 'RSVP needed', itinEmpty: 'Your itinerary will appear here soon.', itinLegend: '✓ you’ve said yes · ✗ you’ve said no · ● tap to RSVP',
@@ -272,7 +279,7 @@ const STR = {
     changeAnswer: 'Change your answer', letUsKnowRoom: 'Let us know if you’d like it'
   },
   es: {
-    parkingLink: 'Cómo llegar y aparcamiento →',
+    when: 'Cuándo', where: 'Dónde', openMap: 'Abrir en Google Maps',
     alsoForYou: 'También para vosotros',
     notInvitedNb: 'La fiesta de la noche anterior no forma parte de vuestra invitación, ¡pero tenemos muchas ganas de veros en la boda!', backHome: '← Volver al inicio', timings: 'Horario', nothingMorning: 'No hay nada previsto para vosotros la mañana siguiente. ¡Buen viaje de vuelta!',
     stYes: 'Confirmado', stNo: 'Rechazado', stTodo: 'Falta confirmar', itinEmpty: 'Vuestro itinerario aparecerá aquí pronto.', itinLegend: '✓ habéis dicho que sí · ✗ habéis dicho que no · ● pulsa para confirmar',

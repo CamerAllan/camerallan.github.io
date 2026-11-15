@@ -29,7 +29,8 @@ try {
     <div class="lang-switch"><a href="#" data-set-lang="es" data-lang="en" lang="es">Español</a><a href="#" data-set-lang="en" data-lang="es" lang="en">English</a></div>
   </header>
 
-  <div class="hero-wrap"><img class="hero" src="us.jpg" alt="Cameron &amp; Annie" width="772" height="1038"></div>
+  <!-- Photo slideshow: add more photos to data-photos (comma-separated, same shape as us.jpg ideally) -->
+  <div class="hero-wrap slideshow" data-photos="us.jpg"><img class="hero" src="us.jpg" alt="Cameron &amp; Annie" width="772" height="1038"></div>
 
   <section>
     <p class="blurb"><span data-lang="en">We’re so excited to be getting married, and we can’t wait to celebrate with our favourite people.</span><span data-lang="es">Estamos muy ilusionados por casarnos y deseando celebrarlo con nuestras personas favoritas.</span></p>
@@ -43,6 +44,25 @@ try {
   </section>
 </main>
 <script src="common.js"></script>
+<script>
+// Cross-fade through the photos listed in data-photos; tap a photo to skip ahead.
+(function () {
+  var wrap = document.querySelector('.slideshow');
+  var srcs = (wrap.dataset.photos || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+  if (srcs.length < 2) return;
+  var first = wrap.querySelector('img');
+  var imgs = [first].concat(srcs.slice(1).map(function (src) {
+    var im = new Image(); im.className = 'hero slide'; im.src = src; im.alt = ''; im.loading = 'lazy';
+    wrap.appendChild(im); return im;
+  }));
+  first.classList.add('slide', 'on');
+  var i = 0, timer;
+  function show(n) { imgs[i].classList.remove('on'); i = (n + imgs.length) % imgs.length; imgs[i].classList.add('on'); }
+  function start() { clearInterval(timer); timer = setInterval(function () { show(i + 1); }, 5000); }
+  wrap.addEventListener('click', function () { show(i + 1); start(); });
+  start();
+})();
+</script>
 <script>
 // Once a household has replied, the RSVP box thanks them instead of asking (and drops the deadline).
 function markReplied(d) { document.querySelector('.panel-wine').classList.toggle('replied', !!(d && d.ok && d.existing && d.existing.length)); }

@@ -335,7 +335,6 @@ main, #gate { border-width:14px; box-shadow:inset 0 0 0 7px var(--paper), inset 
 .event-meta span, .event-meta a { display:block; }
 .event-meta a { color:var(--wine); text-decoration-color:var(--duck); text-underline-offset:3px; }
 .event-section .event-status { display:flex; justify-content:center; margin:4px 0 14px; }
-.event-section > p { text-align:center; }
 .event-timeline { margin-top:18px; }
 .bridal { margin-top:26px; }
 .panel-more { margin:18px 0 0; }
@@ -388,15 +387,21 @@ main, #gate { border-width:14px; box-shadow:inset 0 0 0 7px var(--paper), inset 
 .card.venue { text-align:center; padding:20px 18px; margin:14px 0 22px; }
 .card.venue h3 { font:400 1.5rem/1.2 var(--display); letter-spacing:.01em; text-transform:none; color:var(--wine); margin:0 0 4px; }
 
-/* Blue floral sprays in the top-left and bottom-right corners of the card */
+/* Blue floral vines inside the border: one hanging from the top-left corner, one climbing from the bottom-right */
 main::before, main::after, #gate::before, #gate::after {
-  content:""; position:absolute; width:clamp(110px, 17vw, 210px); aspect-ratio:1;
-  background:url("img/floral-corner.svg") no-repeat center / contain; pointer-events:none; z-index:2;
+  content:""; position:absolute; pointer-events:none; z-index:-1; background:no-repeat center / contain;
 }
-main::before, #gate::before { top:calc(-1 * var(--card-border, 14px) - 10px); left:calc(-1 * var(--card-border, 14px) - 10px); }
-main::after, #gate::after { bottom:calc(-1 * var(--card-border, 14px) - 10px); right:calc(-1 * var(--card-border, 14px) - 10px); transform:rotate(180deg); }
+main::before, #gate::before { background-image:url("img/floral-top.svg"); top:12px; left:12px; width:150px; aspect-ratio:130/330; }
+main::after, #gate::after { background-image:url("img/floral-bottom.svg"); bottom:12px; right:12px; width:116px; aspect-ratio:110/290; transform:rotate(180deg); }
+main, #gate { isolation:isolate; }
 @media (max-width:520px) {
-  main::before, main::after, #gate::before, #gate::after { width:118px; }
-  main::before, #gate::before { top:-14px; left:-14px; }
-  main::after, #gate::after { bottom:-14px; right:-14px; }
+  main::before, #gate::before { top:9px; left:9px; width:66px; }
+  main::after, #gate::after { bottom:9px; right:9px; width:56px; }
 }
+
+/* Home photo slideshow: the first photo sets the size, the others fade in on top of it */
+.slideshow { cursor:pointer; }
+.slideshow .slide { transition:opacity 1.2s ease; }
+.slideshow .slide:not(:first-of-type) { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 30%; }
+.slideshow .slide:not(.on) { opacity:0; }
+@media (prefers-reduced-motion: reduce) { .slideshow .slide { transition:none; } }

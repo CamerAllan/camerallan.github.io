@@ -1,6 +1,6 @@
 // ---- Details: one section per event this household is invited to ----
 // Each section: title, when & where, free-text details (Events tab), RSVP status, then that event's timeline
-// (Itinerary tab). The wedding section also links to parking. Bridal party rows (Itinerary for = bridal_party)
+// (Itinerary tab). The wedding section shows a map beside its details. Bridal party rows (Itinerary for = bridal_party)
 // simply appear in the timelines of households with someone in the bridal party.
 
 const MAP = q => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
@@ -18,25 +18,45 @@ function eventsFor(data) {
 }
 
 
+/** Split the free-text details into plain paragraphs and "Label: text" facts (e.g. "Dress code: …"). */
+function splitDetails(text) {
+  const paras = [], facts = [];
+  String(text || '').split(/\n+/).map(s => s.trim()).filter(Boolean).forEach(line => {
+    const m = line.match(/^([^:\[\]]{2,24}):\s*(.+)$/);
+    if (m) facts.push([m[1], m[2].charAt(0).toUpperCase() + m[2].slice(1)]); else paras.push(line);
+  });
+  return { paras, facts };
+}
+
+const factRow = (label, html) => `<div><dt>${esc(label)}</dt><dd>${html}</dd></div>`;
+const mapEmbed = q => `<div class="event-map"><iframe title="${esc(q)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+  src="https://maps.google.com/maps?q=${encodeURIComponent(q)}&z=13&output=embed"></iframe>
+  <a href="${MAP(q)}" target="_blank" rel="noopener">${t('openMap')}</a></div>`;
+
 withInvite(data => {
   $('events').innerHTML = eventsFor(data).map(ev => {
     const id = ev.event;
     const title = L(ev, 'title') || eventTitle(id);
     const loc = L(ev, 'location');
-    const details = L(ev, 'details');
+    const withMap = id === 'wedding' && loc;
+    const { paras, facts } = splitDetails(L(ev, 'details'));
     const rows = rowsFor(data, id);
+    const factRows = [
+      L(ev, 'when') ? factRow(t('when'), esc(L(ev, 'when'))) : '',
+      loc && !withMap ? factRow(t('where'), `<a href="${MAP(loc)}" target="_blank" rel="noopener">${esc(loc)}</a>`) : '',
+      ...facts.map(([k, v]) => factRow(k, esc(v)))
+    ].join('');
+    const text = `<div class="event-text">
+        ${paras.map(p => `<p>${esc(p)}</p>`).join('')}
+        ${factRows ? `<dl class="facts">${factRows}</dl>` : ''}
+      </div>`;
     return `<section class="event-section" id="${id}">
       <h2>${esc(title)}</h2>
-      <p class="event-meta">
-        ${L(ev, 'when') ? `<span>${esc(L(ev, 'when'))}</span>` : ''}
-        ${loc ? `<a href="${MAP(loc)}" target="_blank" rel="noopener">${esc(loc)}</a>` : ''}
-      </p>
       <div class="event-status">${statusBadge(EVENTS[id].status, data.existing)}</div>
-      ${details ? details.split(/\n+/).map(p => `<p>${esc(p)}</p>`).join('') : ''}
-      ${id === 'wedding' ? `<p><a href="travel.html#parking">${t('parkingLink')}</a></p>` : ''}
+      ${withMap ? `<div class="event-body">${text}${mapEmbed(loc)}</div>` : text}
       ${rows.length ? `<div class="event-timeline">${timelineHtml(rows, data, {
           skipStatus: EVENTS[id].status,                                 // already shown at the top of the section
-          dayHeadings: spansDays(rows)                                   // otherwise the date is already in the section heading
+          dayHeadings: spansDays(rows)                                   // otherwise the date is already in the facts
         })}</div>` : ''}
     </section>`;
   }).join('');

@@ -288,6 +288,7 @@ function readMenu_() {
     if (header[i] && !/_es$/i.test(header[i])) dietCols.push({ idx: i, name: header[i] });
   }
   var descEs = header.indexOf('description_es');
+  var optEs = header.indexOf('option_es');
 
   var courses = [];
   var byName = {};
@@ -303,6 +304,7 @@ function readMenu_() {
     if (!byName[name]) { byName[name] = { name: name, options: [] }; courses.push(byName[name]); }
     byName[name].options.push({
       option: option,
+      option_es: optEs > -1 ? String(r[optEs] || '').trim() : '',
       description: String(r[2] || ''),
       description_es: descEs > -1 ? String(r[descEs] || '') : '',
       diets: diets
