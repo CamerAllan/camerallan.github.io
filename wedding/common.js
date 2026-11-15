@@ -486,9 +486,18 @@ document.addEventListener('scroll', e => {
   tr.parentElement.querySelectorAll('.rg-dots span').forEach((d, k) => d.classList.toggle('on', k === i));
 }, true);
 
+/** Prices typed as a bare number (e.g. 80 or 80.5) are shown in pounds: "£80" in English, "80 £" in Spanish.
+    Anything else (e.g. "£180 per night") is shown as typed. */
+function money(v) {
+  const s = String(v || '').trim();
+  if (!/^\d+(\.\d+)?$/.test(s)) return s;
+  const n = Number(s), txt = Number.isInteger(n) ? String(n) : n.toFixed(2);
+  return getLang() === 'es' ? txt.replace('.', ',') + ' £' : '£' + txt;
+}
+
 /** A room: photo(s), name, description, then night / price / breakfast rows. Values are escaped here. */
 function roomCardHtml(r) {
-  const price = r.free ? t('roomFreeShort') : L(r, 'price');
+  const price = r.free ? t('roomFreeShort') : money(L(r, 'price'));
   return `${roomPhotosHtml(r)}
     <h3 class="card-title">${esc(L(r, 'name'))}</h3>
     ${L(r, 'description') ? `<p class="card-lead">${esc(L(r, 'description'))}</p>` : ''}
