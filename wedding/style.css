@@ -492,3 +492,9 @@ summary::marker { color:var(--duck); }
 .sum-section { margin-top:18px; }
 .sum-section + .sum-person { margin-top:0; }
 .sum-person > .card-label { margin-top:0; }
+
+/* Travel: venue map in the same frame as the Details page map */
+.venue-map { margin:14px 0 22px; }
+.venue-map iframe { display:block; width:100%; aspect-ratio:16/9; min-height:240px; border:0; background:var(--cream); }
+.venue-address { text-align:center; color:var(--muted); font-size:.92rem; margin:10px 0 0; }
+@media (max-width:520px) { .venue-map iframe { aspect-ratio:4/3; } }
