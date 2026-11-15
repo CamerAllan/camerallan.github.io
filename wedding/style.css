@@ -391,6 +391,7 @@ main, #gate { border-width:14px; box-shadow:inset 0 0 0 7px var(--paper), inset 
 /* Home photo slideshow: the first photo sets the size, the others fade in on top of it */
 .slideshow { cursor:pointer; }
 .slideshow .slide { transition:opacity 1.2s ease; }
+.slideshow { position:relative; }
 .slideshow .slide:not(:first-of-type) { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 30%; }
 .slideshow .slide:not(.on) { opacity:0; }
 @media (prefers-reduced-motion: reduce) { .slideshow .slide { transition:none; } }
@@ -475,3 +476,14 @@ summary { font:400 1.2rem/1.35 var(--display); color:var(--wine); }
 summary::marker { color:var(--duck); }
 .card-label + .nb-row, .card-label + .who-row { border-top:0; padding-top:2px; }
 @media (max-width:520px) { .facts.compact > div { grid-template-columns:92px 1fr; gap:10px; } .facts.compact dt { font-size:.68rem; letter-spacing:.14em; } }
+
+/* FAQs: questions on the left, photo slideshow on the right (above the questions on narrow screens) */
+.faq-photos { position:relative; isolation:isolate; }
+.faq-photos .hero { display:block; width:100%; height:auto; aspect-ratio:772/1038; margin:0; }
+.faq-photos::before { content:""; position:absolute; inset:0; transform:translate(12px, 12px); z-index:-1;
+  border:4px solid var(--duck); box-shadow:inset 0 0 0 3px var(--paper), inset 0 0 0 4px var(--duck); }
+@media (min-width:900px) {
+  .faq-layout { display:grid; grid-template-columns:minmax(0,1fr) clamp(180px, 30%, 280px); column-gap:clamp(28px, 4vw, 52px); align-items:start; }
+  .faq-photos { margin-top:6px; position:sticky; top:24px; }
+}
+@media (max-width:899px) { .faq-layout { display:flex; flex-direction:column; } .faq-photos { order:-1; width:min(240px, 62%); margin:8px auto 28px; transform:translateX(-6px); } }
