@@ -513,3 +513,5 @@ summary::marker { color:var(--duck); }
 .rg-dots { display:flex; justify-content:center; gap:7px; margin-top:8px; }
 .rg-dots span { width:6px; height:6px; border-radius:50%; background:var(--line); }
 .rg-dots span.on { background:var(--wine); }
+/* Room photos are wide (about 16:9), so frame them that shape rather than trimming them */
+.room img, .rg-track img { aspect-ratio:16/9 !important; object-fit:cover; }

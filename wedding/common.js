@@ -6,7 +6,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxII2fMqqJvL2AdopDELxpD
 const DEMO = {
   invites: {
     DEMO01: { code:'DEMO01', guests:['Alex Smith','Jamie Smith'], plusOnesAllowed:0,
-      room:{ name:'The Garden Suite', description:'Ground-floor suite opening onto the walled garden.', nights:'Saturday 12th June (wedding night)', image:'rooms/garden.svg, rooms/loft.svg', price:'£180',
+      room:{ name:'The Garden Suite', description:'Ground-floor suite opening onto the walled garden.', nights:'Saturday 12th June (wedding night)', image:'rooms/mure-2.jpg, rooms/mure-1.jpg, rooms/mure-3.jpg', price:'£180',
              description_es:'Suite en la planta baja con acceso al jardín amurallado.', nights_es:'Sábado 12 de junio (noche de la boda)', price_es:'180 £' },
       nightBefore:{ title:'Night-before party', when:'Friday 11th June 2027, from 7pm', where:'Placeholder pub, Somewhere', details:'Casual drinks and food.',
                     title_es:'Fiesta de la noche anterior', when_es:'Viernes 11 de junio de 2027, a partir de las 19:00', where_es:'Pub provisional', details_es:'Copas y algo de comer.' } },
