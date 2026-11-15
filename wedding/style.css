@@ -353,3 +353,17 @@ main, #gate { border-width:14px; box-shadow:inset 0 0 0 7px var(--paper), inset 
 .timeline.itin li.itin-day-row .itin-day { margin:14px 0 4px; }
 .timeline.itin li.itin-day-row:first-child .itin-day { margin-top:0; }
 .timeline.itin li.itin-day-row::after { display:none; }
+
+/* RSVP box: "replied" state */
+.panel-wine .if-replied { display:none; }
+.panel-wine.replied .if-replied { display:inline; }
+.panel-wine.replied .if-not-replied { display:none; }
+.panel-wine.replied p.panel-caps { display:none; }
+.panel-wine.replied .script { margin-bottom:16px; }
+
+/* Phones & tablets: photo centred above the welcome text instead of squeezed beside it */
+@media (max-width:1079px) {
+  .hero-wrap { float:none; width:min(64%, 280px); max-width:none; margin:10px auto 44px; transform:translateX(-6px); }
+  .hero-wrap::before { transform:translate(12px, 12px); }
+  .hero-wrap + section .blurb { text-align:center; margin-top:0; }
+}

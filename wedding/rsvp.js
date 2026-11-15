@@ -394,6 +394,7 @@ let lastPayload = null;
 let doneIsNew = true;
 
 function showDone(payload, isNew) {
+  show($('reply-by'), false); // they've replied, so the deadline no longer matters
   lastPayload = payload;
   doneIsNew = isNew;
   renderSummary(payload);
