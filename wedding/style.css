@@ -313,7 +313,7 @@ header { margin-bottom:28px; }
   main, #gate { width:60%; }
 }
 /* Header text 25% larger */
-.formal { font-size:.875rem; }
+.formal { font-size:.875rem; line-height:1.45; }
 .names { font-size:clamp(2.5rem, 11vw, 3.625rem); }
 .eyebrow, header .muted { font-size:.9rem; }
 .site-nav a { font-size:.875rem; }
