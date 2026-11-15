@@ -387,17 +387,6 @@ main, #gate { border-width:14px; box-shadow:inset 0 0 0 7px var(--paper), inset 
 .card.venue { text-align:center; padding:20px 18px; margin:14px 0 22px; }
 .card.venue h3 { font:400 1.5rem/1.2 var(--display); letter-spacing:.01em; text-transform:none; color:var(--wine); margin:0 0 4px; }
 
-/* Blue floral vines inside the border: one hanging from the top-left corner, one climbing from the bottom-right */
-main::before, main::after, #gate::before, #gate::after {
-  content:""; position:absolute; pointer-events:none; z-index:-1; background:no-repeat center / contain;
-}
-main::before, #gate::before { background-image:url("img/floral-top.svg"); top:12px; left:12px; width:150px; aspect-ratio:130/330; }
-main::after, #gate::after { background-image:url("img/floral-bottom.svg"); bottom:12px; right:12px; width:290px; aspect-ratio:290/110; }
-main, #gate { isolation:isolate; }
-@media (max-width:520px) {
-  main::before, #gate::before { top:9px; left:9px; width:66px; }
-  main::after, #gate::after { bottom:9px; right:9px; width:150px; }
-}
 
 /* Home photo slideshow: the first photo sets the size, the others fade in on top of it */
 .slideshow { cursor:pointer; }
@@ -429,3 +418,10 @@ main, #gate { isolation:isolate; }
 
 /* Gentle cross-fade between pages (browsers that support it) */
 @view-transition { navigation: auto; }
+
+/* Castle drawing beside the names (above the invitation line on narrow screens) */
+.castle { display:block; height:auto; pointer-events:none; user-select:none; }
+@media (min-width:721px) {
+  main > header .castle, #gate > header .castle { position:absolute; top:150px; right:22px; width:min(210px, calc((100% - 330px) / 2 - 26px)); }
+}
+@media (max-width:720px) { .castle { width:min(220px, 62%); margin:6px auto 18px; } }
