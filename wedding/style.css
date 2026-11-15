@@ -302,3 +302,9 @@ header { margin-bottom:28px; }
 @media (min-width:521px) {
   main, #gate { width:80%; max-width:none; margin-left:auto; margin-right:auto; }
 }
+/* Wide screens: photo back inside the card. Photo + welcome text + RSVP box form one centred group (max 820px). */
+@media (min-width:1080px) {
+  .hero-wrap { width:200px; margin-left:max(0px, calc((100% - 820px) / 2)); margin-right:36px; margin-top:10px; }
+  .hero-wrap + section, .hero-wrap ~ .panel-wine { margin-right:max(0px, calc((100% - 820px) / 2)); }
+  .hero-wrap + section .blurb { margin-top:4px; }
+}
