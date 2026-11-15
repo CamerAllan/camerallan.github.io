@@ -33,7 +33,7 @@ const DEMO = {
     {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'1:00pm',time_es:'13:00',title:'Guests arrive',title_es:'Llegada de los invitados',details:'Please park at the Glasshouse restaurant.',for:'everyone',rsvp:'wedding'},
     {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'1:30pm',time_es:'13:30',title:'Ceremony',title_es:'Ceremonia',for:'everyone',rsvp:'wedding'},
     {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'[time TBC]',time_es:'[hora por confirmar]',title:'Check in to your room',title_es:'Entrada en la habitación',for:'room',rsvp:'room'},
-    {day:'Sunday 13th June',day_es:'Domingo 13 de junio',time:'9:30am',time_es:'9:30',title:'Breakfast',title_es:'Desayuno',details:'Included with your room.',for:'room',rsvp:'room'}
+    {day:'Sunday 13th June',day_es:'Domingo 13 de junio',time:'9:30–10:30am',time_es:'9:30–10:30',title:'Breakfast',title_es:'Desayuno',details:'Included with your room.',for:'room',rsvp:'room'}
   ]
 };
 DEMO.events = [
@@ -267,7 +267,7 @@ const STR = {
     bringingGuest: 'I’m bringing a guest', alsoInvited: 'You’re also invited: {title}', nightBefore: 'Night-before party',
     willBeThere: 'Will be there', cantMake: 'Can’t make it',
     roomSaved: 'We’ve saved a room for you: {room}', yesPlease: 'Yes please', noThanks: 'No thanks',
-    breakfast: 'Breakfast is included, served from 9:30am.',
+    breakfast: 'Breakfast is included, served 9:30–10:30am.',
     needAnswer: 'A few things still need an answer:', enterGuestName: 'Please enter your guest’s name',
     letUsKnow: '{who}: please let us know if you can come', tellDiet: '{who}: please tell us your dietary requirements',
     chooseCourse: '{who}: please choose a {course}', nbQuestion: '{who}: will you be at the {title}?',
@@ -279,7 +279,7 @@ const STR = {
     sending: 'Sending…', send: 'Send RSVP', sendFailed: 'Sorry, that didn’t send. Please try again.',
     yourRoom: 'Your room', accepted: 'You’ve accepted this room.', declined: 'You’ve declined this room.',
     changeAnswer: 'Change your answer', letUsKnowRoom: 'Let us know if you’d like it',
-    roomNight: 'Night', roomPrice: 'Price', breakfastLabel: 'Breakfast', breakfastShort: 'Included, served from 9:30am',
+    roomNight: 'Night', roomPrice: 'Price', breakfastLabel: 'Breakfast', breakfastShort: 'Included, served 9:30–10:30am', checkoutLabel: 'Check-out', checkoutShort: 'By 11am',
     roomFreeShort: 'No charge – it’s on us!', roomIntro: 'We’d love you to join us staying at the castle, so we’ve saved a room for you.',
     roomQ: 'Would you like it?', nbQ: 'Can you make it?', yourAnswer: 'Your answer', dietShort: 'Dietary', theWedding: 'The wedding'
   },
@@ -300,7 +300,7 @@ const STR = {
     bringingGuest: 'Vendré con acompañante', alsoInvited: 'También estáis invitados: {title}', nightBefore: 'Fiesta de la noche anterior',
     willBeThere: 'Allí estaré', cantMake: 'No podré ir',
     roomSaved: 'Os hemos reservado una habitación: {room}', yesPlease: 'Sí, por favor', noThanks: 'No, gracias',
-    breakfast: 'El desayuno está incluido y se sirve a partir de las 9:30.',
+    breakfast: 'El desayuno está incluido y se sirve de 9:30 a 10:30.',
     needAnswer: 'Aún faltan algunas respuestas:', enterGuestName: 'Escribe el nombre de tu acompañante',
     letUsKnow: '{who}: dinos si puedes venir', tellDiet: '{who}: cuéntanos tus requisitos alimentarios',
     chooseCourse: '{who}: elige un {course}', nbQuestion: '{who}: ¿vendrás a la {title}?',
@@ -312,7 +312,7 @@ const STR = {
     sending: 'Enviando…', send: 'Enviar respuesta', sendFailed: 'Lo sentimos, no se ha enviado. Inténtalo de nuevo.',
     yourRoom: 'Vuestra habitación', accepted: 'Habéis aceptado esta habitación.', declined: 'Habéis rechazado esta habitación.',
     changeAnswer: 'Cambiar la respuesta', letUsKnowRoom: 'Decidnos si la queréis',
-    roomNight: 'Noche', roomPrice: 'Precio', breakfastLabel: 'Desayuno', breakfastShort: 'Incluido, se sirve a partir de las 9:30',
+    roomNight: 'Noche', roomPrice: 'Precio', breakfastLabel: 'Desayuno', breakfastShort: 'Incluido, se sirve de 9:30 a 10:30', checkoutLabel: 'Salida', checkoutShort: 'Antes de las 11:00',
     roomFreeShort: 'Sin coste: ¡invitamos nosotros!', roomIntro: 'Nos encantaría que os quedarais con nosotros en el castillo, así que os hemos reservado una habitación.',
     roomQ: '¿La queréis?', nbQ: '¿Podéis venir?', yourAnswer: 'Vuestra respuesta', dietShort: 'Dieta', theWedding: 'La boda'
   }
@@ -501,5 +501,5 @@ function roomCardHtml(r) {
   return `${roomPhotosHtml(r)}
     <h3 class="card-title">${esc(L(r, 'name'))}</h3>
     ${L(r, 'description') ? `<p class="card-lead">${esc(L(r, 'description'))}</p>` : ''}
-    ${factsHtml([[t('roomNight'), esc(L(r, 'nights'))], [t('roomPrice'), esc(price)], [t('breakfastLabel'), esc(t('breakfastShort'))]], 'compact')}`;
+    ${factsHtml([[t('roomNight'), esc(L(r, 'nights'))], [t('roomPrice'), esc(price)], [t('breakfastLabel'), esc(t('breakfastShort'))], [t('checkoutLabel'), esc(t('checkoutShort'))]], 'compact')}`;
 }
