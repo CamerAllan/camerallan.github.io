@@ -367,31 +367,47 @@ function startFireworks() {
       ctx.setTransform(d, 0, 0, d, 0, 0);
     }
     const rnd = (a, b) => a + Math.random() * (b - a);
-    function launch(t, x, y) {
-      const n = Math.round(rnd(12, 18)), rot = rnd(0, Math.PI * 2);
-      shows.push({ t0: t, x: x ?? rnd(W * .2, W * .8), y0: H * .97, y: y ?? rnd(H * .26, H * .5),
-        rise: rnd(650, 900), size: rnd(.09, .14) * W, colour: COLOURS[Math.floor(Math.random() * COLOURS.length)],
-        rays: Array.from({ length: n }, (_, i) => ({ a: rot + i / n * Math.PI * 2 + rnd(-.08, .08), l: rnd(.75, 1.05) })) });
+    // Simple physics, worked out from the time since launch (so nothing accumulates between frames):
+    // rockets climb on a slight angle and slow to a stop at the top; sparks fly out, are slowed by air,
+    // pulled down by gravity and nudged sideways by a little wind.
+    const DRAG = 2.4;                                       // per second
+    function sparkAt(s, p, t) {                             // spark position t seconds after the burst
+      const e = (1 - Math.exp(-DRAG * t)) / DRAG, gk = s.g / DRAG, wk = s.wind;
+      return [s.bx + (p.vx - wk) * e + wk * t, s.by + (p.vy - gk) * e + gk * t];
     }
-    function drawShow(s, t) {
-      const age = t - s.t0;
-      ctx.strokeStyle = ctx.fillStyle = s.colour; ctx.lineCap = 'round';
-      if (age < s.rise) {                                   // the rocket climbing, with a short trail
-        const p = 1 - Math.pow(1 - age / s.rise, 2), y = s.y0 + (s.y - s.y0) * p;
-        ctx.globalAlpha = .8; ctx.lineWidth = 1.2;
-        ctx.beginPath(); ctx.moveTo(s.x, y); ctx.lineTo(s.x + Math.sin(age / 90) * .6, Math.min(s.y0, y + 16)); ctx.stroke();
+    function launch(t, x, y) {
+      const x0 = x ?? rnd(W * .22, W * .78), yt = y ?? rnd(H * .26, H * .5), y0 = H * .97;
+      const rise = rnd(.75, 1.05), drift = rnd(-.09, .09) * W, h = y0 - yt, size = rnd(.11, .16) * W;
+      const n = Math.round(rnd(14, 20)), rot = rnd(0, Math.PI * 2);
+      shows.push({ t0: t, x0, y0, h, rise, drift, colour: COLOURS[Math.floor(Math.random() * COLOURS.length)],
+        bx: x0 + drift, by: yt, g: size * rnd(2.6, 3.4), wind: rnd(-.35, .35) * size + drift * .6, life: rnd(2, 2.5),
+        sparks: Array.from({ length: n }, (_, i) => {
+          const a = rot + i / n * Math.PI * 2 + rnd(-.12, .12), v = size * DRAG * rnd(.8, 1.1);
+          return { vx: Math.cos(a) * v + drift * .5, vy: Math.sin(a) * v };
+        }) });
+    }
+    function drawShow(s, now) {
+      const age = (now - s.t0) / 1000;
+      ctx.strokeStyle = ctx.fillStyle = s.colour; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      if (age < s.rise) {                                   // the rocket: eases to a stop at the top, drifting sideways
+        const pos = u => { const q = Math.min(u, s.rise) / s.rise;
+          return [s.x0 + s.drift * q * q + Math.sin(u * 14) * .7, s.y0 - s.h * (1 - Math.pow(1 - q, 2))]; };
+        ctx.globalAlpha = .8; ctx.lineWidth = 1.2; ctx.beginPath();
+        for (let k = 0; k <= 6; k++) { const [x, y] = pos(Math.max(0, age - .09 * (1 - k / 6))); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+        ctx.stroke();
         return true;
       }
-      const b = (age - s.rise) / 1700;                      // the burst
-      if (b >= 1) return false;
-      const grow = 1 - Math.pow(1 - Math.min(b * 2.2, 1), 3), fall = b * b * s.size * .35;
-      ctx.globalAlpha = Math.max(0, 1 - Math.pow(b, 1.6));
+      const b = age - s.rise;                               // the burst
+      if (b >= s.life) return false;
+      ctx.globalAlpha = Math.max(0, 1 - Math.pow(b / s.life, 1.5));
       ctx.lineWidth = 1.1;
-      s.rays.forEach(r => {
-        const L = s.size * r.l * grow, inner = L * Math.min(1, b * 1.6);
-        const cx = Math.cos(r.a), cy = Math.sin(r.a);
-        ctx.beginPath(); ctx.moveTo(s.x + cx * inner, s.y + cy * inner + fall * .5); ctx.lineTo(s.x + cx * L, s.y + cy * L + fall); ctx.stroke();
-        ctx.beginPath(); ctx.arc(s.x + cx * (L + 3), s.y + cy * (L + 3) + fall * 1.2, 1.2, 0, Math.PI * 2); ctx.fill();
+      const tail = Math.min(b, .16 + .14 * Math.exp(-b * 2));   // streaks are long at first, shortening as sparks slow
+      s.sparks.forEach(p => {
+        ctx.beginPath();
+        for (let k = 0; k <= 5; k++) { const [x, y] = sparkAt(s, p, b - tail * (1 - k / 5)); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+        ctx.stroke();
+        const [x, y] = sparkAt(s, p, b);
+        ctx.beginPath(); ctx.arc(x, y, 1.2, 0, Math.PI * 2); ctx.fill();
       });
       return true;
     }
@@ -409,7 +425,7 @@ function startFireworks() {
     function drawStill() {
       ctx.clearRect(0, 0, W, H); shows = [];
       [[.3, .42], [.55, .3], [.76, .46]].forEach(([x, y]) => { launch(0, W * x, H * y); });
-      shows.forEach(s => drawShow(s, s.rise + 450));
+      shows.forEach(s => drawShow(s, s.t0 + (s.rise + .35) * 1000));
     }
     if (still) { drawStill(); return; }
     if ('IntersectionObserver' in window) {
