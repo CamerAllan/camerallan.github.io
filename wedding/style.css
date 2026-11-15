@@ -387,3 +387,16 @@ main, #gate { border-width:14px; box-shadow:inset 0 0 0 7px var(--paper), inset 
 /* Getting there */
 .card.venue { text-align:center; padding:20px 18px; margin:14px 0 22px; }
 .card.venue h3 { font:400 1.5rem/1.2 var(--display); letter-spacing:.01em; text-transform:none; color:var(--wine); margin:0 0 4px; }
+
+/* Blue floral sprays in the top-left and bottom-right corners of the card */
+main::before, main::after, #gate::before, #gate::after {
+  content:""; position:absolute; width:clamp(110px, 17vw, 210px); aspect-ratio:1;
+  background:url("img/floral-corner.svg") no-repeat center / contain; pointer-events:none; z-index:2;
+}
+main::before, #gate::before { top:calc(-1 * var(--card-border, 14px) - 10px); left:calc(-1 * var(--card-border, 14px) - 10px); }
+main::after, #gate::after { bottom:calc(-1 * var(--card-border, 14px) - 10px); right:calc(-1 * var(--card-border, 14px) - 10px); transform:rotate(180deg); }
+@media (max-width:520px) {
+  main::before, main::after, #gate::before, #gate::after { width:118px; }
+  main::before, #gate::before { top:-14px; left:-14px; }
+  main::after, #gate::after { bottom:-14px; right:-14px; }
+}
