@@ -17,12 +17,12 @@ try {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Italianno&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261115q">
+<link rel="stylesheet" href="style.css?v=20261115r">
 </head>
 <body>
 <main>
   <header>
-    <img class="castle" src="img/castle.png" alt="" width="1422" height="994">
+    <div class="castle"><canvas class="fireworks" aria-hidden="true"></canvas><img src="img/castle.png" alt="" width="1422" height="994"></div>
     <p class="formal"><span data-lang="en">You are hereby invited to the wedding of</span><span data-lang="es">Tenemos el placer de invitaros a la boda de</span></p>
     <h1 class="names"><a href="index.html"><span class="first">Cameron</span><span class="last">Allan</span><span class="and"><span data-lang="en">and</span><span data-lang="es">y</span></span><span class="first">Annie</span><span class="last">MacConnachie</span></a></h1>
     <div class="eyebrow"><span data-lang="en">Saturday 12th June 2027</span><span data-lang="es">Sábado, 12 de junio de 2027</span> · Rowallan Castle</div>
@@ -87,8 +87,8 @@ try {
     </div>
   </section>
 </main>
-<script src="common.js?v=20261115q"></script>
-<script src="rsvp.js?v=20261115q"></script>
+<script src="common.js?v=20261115r"></script>
+<script src="rsvp.js?v=20261115r"></script>
 <script>
 // Button/loading text set from JS so they follow the language switch.
 function setStaticRsvpText() { if (!$('submit-btn').disabled) $('submit-btn').textContent = t('send'); $('loading-text').textContent = t('loading1'); }

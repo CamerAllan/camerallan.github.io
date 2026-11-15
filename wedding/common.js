@@ -129,7 +129,7 @@ function showGate() {
   const gate = document.createElement('div');
   gate.id = 'gate';
   gate.innerHTML = `
-    <header><img class="castle" src="img/castle.png" alt="" width="1422" height="994">
+    <header><div class="castle"><canvas class="fireworks" aria-hidden="true"></canvas><img src="img/castle.png" alt="" width="1422" height="994"></div>
     <p class="formal"><span data-lang="en">You are hereby invited to the wedding of</span><span data-lang="es">Tenemos el placer de invitaros a la boda de</span></p>
     <h1 class="names"><span class="first">Cameron</span><span class="last">Allan</span><span class="and"><span data-lang="en">and</span><span data-lang="es">y</span></span><span class="first">Annie</span><span class="last">MacConnachie</span></h1></header>
     <form class="card" id="gate-form" novalidate>
@@ -145,6 +145,7 @@ function showGate() {
     </form>
     <div class="lang-switch"><a href="#" data-set-lang="es" data-lang="en" lang="es">Español</a><a href="#" data-set-lang="en" data-lang="es" lang="en">English</a></div>`;
   document.body.prepend(gate);
+  startFireworks();
   gate.querySelectorAll('[data-set-lang]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); setLang(a.dataset.setLang, true); }));
   (code ? $('gate-name') : $('gate-code')).focus();
 
@@ -349,3 +350,76 @@ document.addEventListener('DOMContentLoaded', () => {
   window.scrollTo(0, y);
   setTimeout(function () { document.body.style.minHeight = ''; }, 2500);
 })();
+
+// ---- Fireworks over the castle ----
+// Fine bursts of lines in the site's blues: a rocket rises from behind the roof, bursts into rays,
+// and its sparks drift down and fade. Paused while off screen; a still drawing if motion is reduced.
+function startFireworks() {
+  document.querySelectorAll('canvas.fireworks:not([data-on])').forEach(cv => {
+    cv.dataset.on = '1';
+    const ctx = cv.getContext('2d');
+    const COLOURS = ['#2c4a56', '#2c4a56', '#5f8a99', '#91b7c4'];
+    const still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let W = 0, H = 0, shows = [], visible = true, running = false, nextAt = 0;
+    function size() {
+      const r = cv.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2);
+      W = r.width; H = r.height; cv.width = Math.round(W * d); cv.height = Math.round(H * d);
+      ctx.setTransform(d, 0, 0, d, 0, 0);
+    }
+    const rnd = (a, b) => a + Math.random() * (b - a);
+    function launch(t, x, y) {
+      const n = Math.round(rnd(12, 18)), rot = rnd(0, Math.PI * 2);
+      shows.push({ t0: t, x: x ?? rnd(W * .2, W * .8), y0: H * .97, y: y ?? rnd(H * .26, H * .5),
+        rise: rnd(650, 900), size: rnd(.09, .14) * W, colour: COLOURS[Math.floor(Math.random() * COLOURS.length)],
+        rays: Array.from({ length: n }, (_, i) => ({ a: rot + i / n * Math.PI * 2 + rnd(-.08, .08), l: rnd(.75, 1.05) })) });
+    }
+    function drawShow(s, t) {
+      const age = t - s.t0;
+      ctx.strokeStyle = ctx.fillStyle = s.colour; ctx.lineCap = 'round';
+      if (age < s.rise) {                                   // the rocket climbing, with a short trail
+        const p = 1 - Math.pow(1 - age / s.rise, 2), y = s.y0 + (s.y - s.y0) * p;
+        ctx.globalAlpha = .8; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(s.x, y); ctx.lineTo(s.x + Math.sin(age / 90) * .6, Math.min(s.y0, y + 16)); ctx.stroke();
+        return true;
+      }
+      const b = (age - s.rise) / 1700;                      // the burst
+      if (b >= 1) return false;
+      const grow = 1 - Math.pow(1 - Math.min(b * 2.2, 1), 3), fall = b * b * s.size * .35;
+      ctx.globalAlpha = Math.max(0, 1 - Math.pow(b, 1.6));
+      ctx.lineWidth = 1.1;
+      s.rays.forEach(r => {
+        const L = s.size * r.l * grow, inner = L * Math.min(1, b * 1.6);
+        const cx = Math.cos(r.a), cy = Math.sin(r.a);
+        ctx.beginPath(); ctx.moveTo(s.x + cx * inner, s.y + cy * inner + fall * .5); ctx.lineTo(s.x + cx * L, s.y + cy * L + fall); ctx.stroke();
+        ctx.beginPath(); ctx.arc(s.x + cx * (L + 3), s.y + cy * (L + 3) + fall * 1.2, 1.2, 0, Math.PI * 2); ctx.fill();
+      });
+      return true;
+    }
+    function kick() { if (!running && visible && !document.hidden) { running = true; requestAnimationFrame(frame); } }
+    function frame(t) {
+      if (!visible || document.hidden) { running = false; return; }
+      if (!W) size();
+      if (t >= nextAt) { launch(t); if (Math.random() < .35) launch(t + rnd(150, 400)); nextAt = t + rnd(1100, 2300); }
+      ctx.clearRect(0, 0, W, H);
+      shows = shows.filter(s => t < s.t0 || drawShow(s, t));
+      requestAnimationFrame(frame);
+    }
+    size();
+    window.addEventListener('resize', () => { size(); if (still) drawStill(); });
+    function drawStill() {
+      ctx.clearRect(0, 0, W, H); shows = [];
+      [[.3, .42], [.55, .3], [.76, .46]].forEach(([x, y]) => { launch(0, W * x, H * y); });
+      shows.forEach(s => drawShow(s, s.rise + 450));
+    }
+    if (still) { drawStill(); return; }
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(es => {
+        const v = es[0].isIntersecting;
+        visible = v; if (v) kick();
+      }).observe(cv);
+    }
+    document.addEventListener('visibilitychange', kick);
+    kick();
+  });
+}
+startFireworks();
