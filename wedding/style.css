@@ -497,10 +497,11 @@ summary::marker { color:var(--duck); }
 .sum-person > .card-label { margin-top:0; }
 
 /* Travel: venue map in the same frame as the Details page map */
-.venue-map { margin:14px 0 22px; }
-.venue-map iframe { display:block; width:100%; aspect-ratio:16/9; min-height:240px; border:0; background:var(--cream); }
+.venue-map { margin:4px 0 0; }
+.venue-map iframe { display:block; width:100%; aspect-ratio:1; min-height:240px; border:0; background:var(--cream); }
+.venue-body .event-text > p:first-child { margin-top:0; }
 .venue-address { text-align:center; color:var(--muted); font-size:.92rem; margin:10px 0 0; }
-@media (max-width:520px) { .venue-map iframe { aspect-ratio:4/3; } }
+@media (max-width:720px) { .venue-map iframe { aspect-ratio:4/3; } .venue-map { margin-top:0; } }
 
 /* Room photo gallery: swipe (or use the arrows) through several photos */
 .room-gallery { position:relative; margin-bottom:16px; }
