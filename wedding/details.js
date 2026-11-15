@@ -1,6 +1,6 @@
 // ---- Details: one section per event this household is invited to ----
 // Each section: title, when & where, free-text details (Events tab), then that event's timeline
-// (Itinerary tab). The wedding section shows a map beside its details. Bridal party rows (Itinerary for = bridal_party)
+// (Itinerary tab). Each event shows a map beside its details (unless it's at the wedding venue). Bridal party rows (Itinerary for = bridal_party)
 // simply appear in the timelines of households with someone in the bridal party.
 
 const MAP = q => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
@@ -37,7 +37,11 @@ withInvite(data => {
     const id = ev.event;
     const title = L(ev, 'title') || eventTitle(id);
     const loc = L(ev, 'location');
-    const withMap = id === 'wedding' && loc;
+    // Every event with a location gets a map, except one at the same place as the wedding (the morning after),
+    // which would just repeat the wedding's map.
+    const weddingLoc = (eventsFor(data).find(e => e.event === 'wedding') || {}).location || '';
+    const samePlace = id !== 'wedding' && weddingLoc && String(ev.location || '').split(',')[0].trim().toLowerCase() === weddingLoc.split(',')[0].trim().toLowerCase();
+    const withMap = !!loc && !samePlace;
     const { paras, facts } = splitDetails(L(ev, 'details'));
     const rows = rowsFor(data, id);
     const factRows = [
