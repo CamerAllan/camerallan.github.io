@@ -281,7 +281,7 @@ const STR = {
     gateNeedCode: 'Escribe tu código de invitación.', gateNeedName: 'Escribe tu apellido.', gateWrongName: 'Ese apellido no coincide con esta invitación. Inténtalo de nuevo.',
     doneNew: '¡Gracias! Hemos recibido vuestra respuesta.', doneExisting: 'Esta es vuestra respuesta:',
     whosComing: '¿Quién viene?', mealChoices: 'Menú', alsoInvitedShort: '¡También estáis invitados a la noche anterior!',
-    greeting: '¡Hola, {names}! Nos encantaría saber si podéis venir.',
+    greeting: '¡Hola, {names}! Por favor, decidnos si podéis venir.',
     guestName: 'Nombre de tu acompañante', yourGuest: 'Tu acompañante', accepts: 'Sí, asistiré', declines: 'Lamentablemente, no podré asistir',
     dietary: 'Requisitos alimentarios', tellUs: 'Cuéntanos tus requisitos',
     noneFit: 'Por ahora ninguna opción de {course} se ajusta a estos requisitos. Hablaremos con el lugar y te diremos algo.',
