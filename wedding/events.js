@@ -97,7 +97,6 @@ function timelineHtml(items, data, { badges = true, skipStatus = '', dayHeadings
         <span class="time">${esc(tidy(L(it, 'time'), 'time'))}</span>
         <span class="itin-body">
           <span class="itin-title">${esc(L(it, 'title'))}</span>
-          ${it.rsvp === 'room' && data.invite.room ? `<span class="muted"> · ${esc(L(data.invite.room, 'name'))}</span>` : ''}
           ${L(it, 'details') ? `<span class="desc">${esc(L(it, 'details'))}</span>` : ''}
           ${badges && it.rsvp !== skipStatus ? statusBadge(it.rsvp, data.existing) : ''}
         </span></li>`);
