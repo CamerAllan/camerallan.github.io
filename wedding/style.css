@@ -419,12 +419,15 @@ main, #gate { border-width:14px; box-shadow:inset 0 0 0 7px var(--paper), inset 
 /* Gentle cross-fade between pages (browsers that support it) */
 @view-transition { navigation: auto; }
 
-/* Castle drawing beside the names (above the invitation line on narrow screens) */
+/* Header: names left-aligned with the castle beside them; date and menu centred underneath.
+   On narrower screens the castle sits centred above the title instead. */
 .castle { display:block; height:auto; pointer-events:none; user-select:none; }
-@media (min-width:721px) {
-  main > header .castle, #gate > header .castle { position:absolute; top:132px; right:14px;
-    width:min(267px, calc((100% - 330px) / 2 - 18px + 2 * var(--title-shift))); }
-  main, #gate { --title-shift:clamp(24px, 3vw, 44px); }
-  main > header .names, #gate > header .names { transform:translateX(calc(-2 * var(--title-shift))); }
+@media (min-width:1200px) {
+  main > header, #gate > header { display:grid; grid-template-columns:1fr max-content minmax(150px, 270px) 1fr; align-items:center; column-gap:clamp(20px, 3vw, 36px); }
+  main > header > *, #gate > header > * { grid-column:1 / -1; }
+  main > header .formal, #gate > header .formal { grid-column:2; grid-row:1; text-align:left; margin-left:0; margin-right:0; }
+  main > header .names, #gate > header .names { grid-column:2; grid-row:2; text-align:left; }
+  main > header .castle, #gate > header .castle { grid-column:3; grid-row:1 / 3; width:100%; }
 }
-@media (max-width:720px) { .castle { width:min(280px, 79%); margin:0 auto 14px; } }
+@media (max-width:1199px) { .castle { width:min(280px, 62%); margin:0 auto 14px; } }
+@media (max-width:520px) { .castle { width:min(280px, 79%); } }
