@@ -516,3 +516,7 @@ summary::marker { color:var(--duck); }
 .rg-dots span.on { background:var(--wine); }
 /* Room photos are wide (about 16:9), so frame them that shape rather than trimming them */
 .room img, .rg-track img { aspect-ratio:16/9 !important; object-fit:cover; }
+
+/* Taxi firms under Getting there */
+.taxis { margin-top:18px; }
+.taxis .card.stay { margin:10px 0; }
