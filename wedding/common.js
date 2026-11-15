@@ -367,31 +367,31 @@ function startFireworks() {
       ctx.setTransform(d, 0, 0, d, 0, 0);
     }
     const rnd = (a, b) => a + Math.random() * (b - a);
-    // Simple physics, worked out from the time since launch (so nothing accumulates between frames):
-    // rockets climb on a slight angle and slow to a stop at the top; sparks fly out, are slowed by air,
-    // pulled down by gravity and nudged sideways by a little wind.
-    const DRAG = 2.4;                                       // per second
+    // Simple physics, worked out from the time since launch (so nothing accumulates between frames).
+    // Like real fireworks: sparks burst out evenly in every direction, air resistance stops them quickly,
+    // then they sink slowly (heavy drag means a low falling speed), with only the faintest breeze.
+    const DRAG = 3.2;                                       // per second
     function sparkAt(s, p, t) {                             // spark position t seconds after the burst
-      const e = (1 - Math.exp(-DRAG * t)) / DRAG, gk = s.g / DRAG, wk = s.wind;
-      return [s.bx + (p.vx - wk) * e + wk * t, s.by + (p.vy - gk) * e + gk * t];
+      const k = p.k, e = (1 - Math.exp(-k * t)) / k, fall = s.g / k, wind = s.wind / k;
+      return [s.bx + (p.vx - wind) * e + wind * t, s.by + (p.vy - fall) * e + fall * t];
     }
     function launch(t, x, y) {
-      const x0 = x ?? rnd(W * .22, W * .78), yt = y ?? rnd(H * .26, H * .5), y0 = H * .97;
-      const rise = rnd(.75, 1.05), drift = rnd(-.09, .09) * W, h = y0 - yt, size = rnd(.11, .16) * W;
-      const n = Math.round(rnd(14, 20)), rot = rnd(0, Math.PI * 2);
-      shows.push({ t0: t, x0, y0, h, rise, drift, colour: COLOURS[Math.floor(Math.random() * COLOURS.length)],
-        bx: x0 + drift, by: yt, g: size * rnd(1.3, 1.8), wind: rnd(-.35, .35) * size + drift * .6, life: rnd(2, 2.5),
+      const x0 = x ?? rnd(W * .24, W * .76), yt = y ?? rnd(H * .24, H * .46), y0 = H * .97;
+      const rise = rnd(.8, 1.1), lean = rnd(-.04, .04) * W, h = y0 - yt, size = rnd(.11, .15) * W;
+      const n = Math.round(rnd(16, 22)), rot = rnd(0, Math.PI * 2);
+      shows.push({ t0: t, x0, y0, h, rise, lean, colour: COLOURS[Math.floor(Math.random() * COLOURS.length)],
+        bx: x0 + lean, by: yt, g: size * .9, wind: size * rnd(-.15, .15), life: rnd(1.9, 2.3),
         sparks: Array.from({ length: n }, (_, i) => {
-          const a = rot + i / n * Math.PI * 2 + rnd(-.12, .12), v = size * DRAG * rnd(.8, 1.1);
-          return { vx: Math.cos(a) * v + drift * .5, vy: Math.sin(a) * v - size * DRAG * .3 };   // a little upward lift
+          const a = rot + i / n * Math.PI * 2 + rnd(-.1, .1), k = DRAG * rnd(.8, 1.25), v = size * k * rnd(.85, 1.05);
+          return { vx: Math.cos(a) * v, vy: Math.sin(a) * v, k };   // each spark meets slightly different air resistance
         }) });
     }
     function drawShow(s, now) {
       const age = (now - s.t0) / 1000;
       ctx.strokeStyle = ctx.fillStyle = s.colour; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-      if (age < s.rise) {                                   // the rocket: eases to a stop at the top, drifting sideways
-        const pos = u => { const q = Math.min(u, s.rise) / s.rise;
-          return [s.x0 + s.drift * q * q + Math.sin(u * 14) * .7, s.y0 - s.h * (1 - Math.pow(1 - q, 2))]; };
+      if (age < s.rise) {                                   // the rocket: climbs on a slight lean, slowing to a stop at the top
+        const pos = u => { const q = Math.min(u, s.rise) / s.rise, up = 1 - Math.pow(1 - q, 2);
+          return [s.x0 + s.lean * up, s.y0 - s.h * up]; };
         ctx.globalAlpha = .8; ctx.lineWidth = 1.2; ctx.beginPath();
         for (let k = 0; k <= 6; k++) { const [x, y] = pos(Math.max(0, age - .09 * (1 - k / 6))); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
         ctx.stroke();
@@ -401,7 +401,7 @@ function startFireworks() {
       if (b >= s.life) return false;
       ctx.globalAlpha = Math.max(0, 1 - Math.pow(b / s.life, 1.5));
       ctx.lineWidth = 1.1;
-      const tail = Math.min(b, .16 + .14 * Math.exp(-b * 2));   // streaks are long at first, shortening as sparks slow
+      const tail = Math.min(b, .12);                       // a fixed slice of time, so streaks shrink naturally as sparks slow
       s.sparks.forEach(p => {
         ctx.beginPath();
         for (let k = 0; k <= 5; k++) { const [x, y] = sparkAt(s, p, b - tail * (1 - k / 5)); k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
