@@ -421,3 +421,8 @@ main, #gate { isolation:isolate; }
   .event-map iframe { aspect-ratio:4/3; }
 }
 @media (max-width:520px) { .facts > div { grid-template-columns:1fr; gap:2px; } }
+
+/* Tighter nav so it stays on one line for longer */
+.site-nav { gap:4px 14px; }
+.site-nav a { letter-spacing:.14em; margin-right:-.14em; }
+@media (max-width:520px) { .site-nav { gap:2px 10px; } .site-nav a { letter-spacing:.1em; margin-right:-.1em; } }
