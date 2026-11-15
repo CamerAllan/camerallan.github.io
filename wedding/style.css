@@ -437,9 +437,11 @@ main, #gate { border-width:14px; box-shadow:inset 0 0 0 7px var(--paper), inset 
   /* Staggered names: "and" steps in a little, Annie MacConnachie a little more */
   main > header .names .and, #gate > header .names .and { margin-left:44px; }
   main > header .names .and ~ span, #gate > header .names .and ~ span { margin-left:66px; }
-  main > header .names .last, #gate > header .names .last { margin-left:0; }                    /* Allan */
-  main > header .names .first, #gate > header .names .first { margin-left:-22px; }              /* Cameron */
-  main > header .formal, #gate > header .formal { margin-left:-22px !important; }
+  main > header .names .last, #gate > header .names .last { margin-left:calc(22px - var(--name-shift)); }   /* Allan */
+  main > header .names .first, #gate > header .names .first { margin-left:calc(-1 * var(--name-shift)); }   /* Cameron */
+  main > header .formal, #gate > header .formal { margin-left:calc(-1 * var(--name-shift)) !important; }
+  /* The first lines sit further left on wide screens, easing back as the window narrows so they never touch the border. */
+  main, #gate { --name-shift:clamp(22px, calc((100vw - 1300px) * .3 + 22px), 62px); }
   main > header .names .and ~ .last, #gate > header .names .and ~ .last { margin-left:88px; }  /* MacConnachie */
   main > header .castle, #gate > header .castle { grid-column:3; grid-row:1 / 3; align-self:end; width:calc(100% - clamp(20px, 3vw, 36px)); margin-left:clamp(20px, 3vw, 36px); margin-bottom:21px; }
 }
