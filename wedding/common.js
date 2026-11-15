@@ -325,3 +325,26 @@ document.addEventListener('DOMContentLoaded', () => {
   document.documentElement.classList.remove('locked');
   getInvite(getCode()).then(d => { if (d.ok) adoptInviteLang(d.invite); }).catch(() => {});
 });
+
+// ---- Keep the header steady when moving between pages ----
+// Every page has the same header, so when you follow a menu link we remember how far down you were
+// (at most down to the menu itself) and open the next page at the same place, rather than jumping to the top.
+(function () {
+  var KEY = 'weddingNavScroll';
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('header a, .site-nav a');
+    if (!a || a.target || e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+    var nav = document.querySelector('.site-nav');
+    var limit = nav ? nav.getBoundingClientRect().top + window.scrollY - 12 : 0;
+    try { sessionStorage.setItem(KEY, String(Math.max(0, Math.min(window.scrollY, limit)))); } catch (err) {}
+  });
+  var y = null;
+  try { y = sessionStorage.getItem(KEY); sessionStorage.removeItem(KEY); } catch (err) {}
+  if (y === null || location.hash) return;
+  y = +y || 0;
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  // Give the page room to scroll that far while its content is still loading.
+  document.body.style.minHeight = (y + window.innerHeight) + 'px';
+  window.scrollTo(0, y);
+  setTimeout(function () { document.body.style.minHeight = ''; }, 2500);
+})();
