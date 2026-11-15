@@ -25,7 +25,7 @@ try {
     <p class="formal"><span data-lang="en">You are hereby invited to the wedding of</span><span data-lang="es">Tenemos el placer de invitaros a la boda de</span></p>
     <h1 class="names"><a href="index.html"><span class="first">Cameron</span><span class="last">Allan</span><span class="and"><span data-lang="en">and</span><span data-lang="es">y</span></span><span class="first">Annie</span><span class="last">MacConnachie</span></a></h1>
     <div class="eyebrow"><span data-lang="en">Saturday 12th June 2027</span><span data-lang="es">Sábado, 12 de junio de 2027</span> · Rowallan Castle</div>
-    <nav class="site-nav"><a href="index.html" aria-current="page"><span data-lang="en">Home</span><span data-lang="es">Inicio</span></a><a href="itinerary.html"><span data-lang="en">Your itinerary</span><span data-lang="es">Vuestro itinerario</span></a><a href="rsvp.html"><span data-lang="en">RSVP</span><span data-lang="es">Confirmar asistencia</span></a><a href="travel.html"><span data-lang="en">Travel &amp; Stay</span><span data-lang="es">Viaje y alojamiento</span></a><a href="faqs.html"><span data-lang="en">FAQs</span><span data-lang="es">Preguntas frecuentes</span></a></nav>
+    <nav class="site-nav"><a href="index.html" aria-current="page"><span data-lang="en">Home</span><span data-lang="es">Inicio</span></a><a href="details.html"><span data-lang="en">Details</span><span data-lang="es">Detalles</span></a><a href="rsvp.html"><span data-lang="en">RSVP</span><span data-lang="es">Confirmar asistencia</span></a><a href="travel.html"><span data-lang="en">Travel &amp; Stay</span><span data-lang="es">Viaje y alojamiento</span></a><a href="faqs.html"><span data-lang="en">FAQs</span><span data-lang="es">Preguntas frecuentes</span></a></nav>
     <div class="lang-switch"><a href="#" data-set-lang="es" data-lang="en" lang="es">Español</a><a href="#" data-set-lang="en" data-lang="es" lang="en">English</a></div>
   </header>
 
@@ -39,48 +39,11 @@ try {
     <p class="script"><span data-lang="en">Will you join us?</span><span data-lang="es">¿Nos acompañáis?</span></p>
     <p class="panel-caps"><span data-lang="en">Please reply by 1st February 2027</span><span data-lang="es">Responded antes del 1 de febrero de 2027</span></p>
     <p><a class="btn-link btn-light" href="rsvp.html"><span data-lang="en">RSVP</span><span data-lang="es">Confirmar asistencia</span></a></p>
-</section>
-
-  <section>
-    <h2><span data-lang="en">The wedding</span><span data-lang="es">La boda</span></h2>
-    <a class="card event-card" href="wedding.html">
-      <span class="event-title"><span data-lang="en">Saturday 12th June 2027</span><span data-lang="es">Sábado, 12 de junio de 2027</span></span>
-      <span class="muted">Rowallan Castle, Kilmaurs, Ayrshire</span>
-      <span id="wedding-status"></span>
-      <span class="event-more"><span data-lang="en">Timings, venue &amp; more →</span><span data-lang="es">Horario, lugar y más →</span></span>
-    </a>
-    <!-- Only shown to households invited to more than the wedding -->
-    <div id="extras" class="hidden"></div>
+    <p class="panel-more"><a href="details.html"><span data-lang="en">Times, places &amp; everything else →</span><span data-lang="es">Horarios, lugares y todo lo demás →</span></a></p>
   </section>
 </main>
 <script src="common.js"></script>
-<script src="events.js"></script>
-<script>
-// The wedding is the focus for everyone. Households invited to the night before or the morning after
-// also get those listed underneath; everyone else simply doesn't see that part.
-function badge(kind, data) {
-  const s = rsvpStatus(kind, data.existing);
-  return s === 'yes' ? `<span class="status yes">${t('stYes')}</span>`
-       : s === 'no' ? `<span class="status no">${t('stNo')}</span>`
-       : `<span class="status todo">${t('stTodo')}</span>`;
-}
-withInvite(data => {
-  $('wedding-status').innerHTML = badge('wedding', data);
-  const extras = householdEvents(data).filter(id => id !== 'wedding');
-  if (!extras.length) { show($('extras'), false); return; }
-  $('extras').innerHTML = `<h3 class="extras-title">${t('alsoForYou')}</h3>` + extras.map(id => {
-    const rows = rowsFor(data, id);
-    const day = rows.length ? dayOf(rows[0]) : '';
-    const place = id === 'night_before' ? L(data.invite.nightBefore, 'where') : '';
-    return `<a class="card event-card small" href="${EVENTS[id].page}">
-      <span class="event-title">${esc(eventTitle(id))}</span>
-      <span class="muted">${esc([day, place].filter(Boolean).join(' · '))}</span>
-      ${badge(EVENTS[id].status, data)}
-    </a>`;
-  }).join('');
-  show($('extras'), true);
-});
-</script>
+
 
 </body>
 </html>

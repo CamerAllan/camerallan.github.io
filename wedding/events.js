@@ -74,7 +74,7 @@ function tidy(value, kind) {
 const dayOf = it => tidy(L(it, 'day'), 'day');
 
 /** Timeline for some itinerary rows, with a heading for each day. */
-function timelineHtml(items, data, { badges = true } = {}) {
+function timelineHtml(items, data, { badges = true, skipStatus = '', dayHeadings = true } = {}) {
   const days = [];
   items.forEach(it => {
     const day = dayOf(it);
@@ -82,7 +82,7 @@ function timelineHtml(items, data, { badges = true } = {}) {
     days.at(-1).items.push(it);
   });
   return days.map(d => `
-    <h3 class="itin-day">${esc(d.day)}</h3>
+    ${dayHeadings ? `<h3 class="itin-day">${esc(d.day)}</h3>` : ''}
     <ul class="timeline itin">
       ${d.items.map(it => `<li>
         <span class="time">${esc(tidy(L(it, 'time'), 'time'))}</span>
@@ -90,7 +90,7 @@ function timelineHtml(items, data, { badges = true } = {}) {
           <span class="itin-title">${esc(L(it, 'title'))}</span>
           ${it.rsvp === 'room' && data.invite.room ? `<span class="muted"> · ${esc(L(data.invite.room, 'name'))}</span>` : ''}
           ${L(it, 'details') ? `<span class="desc">${esc(L(it, 'details'))}</span>` : ''}
-          ${badges ? statusBadge(it.rsvp, data.existing) : ''}
+          ${badges && it.rsvp !== skipStatus ? statusBadge(it.rsvp, data.existing) : ''}
         </span></li>`).join('')}
     </ul>`).join('');
 }

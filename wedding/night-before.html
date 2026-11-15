@@ -1,54 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
-<script>
-// Language and lock state are set before the page draws, so nothing flashes.
-try {
-  if (localStorage.getItem('weddingLang') === 'es') document.documentElement.lang = 'es';
-  var v = JSON.parse(localStorage.getItem('weddingVerified') || 'null');
-  var c = (new URLSearchParams(location.search).get('code') || '').trim().toUpperCase();
-  if (!v || (c && c !== v.code)) document.documentElement.classList.add('locked');
-} catch (e) { document.documentElement.classList.add('locked'); }
-</script>
-<title>The night before · Cameron &amp; Annie</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Italianno&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<main>
-  <header>
-    <h1 class="names"><a href="index.html"><span class="first">Cameron</span><span class="last">Allan</span><span class="and"><span data-lang="en">and</span><span data-lang="es">y</span></span><span class="first">Annie</span><span class="last">MacConnachie</span></a></h1>
-    <div class="eyebrow"><span data-lang="en">Saturday 12th June 2027</span><span data-lang="es">Sábado, 12 de junio de 2027</span> · Rowallan Castle</div>
-    <nav class="site-nav"><a href="index.html"><span data-lang="en">Home</span><span data-lang="es">Inicio</span></a><a href="itinerary.html"><span data-lang="en">Your itinerary</span><span data-lang="es">Vuestro itinerario</span></a><a href="rsvp.html"><span data-lang="en">RSVP</span><span data-lang="es">Confirmar asistencia</span></a><a href="travel.html"><span data-lang="en">Travel &amp; Stay</span><span data-lang="es">Viaje y alojamiento</span></a><a href="faqs.html"><span data-lang="en">FAQs</span><span data-lang="es">Preguntas frecuentes</span></a></nav>
-    <div class="lang-switch"><a href="#" data-set-lang="es" data-lang="en" lang="es">Español</a><a href="#" data-set-lang="en" data-lang="es" lang="en">English</a></div>
-  </header>
-
-  <section>
-    <h2><span data-lang="en">The night before</span><span data-lang="es">La noche anterior</span></h2>
-    <div id="nb"><div class="loading" role="status"><span class="spinner" aria-hidden="true"></span></div></div>
-  </section>
-</main>
-<script src="common.js"></script>
-<script src="events.js"></script>
-<script>
-// Details only come from the backend for households invited to the night before.
-withInvite(data => {
-  const n = data.invite.nightBefore;
-  if (!n) { $('nb').innerHTML = `<p>${t('notInvitedNb')}</p><p><a href="index.html">${t('backHome')}</a></p>`; return; }
-  $('nb').innerHTML = `
-    <div class="event-status">${statusBadge('night_before', data.existing)}</div>
-    <p><strong>${esc(L(n, 'title') || t('nightBefore'))}</strong>
-      ${L(n, 'when') ? `<br>${esc(L(n, 'when'))}` : ''}
-      ${L(n, 'where') ? `<br>${esc(L(n, 'where'))}` : ''}</p>
-    ${L(n, 'details') ? `<p>${esc(L(n, 'details'))}</p>` : ''}
-    ${rowsFor(data, 'night_before').length ? `<h2>${t('timings')}</h2>${timelineHtml(rowsFor(data, 'night_before'), data)}` : ''}`;
-}, 'nb');
-</script>
-
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Details · Cameron &amp; Annie</title>
+<script>location.replace('details.html' + location.search + '#night_before');</script>
+<meta http-equiv="refresh" content="0; url=details.html#night_before"></head>
+<body><p><a href="details.html#night_before">Details</a></p></body></html>

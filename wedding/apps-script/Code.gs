@@ -4,7 +4,9 @@
  * Tabs:
  *   Guests     code | guest_names (comma-separated) | plus_ones_allowed | room_id | notes (private) | night_before
  *              Put anything (e.g. "x") in night_before to invite that household to the night-before party.
- *   Night Before   field | value  (rows: title, when, where, details). Only shown to invited households.
+ *   Events         event | title | when | location | details (+ *_es). One row per event (night_before / wedding /
+ *                  morning_after); each is a section on the Details page. Only events a household is invited to are sent.
+ *   Night Before   (older) field | value rows; only used if the Events tab has no night_before row.
  *   Guests.bridal_party   names from that household who are in the bridal party (comma-separated), or "all".
  *   Bridal Party   heading | details  — only sent to households with someone in the bridal party.
  *   Itinerary      day | time | title | details | for | rsvp | event (+ *_es). "event" (night_before / wedding /
@@ -46,12 +48,14 @@ function doGet(e) {
     if (!nameMatches_(invite.guests, name)) {
       return json_({ ok: false, error: name ? 'name_mismatch' : 'name_required', lang: invite.lang });
     }
+    var itinerary = readItinerary_(invite);
     return json_({
       ok: true,
       invite: publicInvite_(invite),
       menu: readMenu_(),
       existing: readExisting_(code),
-      itinerary: readItinerary_(invite)
+      itinerary: itinerary,
+      events: readEvents_(invite, itinerary)
     });
   } catch (err) {
     return json_({ ok: false, error: 'server_error', detail: String(err) });
@@ -237,7 +241,43 @@ function readItinerary_(invite) {
     });
 }
 
+/** Rows of the Events tab, keyed by event id (display values, so nothing gets turned into a date). */
+function eventRows_() {
+  var sheet = ss_().getSheetByName('Events');
+  if (!sheet) return {};
+  var values = sheet.getDataRange().getDisplayValues();
+  var header = values.shift().map(function (h) { return String(h).trim(); });
+  var out = {};
+  values.forEach(function (r) {
+    var o = {}; header.forEach(function (h, i) { o[h] = String(r[i] || '').trim(); });
+    if (o.event) out[o.event.toLowerCase()] = o;
+  });
+  return out;
+}
+
+/** Events this household is invited to, in order: the wedding for everyone; the night before if invited;
+ *  the morning after if they have morning-after itinerary rows (e.g. a room). */
+function readEvents_(invite, itinerary) {
+  var rows = eventRows_();
+  var hasMorning = itinerary.some(function (r) { return r.event === 'morning_after'; });
+  var ids = ['night_before', 'wedding', 'morning_after'].filter(function (id) {
+    return id === 'wedding' || (id === 'night_before' && invite.nightBefore) || (id === 'morning_after' && hasMorning);
+  });
+  return ids.map(function (id) {
+    var r = rows[id] || {};
+    var out = { event: id };
+    ['title', 'when', 'location', 'details', 'title_es', 'when_es', 'location_es', 'details_es'].forEach(function (k) { out[k] = r[k] || ''; });
+    return out;
+  });
+}
+
 function readNightBefore_() {
+  // Prefer the Events tab; fall back to the older Night Before tab.
+  var ev = eventRows_()['night_before'];
+  if (ev) {
+    return { title: ev.title, when: ev.when, where: ev.location, details: ev.details,
+             title_es: ev.title_es, when_es: ev.when_es, where_es: ev.location_es, details_es: ev.details_es };
+  }
   var out = {};
   var sheet = ss_().getSheetByName('Night Before');
   if (!sheet) return { title: 'Night-before party' };
