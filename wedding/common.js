@@ -129,7 +129,7 @@ function showGate() {
   const gate = document.createElement('div');
   gate.id = 'gate';
   gate.innerHTML = `
-    <header><img class="castle" src="img/castle.png" alt="" width="1414" height="1000">
+    <header><img class="castle" src="img/castle.png" alt="" width="1422" height="994">
     <p class="formal"><span data-lang="en">You are hereby invited to the wedding of</span><span data-lang="es">Tenemos el placer de invitaros a la boda de</span></p>
     <h1 class="names"><span class="first">Cameron</span><span class="last">Allan</span><span class="and"><span data-lang="en">and</span><span data-lang="es">y</span></span><span class="first">Annie</span><span class="last">MacConnachie</span></h1></header>
     <form class="card" id="gate-form" novalidate>
