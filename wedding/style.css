@@ -312,3 +312,10 @@ header { margin-bottom:28px; }
 @media (min-width:1000px) {
   main, #gate { width:60%; }
 }
+/* Header text 25% larger */
+.formal { font-size:.875rem; }
+.names { font-size:clamp(2.5rem, 11vw, 3.625rem); }
+.eyebrow, header .muted { font-size:.9rem; }
+.site-nav a { font-size:.875rem; }
+/* Black-and-white photo */
+.hero { filter:grayscale(1); }
