@@ -280,7 +280,7 @@ const STR = {
     yourRoom: 'Your room', accepted: 'You’ve accepted this room.', declined: 'You’ve declined this room.',
     changeAnswer: 'Change your answer', letUsKnowRoom: 'Let us know if you’d like it',
     roomNight: 'Night', roomPrice: 'Price', breakfastLabel: 'Breakfast', breakfastShort: 'Included, served from 9:30am',
-    roomFreeShort: 'No charge – it’s on us!', roomIntro: 'We’ve saved a room for you at the castle.',
+    roomFreeShort: 'No charge – it’s on us!', roomIntro: 'We’d love you to join us staying at the castle, so we’ve saved a room for you.',
     roomQ: 'Would you like it?', nbQ: 'Can you make it?', yourAnswer: 'Your answer', dietShort: 'Dietary', theWedding: 'The wedding'
   },
   es: {
@@ -313,7 +313,7 @@ const STR = {
     yourRoom: 'Vuestra habitación', accepted: 'Habéis aceptado esta habitación.', declined: 'Habéis rechazado esta habitación.',
     changeAnswer: 'Cambiar la respuesta', letUsKnowRoom: 'Decidnos si la queréis',
     roomNight: 'Noche', roomPrice: 'Precio', breakfastLabel: 'Desayuno', breakfastShort: 'Incluido, se sirve a partir de las 9:30',
-    roomFreeShort: 'Sin coste: ¡invitamos nosotros!', roomIntro: 'Os hemos reservado una habitación en el castillo.',
+    roomFreeShort: 'Sin coste: ¡invitamos nosotros!', roomIntro: 'Nos encantaría que os quedarais con nosotros en el castillo, así que os hemos reservado una habitación.',
     roomQ: '¿La queréis?', nbQ: '¿Podéis venir?', yourAnswer: 'Vuestra respuesta', dietShort: 'Dieta', theWedding: 'La boda'
   }
 };
