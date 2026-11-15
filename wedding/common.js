@@ -250,7 +250,7 @@ function term(s) { return (getLang() === 'es' && TERMS_ES[s]) || s; }
 
 const STR = {
   en: {
-    when: 'When', where: 'Where', openMap: 'Open in Google Maps',
+    when: 'When', where: 'Where',
     alsoForYou: 'Also for you',
     notInvitedNb: 'The night-before party isn’t part of your invitation, but we can’t wait to see you at the wedding!', backHome: '← Back to home', timings: 'Timings', nothingMorning: 'Nothing’s planned for you the morning after. Safe travels home!',
     stYes: 'Confirmed', stNo: 'Declined', stTodo: 'RSVP needed', itinEmpty: 'Your itinerary will appear here soon.', itinLegend: '✓ you’ve said yes · ✗ you’ve said no · ● tap to RSVP',
@@ -280,7 +280,7 @@ const STR = {
     changeAnswer: 'Change your answer', letUsKnowRoom: 'Let us know if you’d like it'
   },
   es: {
-    when: 'Cuándo', where: 'Dónde', openMap: 'Abrir en Google Maps',
+    when: 'Cuándo', where: 'Dónde',
     alsoForYou: 'También para vosotros',
     notInvitedNb: 'La fiesta de la noche anterior no forma parte de vuestra invitación, ¡pero tenemos muchas ganas de veros en la boda!', backHome: '← Volver al inicio', timings: 'Horario', nothingMorning: 'No hay nada previsto para vosotros la mañana siguiente. ¡Buen viaje de vuelta!',
     stYes: 'Confirmado', stNo: 'Rechazado', stTodo: 'Falta confirmar', itinEmpty: 'Vuestro itinerario aparecerá aquí pronto.', itinLegend: '✓ habéis dicho que sí · ✗ habéis dicho que no · ● pulsa para confirmar',
