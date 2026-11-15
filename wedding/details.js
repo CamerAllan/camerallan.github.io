@@ -1,5 +1,5 @@
 // ---- Details: one section per event this household is invited to ----
-// Each section: title, when & where, free-text details (Events tab), RSVP status, then that event's timeline
+// Each section: title, when & where, free-text details (Events tab), then that event's timeline
 // (Itinerary tab). The wedding section shows a map beside its details. Bridal party rows (Itinerary for = bridal_party)
 // simply appear in the timelines of households with someone in the bridal party.
 
@@ -51,10 +51,9 @@ withInvite(data => {
       </div>`;
     return `<section class="event-section" id="${id}">
       <h2>${esc(title)}</h2>
-      <div class="event-status">${statusBadge(EVENTS[id].status, data.existing)}</div>
       ${withMap ? `<div class="event-body">${text}${mapEmbed(loc)}</div>` : text}
       ${rows.length ? `<div class="event-timeline">${timelineHtml(rows, data, {
-          skipStatus: EVENTS[id].status,                                 // already shown at the top of the section
+          badges: false,                                                 // no RSVP status on this page
           dayHeadings: spansDays(rows)                                   // otherwise the date is already in the facts
         })}</div>` : ''}
     </section>`;
