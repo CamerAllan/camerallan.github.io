@@ -1,6 +1,7 @@
 // ---- Details: one section per event this household is invited to ----
 // Each section: title, when & where, free-text details (Events tab), RSVP status, then that event's timeline
-// (Itinerary tab). The wedding section also has parking and, for the bridal party, their notes.
+// (Itinerary tab). The wedding section also links to parking. Bridal party rows (Itinerary for = bridal_party)
+// simply appear in the timelines of households with someone in the bridal party.
 
 const MAP = q => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
 
@@ -16,16 +17,6 @@ function eventsFor(data) {
   return householdEvents(data).map(id => ({ event: id, ...defaults[id] }));
 }
 
-function bridalHtml(data) {
-  const bp = data.invite.bridalParty;
-  if (!bp) return '';
-  const names = bp.names.map(n => n.split(' ')[0]).join(' & ');
-  return `<div class="card bridal">
-    <h3>${t('bridalTitle')}</h3>
-    <p style="margin-top:0">${esc(t('bridalIntro', { names }))}</p>
-    <dl>${bp.info.map(i => `<dt>${esc(L(i, 'heading'))}</dt><dd>${esc(L(i, 'details'))}</dd>`).join('')}</dl>
-  </div>`;
-}
 
 withInvite(data => {
   $('events').innerHTML = eventsFor(data).map(ev => {
@@ -47,7 +38,6 @@ withInvite(data => {
           skipStatus: EVENTS[id].status,                                 // already shown at the top of the section
           dayHeadings: new Set(rows.map(dayOf)).size > 1                 // the date is already in the section heading
         })}</div>` : ''}
-      ${id === 'wedding' ? bridalHtml(data) : ''}
     </section>`;
   }).join('');
   // Jump to a section if the link asked for one (e.g. old event-page links).

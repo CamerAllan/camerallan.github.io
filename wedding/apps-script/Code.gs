@@ -8,7 +8,7 @@
  *                  morning_after); each is a section on the Details page. Only events a household is invited to are sent.
  *   Night Before   (older) field | value rows; only used if the Events tab has no night_before row.
  *   Guests.bridal_party   names from that household who are in the bridal party (comma-separated), or "all".
- *   Bridal Party   heading | details  — only sent to households with someone in the bridal party.
+ *                  Those households also see Itinerary rows with for = bridal_party (e.g. hair & makeup).
  *   Itinerary      day | time | title | details | for | rsvp | event (+ *_es). "event" (night_before / wedding /
  *                  morning_after) groups rows onto their event page. "for" decides who sees a row
  *                  (everyone / night_before / room / bridal_party); only matching rows are sent to a household.
@@ -174,8 +174,7 @@ function publicInvite_(inv) {
     plusOnesAllowed: inv.plusOnesAllowed,
     lang: inv.lang,
     room: inv.room && roomForHousehold_(inv.room, inv.roomPrice),
-    // Bridal party info is only sent when someone in this household is in the bridal party.
-    bridalParty: inv.bridalParty.length ? { names: inv.bridalParty, info: readBridalInfo_() } : null,
+
     // Party details are only sent to invited households, so they never appear in the public page.
     nightBefore: inv.nightBefore ? readNightBefore_() : null
   };
@@ -206,15 +205,6 @@ function bridalNames_(cell, guests) {
   return cell.split(',').map(function (s) { return s.trim(); }).filter(function (n) { return guests.indexOf(n) !== -1; });
 }
 
-function readBridalInfo_() {
-  var sheet = ss_().getSheetByName('Bridal Party');
-  if (!sheet) return [];
-  return sheet.getDataRange().getValues().slice(1)
-    .filter(function (r) { return String(r[0] || r[1] || '').trim(); })
-    .map(function (r) {
-      return { heading: String(r[0] || ''), details: String(r[1] || ''), heading_es: String(r[2] || ''), details_es: String(r[3] || '') };
-    });
-}
 
 /** Itinerary rows this household is invited to, in sheet order. */
 function readItinerary_(invite) {

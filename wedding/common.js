@@ -9,8 +9,7 @@ const DEMO = {
       room:{ name:'The Garden Suite', description:'Ground-floor suite opening onto the walled garden.', nights:'Saturday 12th June (wedding night)', image:'rooms/garden.svg', price:'£180',
              description_es:'Suite en la planta baja con acceso al jardín amurallado.', nights_es:'Sábado 12 de junio (noche de la boda)', price_es:'180 £' },
       nightBefore:{ title:'Night-before party', when:'Friday 11th June 2027, from 7pm', where:'Placeholder pub, Somewhere', details:'Casual drinks and food.',
-                    title_es:'Fiesta de la noche anterior', when_es:'Viernes 11 de junio de 2027, a partir de las 19:00', where_es:'Pub provisional', details_es:'Copas y algo de comer.' },
-      bridalParty:{ names:['Alex Smith'], info:[{heading:'Morning prep',details:'Hair & makeup from 9am.',heading_es:'Preparativos',details_es:'Peluquería y maquillaje desde las 9:00.'},{heading:'Photos',details:'Group photos after the ceremony.'}] } },
+                    title_es:'Fiesta de la noche anterior', when_es:'Viernes 11 de junio de 2027, a partir de las 19:00', where_es:'Pub provisional', details_es:'Copas y algo de comer.' } },
     DEMO02: { code:'DEMO02', guests:['Sam Jones'], plusOnesAllowed:1, room:null },
     DEMO03: { code:'DEMO03', lang:'es', guests:['Lucía García','Javier Ruiz'], plusOnesAllowed:0,
       room:{ name:'The Loft Room', description:'Cosy room in the eaves.', description_es:'Acogedora habitación abuhardillada.', nights:'Sat 12th June', nights_es:'Sábado 12 de junio', image:'rooms/loft.svg', price:'', price_es:'', free:true },
@@ -30,7 +29,7 @@ const DEMO = {
   saved:{},
   itinerary:[
     {day:'Friday 11th June',day_es:'Viernes 11 de junio',time:'7:00pm',time_es:'19:00',title:'Night-before party',title_es:'Fiesta de la noche anterior',for:'night_before',rsvp:'night_before'},
-    {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'9:00am',time_es:'9:00',title:'Bridal party: hair & makeup',title_es:'Cortejo nupcial: peluquería y maquillaje',for:'bridal_party',rsvp:''},
+    {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'9:00am',time_es:'9:00',title:'Bridal party: hair & makeup',title_es:'Cortejo nupcial: peluquería y maquillaje',for:'bridal_party',rsvp:'',event:'wedding'},
     {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'1:00pm',time_es:'13:00',title:'Guests arrive',title_es:'Llegada de los invitados',details:'Please park at the Glasshouse restaurant.',for:'everyone',rsvp:'wedding'},
     {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'1:30pm',time_es:'13:30',title:'Ceremony',title_es:'Ceremonia',for:'everyone',rsvp:'wedding'},
     {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'[time TBC]',time_es:'[hora por confirmar]',title:'Check in to your room',title_es:'Entrada en la habitación',for:'room',rsvp:'room'},
@@ -38,7 +37,7 @@ const DEMO = {
   ]
 };
 function demoItinerary(inv) {
-  const ok = { everyone:true, night_before:!!inv.nightBefore, room:!!inv.room, bridal_party:!!inv.bridalParty };
+  const ok = { everyone:true, night_before:!!inv.nightBefore, room:!!inv.room, bridal_party:inv.code === 'DEMO01' };
   return DEMO.itinerary.filter(r => ok[r.for]);
 }
 
@@ -254,7 +253,6 @@ const STR = {
     notFound: 'We couldn’t find that code. Please check your invitation, or get in touch.',
     wentWrong: 'Something went wrong. Please try again in a moment.', unreachable: 'Couldn’t reach the RSVP service. Please try again in a moment.',
     sending: 'Sending…', send: 'Send RSVP', sendFailed: 'Sorry, that didn’t send. Please try again.',
-    bridalTitle: 'For the bridal party', bridalIntro: '{names}, here’s what you need to know.',
     yourRoom: 'Your room', accepted: 'You’ve accepted this room.', declined: 'You’ve declined this room.',
     changeAnswer: 'Change your answer', letUsKnowRoom: 'Let us know if you’d like it'
   },
@@ -285,7 +283,6 @@ const STR = {
     notFound: 'No encontramos ese código. Revisa tu invitación o ponte en contacto con nosotros.',
     wentWrong: 'Algo ha fallado. Inténtalo de nuevo en un momento.', unreachable: 'No hemos podido conectar con el servicio. Inténtalo de nuevo en un momento.',
     sending: 'Enviando…', send: 'Enviar respuesta', sendFailed: 'Lo sentimos, no se ha enviado. Inténtalo de nuevo.',
-    bridalTitle: 'Para el cortejo nupcial', bridalIntro: '{names}, esto es lo que necesitáis saber.',
     yourRoom: 'Vuestra habitación', accepted: 'Habéis aceptado esta habitación.', declined: 'Habéis rechazado esta habitación.',
     changeAnswer: 'Cambiar la respuesta', letUsKnowRoom: 'Decidnos si la queréis'
   }
