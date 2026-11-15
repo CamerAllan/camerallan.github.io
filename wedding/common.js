@@ -160,7 +160,7 @@ function showGate() {
     show($('gate-error'), false);
     const btn = $('gate-btn'), label = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = `<span class="btn-spinner" aria-hidden="true"></span>${esc(t('checking'))}`;
+    btn.innerHTML = `<span class="btn-spinner" aria-hidden="true"><i></i><i></i><i></i></span>${esc(t('checking'))}`;
     try {
       const data = await apiGet(c, name);
       if (!data.ok) {

@@ -319,18 +319,10 @@ function renderSummary(payload) {
   $('summary').innerHTML = parts.join('');
 }
 
-const LOADING_MESSAGES = [[0, 'loading1'], [2500, 'loading2'], [5000, 'loading3'], [9000, 'loading4']];
-let loadingTimers = [];
+/** Show or hide the loading message (one steady message rather than a changing one). */
 function setLoading(on) {
-  loadingTimers.forEach(clearTimeout);
-  loadingTimers = [];
   show($('loading'), on);
-  if (!on) return;
-  LOADING_MESSAGES.forEach(([ms, text]) => loadingTimers.push(setTimeout(() => {
-    const el = $('loading-text');
-    el.textContent = t(text);
-    el.style.animation = 'none'; el.offsetHeight; el.style.animation = ''; // replay fade-in
-  }, ms)));
+  if (on) $('loading-text').textContent = t('loading1');
 }
 
 async function loadInvite(code, prefetched) {

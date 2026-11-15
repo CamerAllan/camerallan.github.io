@@ -530,3 +530,15 @@ summary::marker { color:var(--duck); }
 /* Details: heading above each event's timeline, in the same small-capital style as the fact labels */
 .event-timeline { margin-top:30px; }
 .timeline-title { font:500 .72rem/1.6 var(--sans); letter-spacing:.22em; text-transform:uppercase; color:var(--wine); margin:0 0 14px; padding-bottom:8px; border-bottom:1px solid var(--line); }
+
+/* Loading: three small dots that fade in turn, with a quiet italic line underneath */
+.loading { flex-direction:column; justify-content:center; gap:14px; padding:48px 0; text-align:center; }
+.spinner { width:auto; height:auto; border:0; border-radius:0; animation:none; display:inline-flex; gap:7px; }
+.spinner i, .btn-spinner i { display:block; width:7px; height:7px; border-radius:50%; background:var(--duck); animation:dot 1.2s ease-in-out infinite; }
+.spinner i:nth-child(2), .btn-spinner i:nth-child(2) { animation-delay:.15s; background:var(--wine); }
+.spinner i:nth-child(3), .btn-spinner i:nth-child(3) { animation-delay:.3s; }
+@keyframes dot { 0%, 80%, 100% { opacity:.25; transform:scale(.8); } 40% { opacity:1; transform:scale(1); } }
+#loading-text, .loading-text { font:italic 400 1.15rem/1.4 var(--display); color:var(--muted); animation:none; }
+.btn-spinner { display:inline-flex; gap:4px; width:auto; height:auto; border:0; border-radius:0; animation:none; margin-right:10px; vertical-align:middle; }
+.btn-spinner i { width:5px; height:5px; background:currentColor !important; }
+@media (prefers-reduced-motion: reduce) { .spinner i, .btn-spinner i { animation-duration:2.4s; } }
