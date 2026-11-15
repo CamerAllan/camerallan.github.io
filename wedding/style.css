@@ -520,3 +520,7 @@ summary::marker { color:var(--duck); }
 /* Taxi firms under Getting there */
 .taxis { margin-top:18px; }
 .taxis .card.stay { margin:10px 0; }
+
+/* Room for times like 09:30–10:30 on one line */
+.timeline.itin .time { flex-basis:100px; white-space:nowrap; }
+@media (max-width:520px) { .timeline.itin .time { flex-basis:86px; font-size:.95rem; } }

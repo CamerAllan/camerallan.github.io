@@ -23,7 +23,9 @@ function splitDetails(text) {
   const paras = [], facts = [];
   String(text || '').split(/\n+/).map(s => s.trim()).filter(Boolean).forEach(line => {
     const m = line.match(/^([^:\[\]]{2,24}):\s*(.+)$/);
-    if (m) facts.push([m[1], m[2].charAt(0).toUpperCase() + m[2].slice(1)]); else paras.push(line);
+    // A one-phrase value ("casual.") reads better without a full stop.
+    if (m) facts.push([m[1], (m[2].charAt(0).toUpperCase() + m[2].slice(1)).replace(/^([^.!?]*)\.$/, '$1')]);
+    else paras.push(line);
   });
   return { paras, facts };
 }
@@ -46,7 +48,7 @@ withInvite(data => {
     const rows = rowsFor(data, id);
     const factRows = [
       L(ev, 'when') ? factRow(t('when'), esc(L(ev, 'when'))) : '',
-      loc && !withMap ? factRow(t('where'), `<a href="${MAP(loc)}" target="_blank" rel="noopener">${esc(loc)}</a>`) : '',
+      loc ? factRow(t('where'), `<a href="${MAP(loc)}" target="_blank" rel="noopener">${esc(loc)}</a>`) : '',
       ...facts.map(([k, v]) => factRow(k, esc(v)))
     ].join('');
     const text = `<div class="event-text">
