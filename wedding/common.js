@@ -41,7 +41,7 @@ DEMO.events = [
   { event:'night_before', title:'Night-before party', title_es:'Fiesta de la noche anterior', when:'Friday 11th June 2027, from 19:30', when_es:'Viernes 11 de junio de 2027, a partir de las 19:30', location:'Placeholder pub, Glasgow', details:'Casual drinks the night before.\nDress code: casual', details_es:'Unas copas informales la noche antes.\nVestimenta: informal' },
   { event:'wedding', title:'The wedding', title_es:'La boda', when:'Saturday 12th June 2027', when_es:'Sábado, 12 de junio de 2027', location:'Rowallan Castle, Kilmaurs, Ayrshire KA3 2LP', location_es:'Rowallan Castle, Kilmaurs, Ayrshire, Escocia KA3 2LP',
     details:'The whole day takes place at the castle, from the ceremony through to the ceilidh.\nDress code: cocktail attire. Highland dress is very welcome!', details_es:'Todo el día se celebra en el castillo, desde la ceremonia hasta el ceilidh.\nVestimenta: cóctel. ¡El kilt es más que bienvenido!' },
-  { event:'morning_after', title:'The morning after', title_es:'La mañana siguiente', when:'Sunday 13th June 2027', when_es:'Domingo, 13 de junio de 2027', location:'Rowallan Castle', details:'Breakfast is included for everyone staying at the castle.\nDress code: casual', details_es:'El desayuno está incluido para quienes se alojen en el castillo.\nVestimenta: informal' }
+  { event:'morning_after', title:'The morning after', title_es:'La mañana siguiente', when:'Sunday 13th June 2027', when_es:'Domingo, 13 de junio de 2027', location:'Rowallan Castle', details:'Dress code: casual', details_es:'Vestimenta: informal' }
 ];
 function demoItinerary(inv) {
   const ok = { everyone:true, night_before:!!inv.nightBefore, room:!!inv.room, bridal_party:inv.code === 'DEMO01' };
