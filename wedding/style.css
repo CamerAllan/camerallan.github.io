@@ -431,3 +431,7 @@ main, #gate { border-width:14px; box-shadow:inset 0 0 0 7px var(--paper), inset 
 }
 @media (max-width:1199px) { .castle { width:min(280px, 62%); margin:0 auto 14px; } }
 @media (max-width:520px) { .castle { width:min(280px, 79%); } }
+
+/* Map framed like the card: thick duck-egg border with a fine inner rule */
+.map-frame { border:6px solid var(--duck); padding:7px; background:var(--paper); box-shadow:inset 0 0 0 4px var(--paper), inset 0 0 0 5.5px var(--duck); }
+.map-frame iframe { border:0 !important; }

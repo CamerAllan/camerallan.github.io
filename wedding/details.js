@@ -29,8 +29,8 @@ function splitDetails(text) {
 }
 
 const factRow = (label, html) => `<div><dt>${esc(label)}</dt><dd>${html}</dd></div>`;
-const mapEmbed = q => `<div class="event-map"><iframe title="${esc(q)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-  src="https://www.google.com/maps?q=${encodeURIComponent(q)}&z=14&output=embed"></iframe>
+const mapEmbed = q => `<div class="event-map"><div class="map-frame"><iframe title="${esc(q)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+  src="https://www.google.com/maps?q=${encodeURIComponent(q)}&z=14&output=embed"></iframe></div>
   <a href="${MAP(q)}" target="_blank" rel="noopener">${t('openMap')}</a></div>`;
 
 withInvite(data => {
