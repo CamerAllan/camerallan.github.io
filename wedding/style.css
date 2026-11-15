@@ -487,3 +487,8 @@ summary::marker { color:var(--duck); }
   .faq-photos { margin-top:6px; position:sticky; top:24px; }
 }
 @media (max-width:899px) { .faq-layout { display:flex; flex-direction:column; } .faq-photos { order:-1; width:min(240px, 62%); margin:8px auto 28px; transform:translateX(-6px); } }
+
+/* RSVP summary: each section (wedding, night before, room) starts with the same small heading */
+.sum-section { margin-top:18px; }
+.sum-section + .sum-person { margin-top:0; }
+.sum-person > .card-label { margin-top:0; }

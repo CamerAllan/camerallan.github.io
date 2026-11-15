@@ -306,6 +306,7 @@ function renderSummary(payload) {
     if (diet) rows.push([t('dietShort'), diet]);
     return `<div class="sum-person">${head}${factsHtml(rows, 'compact')}</div>`;
   });
+  parts.unshift(`<p class="card-label sum-section">${t('theWedding')}</p>`);   // a heading like the night-before and room ones
   if (state.invite.nightBefore) {
     const title = L(state.invite.nightBefore, 'title') || t('nightBefore');
     parts.push(`<div class="sum-person"><p class="card-label">${esc(title)}</p>${factsHtml(payload.people.map(p =>

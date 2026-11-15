@@ -281,7 +281,7 @@ const STR = {
     changeAnswer: 'Change your answer', letUsKnowRoom: 'Let us know if you’d like it',
     roomNight: 'Night', roomPrice: 'Price', breakfastLabel: 'Breakfast', breakfastShort: 'Included, served from 9:30am',
     roomFreeShort: 'No charge – it’s on us!', roomIntro: 'We’ve saved a room for you at the castle.',
-    roomQ: 'Would you like it?', nbQ: 'Can you make it?', yourAnswer: 'Your answer', dietShort: 'Dietary'
+    roomQ: 'Would you like it?', nbQ: 'Can you make it?', yourAnswer: 'Your answer', dietShort: 'Dietary', theWedding: 'The wedding'
   },
   es: {
     when: 'Cuándo', where: 'Dónde',
@@ -314,7 +314,7 @@ const STR = {
     changeAnswer: 'Cambiar la respuesta', letUsKnowRoom: 'Decidnos si la queréis',
     roomNight: 'Noche', roomPrice: 'Precio', breakfastLabel: 'Desayuno', breakfastShort: 'Incluido, se sirve a partir de las 9:30',
     roomFreeShort: 'Sin coste: ¡invitamos nosotros!', roomIntro: 'Os hemos reservado una habitación en el castillo.',
-    roomQ: '¿La queréis?', nbQ: '¿Podéis venir?', yourAnswer: 'Vuestra respuesta', dietShort: 'Dieta'
+    roomQ: '¿La queréis?', nbQ: '¿Podéis venir?', yourAnswer: 'Vuestra respuesta', dietShort: 'Dieta', theWedding: 'La boda'
   }
 };
 function t(key, vars) {
