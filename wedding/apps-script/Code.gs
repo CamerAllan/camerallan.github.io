@@ -20,6 +20,8 @@
  *   Spanish text: any column ending in _es (e.g. Rooms.description_es, Menu.description_es) is used in place of
  *   the English column when the site is in Spanish. Night Before / Bridal Party have Spanish in columns C (and D).
  *   Rooms      room_id | name | description | nights | image
+ *   Rooms.image    one or more photo links (or site paths), separated by commas or new lines. Google Drive
+ *                  links work if the file is shared "Anyone with the link". Several photos show as a gallery.
  *   Menu       course | option | description | <one column per dietary requirement, e.g. Vegetarian | Gluten-free ...>
  *              Mark a dish "x" if it suits that requirement. Any other text (e.g. "on request") also counts as
  *              suitable and is shown to guests next to the dish. Guests only see dishes that suit everything they tick.

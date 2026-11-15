@@ -6,7 +6,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxII2fMqqJvL2AdopDELxpD
 const DEMO = {
   invites: {
     DEMO01: { code:'DEMO01', guests:['Alex Smith','Jamie Smith'], plusOnesAllowed:0,
-      room:{ name:'The Garden Suite', description:'Ground-floor suite opening onto the walled garden.', nights:'Saturday 12th June (wedding night)', image:'rooms/garden.svg', price:'£180',
+      room:{ name:'The Garden Suite', description:'Ground-floor suite opening onto the walled garden.', nights:'Saturday 12th June (wedding night)', image:'rooms/garden.svg, rooms/loft.svg', price:'£180',
              description_es:'Suite en la planta baja con acceso al jardín amurallado.', nights_es:'Sábado 12 de junio (noche de la boda)', price_es:'180 £' },
       nightBefore:{ title:'Night-before party', when:'Friday 11th June 2027, from 7pm', where:'Placeholder pub, Somewhere', details:'Casual drinks and food.',
                     title_es:'Fiesta de la noche anterior', when_es:'Viernes 11 de junio de 2027, a partir de las 19:00', where_es:'Pub provisional', details_es:'Copas y algo de comer.' } },
@@ -452,10 +452,44 @@ function factsHtml(rows, cls = '') {
   rows = rows.filter(r => r && r[1]);
   return rows.length ? `<dl class="facts ${cls}">${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${v}</dd></div>`).join('')}</dl>` : '';
 }
-/** A room: photo, name, description, then night / price / breakfast rows. Values are escaped here. */
+/** Room photos from the Rooms tab's image cell: one or more links/paths, separated by commas or new lines.
+    Google Drive share links are turned into direct image links (the file must be shared "Anyone with the link"). */
+function roomPhotoUrls(r) {
+  return String(r.image || '').split(/[\n,]+/).map(s => s.trim()).filter(Boolean).map(u => {
+    const m = u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=)([\w-]+)/);
+    return m ? `https://drive.google.com/thumbnail?id=${m[1]}&sz=w1600` : u;
+  });
+}
+function roomPhotosHtml(r) {
+  const urls = roomPhotoUrls(r), alt = esc(L(r, 'name'));
+  if (!urls.length) return '';
+  if (urls.length === 1) return `<img src="${esc(urls[0])}" alt="${alt}">`;
+  return `<div class="room-gallery">
+    <div class="rg-track">${urls.map((u, i) => `<img src="${esc(u)}" alt="${alt} (${i + 1}/${urls.length})" loading="lazy">`).join('')}</div>
+    <button type="button" class="rg-prev" aria-label="Previous photo">‹</button>
+    <button type="button" class="rg-next" aria-label="Next photo">›</button>
+    <div class="rg-dots">${urls.map((_, i) => `<span${i ? '' : ' class="on"'}></span>`).join('')}</div>
+  </div>`;
+}
+// Gallery controls (works for any gallery drawn later): arrows scroll one photo; dots follow the scroll.
+document.addEventListener('click', e => {
+  const b = e.target.closest('.rg-prev, .rg-next'); if (!b) return;
+  e.preventDefault();
+  const tr = b.parentElement.querySelector('.rg-track');
+  const w = tr.clientWidth, i = Math.round(tr.scrollLeft / w), n = tr.children.length;
+  const next = b.classList.contains('rg-next') ? (i + 1) % n : (i - 1 + n) % n;
+  tr.scrollTo({ left: next * w, behavior: 'smooth' });
+});
+document.addEventListener('scroll', e => {
+  const tr = e.target; if (!tr.classList || !tr.classList.contains('rg-track')) return;
+  const i = Math.round(tr.scrollLeft / tr.clientWidth);
+  tr.parentElement.querySelectorAll('.rg-dots span').forEach((d, k) => d.classList.toggle('on', k === i));
+}, true);
+
+/** A room: photo(s), name, description, then night / price / breakfast rows. Values are escaped here. */
 function roomCardHtml(r) {
   const price = r.free ? t('roomFreeShort') : L(r, 'price');
-  return `${r.image ? `<img src="${esc(r.image)}" alt="${esc(L(r, 'name'))}">` : ''}
+  return `${roomPhotosHtml(r)}
     <h3 class="card-title">${esc(L(r, 'name'))}</h3>
     ${L(r, 'description') ? `<p class="card-lead">${esc(L(r, 'description'))}</p>` : ''}
     ${factsHtml([[t('roomNight'), esc(L(r, 'nights'))], [t('roomPrice'), esc(price)], [t('breakfastLabel'), esc(t('breakfastShort'))]], 'compact')}`;
