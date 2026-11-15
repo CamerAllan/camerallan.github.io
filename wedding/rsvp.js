@@ -292,9 +292,19 @@ function collect() {
 }
 
 function renderSummary(payload) {
-  const rows = payload.people.map(p => `<dt>${esc(p.guest_name)}</dt><dd>${p.attending
-    ? t('attending') + ' · ' + [...p.diets.filter(d => d !== OTHER).map(term), ...Object.values(p.courses).filter(Boolean), p.dietary].filter(Boolean).map(esc).join(' · ')
-    : t('notAttending')}</dd>`);
+  // Per person: whether they're coming (as a status), then their meal by course, then any dietary notes.
+  const rows = payload.people.map(p => {
+    if (!p.attending) return `<dt>${esc(p.guest_name)}</dt><dd><span class="status no">${t('notAttending')}</span></dd>`;
+    const meals = state.menu.courses
+      .filter(c => p.courses[c.name])
+      .map(c => `<li><span class="course-name">${esc(term(c.name))}</span>${esc(p.courses[c.name])}</li>`).join('');
+    const diet = [...p.diets.filter(d => d !== OTHER).map(term), p.dietary].filter(Boolean).map(esc).join(', ');
+    return `<dt>${esc(p.guest_name)}</dt><dd>
+      <span class="status yes">${t('attending')}</span>
+      ${meals ? `<ul class="meal-summary">${meals}</ul>` : ''}
+      ${diet ? `<p class="diet-summary">${t('dietary')}: ${diet}</p>` : ''}
+    </dd>`;
+  });
   if (state.invite.nightBefore) {
     const title = L(state.invite.nightBefore, 'title') || t('nightBefore');
     rows.push(`<dt>${esc(title)}</dt><dd>${payload.people.map(p => esc(p.guest_name) + ': ' + (p.night_before === true ? t('willBeThereLc') : p.night_before === false ? t('cantMakeLc') : '–')).join('<br>')}</dd>`);
