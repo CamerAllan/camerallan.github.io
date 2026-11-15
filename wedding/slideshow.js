@@ -11,9 +11,17 @@
   first.classList.add('slide', 'on');
   var i = 0, timer;
   function load(k) { var im = imgs[k % imgs.length]; if (im.dataset.src) { im.src = im.dataset.src; delete im.dataset.src; } }
+  // The outgoing photo stays fully visible underneath while the next one fades in on top of it,
+  // so nothing behind the photos (like the frame) shows through mid-fade.
+  var prevTimer;
   function show(n) {
-    imgs[i].classList.remove('on'); i = (n + imgs.length) % imgs.length;
+    imgs.forEach(function (im) { im.classList.remove('prev'); });
+    imgs[i].classList.remove('on'); imgs[i].classList.add('prev');
+    var old = imgs[i];
+    i = (n + imgs.length) % imgs.length;
     load(i); imgs[i].classList.add('on'); load(i + 1);   // fetch the next photo ahead of time
+    clearTimeout(prevTimer);
+    prevTimer = setTimeout(function () { old.classList.remove('prev'); }, 1300);
   }
   load(1);
   function start() { clearInterval(timer); timer = setInterval(function () { show(i + 1); }, 5000); }

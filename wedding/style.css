@@ -393,7 +393,10 @@ main, #gate { border-width:14px; box-shadow:inset 0 0 0 7px var(--paper), inset 
 .slideshow .slide { transition:opacity 1.2s ease; }
 .slideshow { position:relative; }
 .slideshow .slide:not(:first-of-type) { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 30%; }
-.slideshow .slide:not(.on) { opacity:0; }
+.slideshow .slide:not(.on):not(.prev) { opacity:0; }
+.slideshow .slide:first-of-type { position:relative; }
+.slideshow .slide.prev { z-index:1; transition:none; }
+.slideshow .slide.on { z-index:2; }
 @media (prefers-reduced-motion: reduce) { .slideshow .slide { transition:none; } }
 
 /* Details: event facts as label / text rows, with a map beside the wedding */
