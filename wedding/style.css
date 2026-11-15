@@ -340,3 +340,9 @@ main, #gate { border-width:14px; box-shadow:inset 0 0 0 7px var(--paper), inset 
 .bridal { margin-top:26px; }
 .panel-more { margin:18px 0 0; }
 .panel-more a { color:#20363f; font:500 .72rem/1.6 var(--sans); letter-spacing:.2em; text-transform:uppercase; text-decoration-color:rgba(32,54,63,.4); text-underline-offset:4px; }
+/* Timeline line runs dot-to-dot only (no tail after the last item, none at all for a single item) */
+.timeline.itin { border-left:0; margin-left:6px; }
+.timeline.itin li { padding-bottom:20px; }
+.timeline.itin li:last-child { padding-bottom:0; }
+.timeline.itin li::before { z-index:1; }
+.timeline.itin li:not(:last-child)::after { content:""; position:absolute; left:-.75px; top:.55em; bottom:-.55em; border-left:1.5px solid var(--line); }
