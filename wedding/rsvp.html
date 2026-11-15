@@ -17,7 +17,7 @@ try {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Italianno&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261115zc">
+<link rel="stylesheet" href="style.css?v=20261115zd">
 </head>
 <body>
 <main>
@@ -32,6 +32,7 @@ try {
 
   <section id="rsvp">
     <h2><span data-lang="en">RSVP</span><span data-lang="es">Confirmar asistencia</span></h2>
+    <p class="lead hidden" id="greeting"></p>
     <p class="muted" id="reply-by"><span data-lang="en">Please reply by 1st February 2027.</span><span data-lang="es">Por favor, responded antes del 1 de febrero de 2027.</span></p>
 
     <!-- Step 1: enter code -->
@@ -51,7 +52,6 @@ try {
 
     <!-- Step 2: RSVP form -->
     <form id="rsvp-form" class="hidden" novalidate>
-      <p id="greeting"></p>
 
       <section class="rsvp-step" id="step-who">
         <h3 class="step-title" id="title-who"></h3>
@@ -81,14 +81,14 @@ try {
     <!-- Step 3: done -->
     <div id="done" class="card hidden">
       <h3 id="done-title"></h3>
-      <dl id="summary"></dl>
+      <div id="summary"></div>
       <p class="muted"><span data-lang="en">You can change your answers any time before the deadline using the same link.</span><span data-lang="es">Podéis cambiar vuestras respuestas cuando queráis antes de la fecha límite con el mismo enlace.</span></p>
       <button type="button" class="secondary" id="edit-btn"><span data-lang="en">Change my answers</span><span data-lang="es">Cambiar mis respuestas</span></button>
     </div>
   </section>
 </main>
-<script src="common.js?v=20261115zc"></script>
-<script src="rsvp.js?v=20261115zc"></script>
+<script src="common.js?v=20261115zd"></script>
+<script src="rsvp.js?v=20261115zd"></script>
 <script>
 // Button/loading text set from JS so they follow the language switch.
 function setStaticRsvpText() { if (!$('submit-btn').disabled) $('submit-btn').textContent = t('send'); $('loading-text').textContent = t('loading1'); }

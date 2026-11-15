@@ -70,8 +70,8 @@ function mealCardHtml(idx, existing) {
     </fieldset>`).join('');
   return `
   <div class="card person hidden" data-idx="${idx}">
-    <h3 class="meal-name"></h3>
-    <label>${t('dietary')}</label>
+    <h3 class="card-title meal-name"></h3>
+    <p class="card-label">${t('dietary')}</p>
     <div class="stack">${diets}</div>
     <div class="other-wrap ${ticked.includes(OTHER)?'':'hidden'}">
       <label for="p${idx}-diet">${t('tellUs')}</label>
@@ -134,6 +134,7 @@ function renderForm() {
   const existingFor = p => p.plus ? plusExisting[p.idx - invite.guests.length] : byName[p.name];
 
   $('greeting').textContent = t('greeting', { names: listNames(invite.guests) });
+  show($('greeting'), true);
   $('title-who').textContent = t('whosComing');
   $('title-meals').textContent = t('mealChoices');
   $('who').innerHTML = whoRows(byName, plusExisting);
@@ -145,11 +146,11 @@ function renderForm() {
     const n = invite.nightBefore;
     nbEl.innerHTML = `
       <h3 class="step-title">${esc(L(n, 'title') || t('nightBefore'))}</h3>
+      <p class="step-intro">${esc(t('alsoInvitedShort'))}</p>
       <div class="card">
-        <p style="margin-top:0">${esc(t('alsoInvitedShort'))}</p>
-        ${L(n, 'when') ? `<p style="margin:0"><strong>${esc(L(n, 'when'))}</strong></p>` : ''}
-        ${L(n, 'where') ? `<p style="margin:0">${esc(L(n, 'where'))}</p>` : ''}
-        ${L(n, 'details') ? `<p>${esc(L(n, 'details'))}</p>` : ''}
+        ${L(n, 'details') ? `<p class="card-lead">${esc(L(n, 'details'))}</p>` : ''}
+        ${factsHtml([[t('when'), esc(L(n, 'when'))], [t('where'), esc(L(n, 'where'))]], 'compact')}
+        <p class="card-label">${t('nbQ')}</p>
         ${people().map(p => {
           const ex = existingFor(p);
           const v = (ex && ex.night_before) || '';
@@ -174,13 +175,10 @@ function renderForm() {
     const acc = existing[0]?.room_accepted || '';
     roomEl.innerHTML = `
       <h3 class="step-title">${t('yourRoom')}</h3>
+      <p class="step-intro">${esc(t('roomIntro'))}</p>
       <div class="card room">
-        ${r.image ? `<img src="${esc(r.image)}" alt="${esc(r.name)}">` : ''}
-        <h3>${esc(t('roomSaved', { room: L(r, 'name') }))}</h3>
-        ${L(r, 'nights') ? `<p class="muted" style="margin:0 0 6px">${esc(L(r, 'nights'))}</p>` : ''}
-        ${r.free ? `<p class="price">${t('roomFree')}</p>` : L(r, 'price') ? `<p class="price">${esc(L(r, 'price'))}</p>` : ''}
-        <p style="margin-top:0">${esc(L(r, 'description'))}</p>
-        <p class="muted" style="margin-top:0">${t('breakfast')}</p>
+        ${roomCardHtml(r)}
+        <p class="card-label">${t('roomQ')}</p>
         <div class="choices">
           <label><input type="radio" name="room" value="yes" ${acc==='yes'?'checked':''}> ${t('yesPlease')}</label>
           <label><input type="radio" name="room" value="no" ${acc==='no'?'checked':''}> ${t('noThanks')}</label>
@@ -298,25 +296,26 @@ function collect() {
 }
 
 function renderSummary(payload) {
-  // Per person: whether they're coming (as a status), then their meal by course, then any dietary notes.
-  const rows = payload.people.map(p => {
-    if (!p.attending) return `<dt>${esc(p.guest_name)}</dt><dd><span class="status no">${t('notAttending')}</span></dd>`;
-    const meals = state.menu.courses
-      .filter(c => p.courses[c.name])
-      .map(c => `<li><span class="course-name">${esc(term(c.name))}</span>${esc(optionLabel(c, p.courses[c.name]))}</li>`).join('');
+  // Same pattern as the rest of the site: a name (serif) with its status, then label / value rows.
+  const parts = payload.people.map(p => {
+    const head = `<div class="sum-head"><h4 class="card-title">${esc(p.guest_name)}</h4>
+      <span class="status ${p.attending ? 'yes' : 'no'}">${t(p.attending ? 'attending' : 'notAttending')}</span></div>`;
+    if (!p.attending) return `<div class="sum-person">${head}</div>`;
     const diet = [...p.diets.filter(d => d !== OTHER).map(term), p.dietary].filter(Boolean).map(esc).join(', ');
-    return `<dt>${esc(p.guest_name)}</dt><dd>
-      <span class="status yes">${t('attending')}</span>
-      ${meals ? `<ul class="meal-summary">${meals}</ul>` : ''}
-      ${diet ? `<p class="diet-summary">${t('dietary')}: ${diet}</p>` : ''}
-    </dd>`;
+    const rows = state.menu.courses.filter(c => p.courses[c.name]).map(c => [term(c.name), esc(optionLabel(c, p.courses[c.name]))]);
+    if (diet) rows.push([t('dietShort'), diet]);
+    return `<div class="sum-person">${head}${factsHtml(rows, 'compact')}</div>`;
   });
   if (state.invite.nightBefore) {
     const title = L(state.invite.nightBefore, 'title') || t('nightBefore');
-    rows.push(`<dt>${esc(title)}</dt><dd>${payload.people.map(p => esc(p.guest_name) + ': ' + (p.night_before === true ? t('willBeThereLc') : p.night_before === false ? t('cantMakeLc') : '–')).join('<br>')}</dd>`);
+    parts.push(`<div class="sum-person"><p class="card-label">${esc(title)}</p>${factsHtml(payload.people.map(p =>
+      [p.guest_name, p.night_before === true ? t('willBeThere') : p.night_before === false ? t('cantMake') : '–']), 'compact people')}</div>`);
   }
-  if (state.invite.room) rows.push(`<dt>${esc(L(state.invite.room, 'name'))}</dt><dd>${payload.room_accepted === true ? t('yesPlease') : payload.room_accepted === false ? t('noThanks') : '–'}</dd>`);
-  $('summary').innerHTML = rows.join('');
+  if (state.invite.room) {
+    parts.push(`<div class="sum-person"><p class="card-label">${t('yourRoom')}</p>${factsHtml([[L(state.invite.room, 'name'),
+      payload.room_accepted === true ? t('yesPlease') : payload.room_accepted === false ? t('noThanks') : '–']], 'compact people')}</div>`);
+  }
+  $('summary').innerHTML = parts.join('');
 }
 
 const LOADING_MESSAGES = [[0, 'loading1'], [2500, 'loading2'], [5000, 'loading3'], [9000, 'loading4']];
@@ -411,6 +410,7 @@ let doneIsNew = true;
 
 function showDone(payload, isNew) {
   show($('reply-by'), false); // they've replied, so the deadline no longer matters
+  show($('greeting'), false);
   lastPayload = payload;
   doneIsNew = isNew;
   renderSummary(payload);

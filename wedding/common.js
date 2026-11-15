@@ -278,7 +278,10 @@ const STR = {
     wentWrong: 'Something went wrong. Please try again in a moment.', unreachable: 'Couldn’t reach the RSVP service. Please try again in a moment.',
     sending: 'Sending…', send: 'Send RSVP', sendFailed: 'Sorry, that didn’t send. Please try again.',
     yourRoom: 'Your room', accepted: 'You’ve accepted this room.', declined: 'You’ve declined this room.',
-    changeAnswer: 'Change your answer', letUsKnowRoom: 'Let us know if you’d like it'
+    changeAnswer: 'Change your answer', letUsKnowRoom: 'Let us know if you’d like it',
+    roomNight: 'Night', roomPrice: 'Price', breakfastLabel: 'Breakfast', breakfastShort: 'Included, served from 9:30am',
+    roomFreeShort: 'No charge – it’s on us!', roomIntro: 'We’ve saved a room for you at the castle.',
+    roomQ: 'Would you like it?', nbQ: 'Can you make it?', yourAnswer: 'Your answer', dietShort: 'Dietary'
   },
   es: {
     when: 'Cuándo', where: 'Dónde',
@@ -308,7 +311,10 @@ const STR = {
     wentWrong: 'Algo ha fallado. Inténtalo de nuevo en un momento.', unreachable: 'No hemos podido conectar con el servicio. Inténtalo de nuevo en un momento.',
     sending: 'Enviando…', send: 'Enviar respuesta', sendFailed: 'Lo sentimos, no se ha enviado. Inténtalo de nuevo.',
     yourRoom: 'Vuestra habitación', accepted: 'Habéis aceptado esta habitación.', declined: 'Habéis rechazado esta habitación.',
-    changeAnswer: 'Cambiar la respuesta', letUsKnowRoom: 'Decidnos si la queréis'
+    changeAnswer: 'Cambiar la respuesta', letUsKnowRoom: 'Decidnos si la queréis',
+    roomNight: 'Noche', roomPrice: 'Precio', breakfastLabel: 'Desayuno', breakfastShort: 'Incluido, se sirve a partir de las 9:30',
+    roomFreeShort: 'Sin coste: ¡invitamos nosotros!', roomIntro: 'Os hemos reservado una habitación en el castillo.',
+    roomQ: '¿La queréis?', nbQ: '¿Podéis venir?', yourAnswer: 'Vuestra respuesta', dietShort: 'Dieta'
   }
 };
 function t(key, vars) {
@@ -439,3 +445,18 @@ function startFireworks() {
   });
 }
 startFireworks();
+
+// ---- Shared building blocks, so information is laid out the same way everywhere ----
+// A card title (serif), a lead paragraph, then label / value rows ("facts"), as on the Details page.
+function factsHtml(rows, cls = '') {
+  rows = rows.filter(r => r && r[1]);
+  return rows.length ? `<dl class="facts ${cls}">${rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${v}</dd></div>`).join('')}</dl>` : '';
+}
+/** A room: photo, name, description, then night / price / breakfast rows. Values are escaped here. */
+function roomCardHtml(r) {
+  const price = r.free ? t('roomFreeShort') : L(r, 'price');
+  return `${r.image ? `<img src="${esc(r.image)}" alt="${esc(L(r, 'name'))}">` : ''}
+    <h3 class="card-title">${esc(L(r, 'name'))}</h3>
+    ${L(r, 'description') ? `<p class="card-lead">${esc(L(r, 'description'))}</p>` : ''}
+    ${factsHtml([[t('roomNight'), esc(L(r, 'nights'))], [t('roomPrice'), esc(price)], [t('breakfastLabel'), esc(t('breakfastShort'))]], 'compact')}`;
+}

@@ -17,7 +17,7 @@ try {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Italianno&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=20261115zc">
+<link rel="stylesheet" href="style.css?v=20261115zd">
 </head>
 <body>
 <main>
@@ -61,7 +61,7 @@ try {
       <div class="card stay"><h3>Glasgow Marriott</h3><p class="stay-address">500 Argyle Street, Glasgow G3 8RR</p><p class="stay-links"><a href="tel:+441412265577">0141 226 5577</a> · <a href="https://www.marriott.co.uk/hotels/travel/gladt-glasgow-marriott-hotel/" target="_blank" rel="noopener"><span data-lang="en">Website</span><span data-lang="es">Web</span></a> · <a href="https://www.google.com/maps/search/?api=1&amp;query=Glasgow+Marriott%2C+500+Argyle+Street%2C+Glasgow+G3+8RR" target="_blank" rel="noopener"><span data-lang="en">Map</span><span data-lang="es">Mapa</span></a></p></div>
   </section>
 </main>
-<script src="common.js?v=20261115zc"></script>
+<script src="common.js?v=20261115zd"></script>
 <script>
 // If this household has been offered a room, show it here too.
 let roomData = null;
@@ -72,13 +72,8 @@ function renderRoom() {
   $('your-room').innerHTML = `
     <h2>${t('yourRoom')}</h2>
     <div class="card room">
-      ${r.image ? `<img src="${esc(r.image)}" alt="${esc(r.name)}">` : ''}
-      <h3>${esc(L(r, 'name'))}</h3>
-      ${L(r, 'nights') ? `<p class="muted" style="margin:0 0 6px">${esc(L(r, 'nights'))}</p>` : ''}
-      ${r.free ? `<p class="price">${t('roomFree')}</p>` : L(r, 'price') ? `<p class="price">${esc(L(r, 'price'))}</p>` : ''}
-      <p>${esc(L(r, 'description'))}</p>
-      <p class="muted">${t('breakfast')}</p>
-      <p style="margin-bottom:0">${answer === 'yes' ? t('accepted') + ' ' : answer === 'no' ? t('declined') + ' ' : ''}<a href="rsvp.html?code=${encodeURIComponent(roomData.invite.code)}">${answer ? t('changeAnswer') : t('letUsKnowRoom')}</a></p>
+      ${roomCardHtml(r)}
+      <p class="room-answer">${answer === 'yes' ? esc(t('accepted')) + ' ' : answer === 'no' ? esc(t('declined')) + ' ' : ''}<a href="rsvp.html?code=${encodeURIComponent(roomData.invite.code)}">${answer ? t('changeAnswer') : t('letUsKnowRoom')}</a></p>
     </div>`;
   show($('your-room'), true);
 }
