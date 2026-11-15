@@ -308,3 +308,7 @@ header { margin-bottom:28px; }
   .hero-wrap + section, .hero-wrap ~ .panel-wine { margin-right:max(0px, calc((100% - 820px) / 2)); }
   .hero-wrap + section .blurb { margin-top:4px; }
 }
+/* Card border 20% in from each side on larger screens (narrower screens keep more width so text isn't cramped) */
+@media (min-width:1000px) {
+  main, #gate { width:60%; }
+}
