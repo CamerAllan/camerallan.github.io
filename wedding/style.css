@@ -542,3 +542,6 @@ summary::marker { color:var(--duck); }
 .btn-spinner { display:inline-flex; gap:4px; width:auto; height:auto; border:0; border-radius:0; animation:none; margin-right:10px; vertical-align:middle; }
 .btn-spinner i { width:5px; height:5px; background:currentColor !important; }
 @media (prefers-reduced-motion: reduce) { .spinner i, .btn-spinner i { animation-duration:2.4s; } }
+
+/* First names 10% larger and a touch heavier (the serif has one weight, so the strokes are thickened slightly) */
+.names .first { font-size:1.1em; -webkit-text-stroke:.022em currentColor; paint-order:stroke fill; }
