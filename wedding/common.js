@@ -251,7 +251,7 @@ const STR = {
     gateNeedCode: 'Please enter your invite code.', gateNeedName: 'Please enter your surname.', gateWrongName: 'That surname doesn’t match this invitation. Please try again.',
     doneNew: 'Thank you, your RSVP is in.', doneExisting: 'Here’s your RSVP:',
     whosComing: 'Who’s coming', mealChoices: 'Meal choices', alsoInvitedShort: 'You’re also invited to the night before!',
-    greeting: 'Hello {names}! We’d love to know if you can make it.',
+    greeting: 'Hello {names}! Please let us know if you can make it.',
     guestName: 'Guest’s name', yourGuest: 'Your guest', accepts: 'Joyfully accepts', declines: 'Regretfully declines',
     dietary: 'Dietary requirements', tellUs: 'Please tell us your requirements',
     noneFit: 'None of our {course} options suit those requirements yet. We’ll speak to the venue and be in touch.',
