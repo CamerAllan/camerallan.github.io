@@ -58,7 +58,7 @@ withInvite(data => {
     return `<section class="event-section" id="${id}">
       <h2>${esc(title)}</h2>
       ${withMap ? `<div class="event-body">${text}${mapEmbed(loc)}</div>` : text}
-      ${rows.length ? `<div class="event-timeline">${timelineHtml(rows, data, {
+      ${rows.length ? `<div class="event-timeline"><h3 class="timeline-title">${t('orderOfEvents')}</h3>${timelineHtml(rows, data, {
           badges: false,                                                 // no RSVP status on this page
           dayHeadings: spansDays(rows)                                   // otherwise the date is already in the facts
         })}</div>` : ''}
