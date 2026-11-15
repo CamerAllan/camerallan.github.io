@@ -380,10 +380,10 @@ function startFireworks() {
       const rise = rnd(.75, 1.05), drift = rnd(-.09, .09) * W, h = y0 - yt, size = rnd(.11, .16) * W;
       const n = Math.round(rnd(14, 20)), rot = rnd(0, Math.PI * 2);
       shows.push({ t0: t, x0, y0, h, rise, drift, colour: COLOURS[Math.floor(Math.random() * COLOURS.length)],
-        bx: x0 + drift, by: yt, g: size * rnd(2.6, 3.4), wind: rnd(-.35, .35) * size + drift * .6, life: rnd(2, 2.5),
+        bx: x0 + drift, by: yt, g: size * rnd(1.3, 1.8), wind: rnd(-.35, .35) * size + drift * .6, life: rnd(2, 2.5),
         sparks: Array.from({ length: n }, (_, i) => {
           const a = rot + i / n * Math.PI * 2 + rnd(-.12, .12), v = size * DRAG * rnd(.8, 1.1);
-          return { vx: Math.cos(a) * v + drift * .5, vy: Math.sin(a) * v };
+          return { vx: Math.cos(a) * v + drift * .5, vy: Math.sin(a) * v - size * DRAG * .3 };   // a little upward lift
         }) });
     }
     function drawShow(s, now) {
