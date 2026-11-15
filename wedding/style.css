@@ -545,3 +545,6 @@ summary::marker { color:var(--duck); }
 
 /* First names 10% larger and a touch heavier (the serif has one weight, so the strokes are thickened slightly) */
 .names .first { font-size:1.1em; -webkit-text-stroke:.022em currentColor; paint-order:stroke fill; }
+
+.taxis { margin-top:26px; }
+.taxis-intro { margin:0 0 4px; }
