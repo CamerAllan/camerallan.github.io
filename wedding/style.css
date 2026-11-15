@@ -423,14 +423,14 @@ main, #gate { border-width:14px; box-shadow:inset 0 0 0 7px var(--paper), inset 
    On narrower screens the castle sits centred above the title instead. */
 .castle { display:block; height:auto; pointer-events:none; user-select:none; }
 @media (min-width:1200px) {
-  main > header, #gate > header { display:grid; grid-template-columns:1fr max-content minmax(150px, 270px) 1fr; align-items:center; column-gap:clamp(20px, 3vw, 36px); }
+  main > header, #gate > header { display:grid; grid-template-columns:1fr max-content minmax(200px, 360px) 1fr; align-items:center; column-gap:0; }
   main > header > *, #gate > header > * { grid-column:1 / -1; }
   main > header .formal, #gate > header .formal { grid-column:2; grid-row:1; text-align:left; margin-left:0; margin-right:0; }
   main > header .names, #gate > header .names { grid-column:2; grid-row:2; text-align:left; }
-  main > header .castle, #gate > header .castle { grid-column:3; grid-row:1 / 3; width:100%; }
+  main > header .castle, #gate > header .castle { grid-column:3; grid-row:1 / 3; width:calc(100% - clamp(20px, 3vw, 36px)); margin-left:clamp(20px, 3vw, 36px); }
 }
-@media (max-width:1199px) { .castle { width:min(280px, 62%); margin:0 auto 14px; } }
-@media (max-width:520px) { .castle { width:min(280px, 79%); } }
+@media (max-width:1199px) { .castle { width:min(336px, 74%); margin:0 auto 14px; } }
+@media (max-width:520px) { .castle { width:min(336px, 92%); } }
 
 /* Map framed like the card: thick duck-egg border with a fine inner rule */
 .map-frame { border:6px solid var(--duck); padding:7px; background:var(--paper); box-shadow:inset 0 0 0 4px var(--paper), inset 0 0 0 5.5px var(--duck); }
