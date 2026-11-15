@@ -422,6 +422,10 @@ main, #gate { border-width:14px; box-shadow:inset 0 0 0 7px var(--paper), inset 
 /* Castle drawing beside the names (above the invitation line on narrow screens) */
 .castle { display:block; height:auto; pointer-events:none; user-select:none; }
 @media (min-width:721px) {
-  main > header .castle, #gate > header .castle { position:absolute; top:150px; right:22px; width:min(210px, calc((100% - 330px) / 2 - 26px)); }
+  main > header .castle, #gate > header .castle { position:absolute; top:132px; right:14px;
+    width:min(267px, calc((100% - 330px) / 2 - 18px + var(--title-shift))); }
+  main, #gate { --title-shift:clamp(24px, 3vw, 44px); }
+  main > header .formal, main > header .names, main > header .eyebrow,
+  #gate > header .formal, #gate > header .names { transform:translateX(calc(-1 * var(--title-shift))); }
 }
-@media (max-width:720px) { .castle { width:min(220px, 62%); margin:6px auto 18px; } }
+@media (max-width:720px) { .castle { width:min(280px, 79%); margin:0 auto 14px; } }
