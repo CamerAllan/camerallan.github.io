@@ -130,7 +130,7 @@ function showGate() {
   gate.id = 'gate';
   gate.innerHTML = `
     <header><div class="castle"><canvas class="fireworks" aria-hidden="true"></canvas><img src="img/castle.png" alt="" width="1422" height="994"></div>
-    <p class="formal"><span data-lang="en">You are invited to <span class="nowrap">the wedding of</span></span><span data-lang="es">Tenemos el placer de invitaros a la boda de</span></p>
+    <p class="formal"><span data-lang="en">We invite you to celebrate <span class="nowrap">the marriage of</span></span><span data-lang="es">Os invitamos a celebrar <span class="nowrap">el enlace de</span></span></p>
     <h1 class="names"><span class="first">Cameron</span><span class="last">Allan</span><span class="and"><span data-lang="en">and</span><span data-lang="es">y</span></span><span class="first">Annie</span><span class="last">MacConnachie</span></h1></header>
     <form class="card" id="gate-form" novalidate>
       <p style="margin-top:0">${code
