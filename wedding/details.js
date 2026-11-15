@@ -36,7 +36,7 @@ withInvite(data => {
       ${id === 'wedding' ? `<p><a href="travel.html#parking">${t('parkingLink')}</a></p>` : ''}
       ${rows.length ? `<div class="event-timeline">${timelineHtml(rows, data, {
           skipStatus: EVENTS[id].status,                                 // already shown at the top of the section
-          dayHeadings: new Set(rows.map(dayOf)).size > 1                 // the date is already in the section heading
+          dayHeadings: spansDays(rows)                                   // otherwise the date is already in the section heading
         })}</div>` : ''}
     </section>`;
   }).join('');

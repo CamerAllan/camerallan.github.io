@@ -74,26 +74,30 @@ function tidy(value, kind) {
 const dayOf = it => tidy(L(it, 'day'), 'day');
 
 /** Timeline for some itinerary rows, with a heading for each day. */
+// Days compare loosely ("Friday 11 June" = "friday 11th june"), and a blank day continues the previous one.
+const dayKey = d => String(d || '').toLowerCase().replace(/(\d+)(st|nd|rd|th)\b/g, '$1').replace(/\s+/g, ' ').trim();
+
+/** One continuous timeline for some itinerary rows. Day labels (if wanted) sit inside it, so the line never breaks. */
 function timelineHtml(items, data, { badges = true, skipStatus = '', dayHeadings = true } = {}) {
-  const days = [];
+  let lastKey = null;
+  const parts = [];
   items.forEach(it => {
-    const day = dayOf(it);
-    if (!days.length || days.at(-1).day !== day) days.push({ day, items: [] });
-    days.at(-1).items.push(it);
-  });
-  return days.map(d => `
-    ${dayHeadings ? `<h3 class="itin-day">${esc(d.day)}</h3>` : ''}
-    <ul class="timeline itin">
-      ${d.items.map(it => `<li>
+    const day = dayOf(it), key = dayKey(day);
+    if (dayHeadings && key && key !== lastKey) parts.push(`<li class="itin-day-row"><h3 class="itin-day">${esc(day)}</h3></li>`);
+    if (key) lastKey = key;
+    parts.push(`<li>
         <span class="time">${esc(tidy(L(it, 'time'), 'time'))}</span>
         <span class="itin-body">
           <span class="itin-title">${esc(L(it, 'title'))}</span>
           ${it.rsvp === 'room' && data.invite.room ? `<span class="muted"> · ${esc(L(data.invite.room, 'name'))}</span>` : ''}
           ${L(it, 'details') ? `<span class="desc">${esc(L(it, 'details'))}</span>` : ''}
           ${badges && it.rsvp !== skipStatus ? statusBadge(it.rsvp, data.existing) : ''}
-        </span></li>`).join('')}
-    </ul>`).join('');
+        </span></li>`);
+  });
+  return `<ul class="timeline itin">${parts.join('')}</ul>`;
 }
+/** True if the rows cover more than one day (so day labels are worth showing). */
+const spansDays = rows => new Set(rows.map(dayOf).map(dayKey).filter(Boolean)).size > 1;
 
 /** Run render(data) once the guest is unlocked and their data has loaded, and again on language change. */
 function withInvite(render, target) {
@@ -107,4 +111,6 @@ function withInvite(render, target) {
       draw();
     } catch (e) { if (target) $(target).innerHTML = `<p>${t('unreachable')}</p>`; }
   });
+  // A fresher copy arrived from the sheet (see getInvite): redraw with it.
+  document.addEventListener('invitefresh', e => { if (e.detail && e.detail.ok) { data = e.detail; draw(); } });
 }

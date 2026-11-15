@@ -346,3 +346,10 @@ main, #gate { border-width:14px; box-shadow:inset 0 0 0 7px var(--paper), inset 
 .timeline.itin li:last-child { padding-bottom:0; }
 .timeline.itin li::before { z-index:1; }
 .timeline.itin li:not(:last-child)::after { content:""; position:absolute; left:-.75px; top:.55em; bottom:-.55em; border-left:1.5px solid var(--line); }
+
+/* Day labels inside a timeline: no dot, and the line runs straight past them */
+.timeline.itin li.itin-day-row { padding:0 0 6px 0; margin-left:-6px; }
+.timeline.itin li.itin-day-row::before { display:none; }
+.timeline.itin li.itin-day-row .itin-day { margin:14px 0 4px; }
+.timeline.itin li.itin-day-row:first-child .itin-day { margin-top:0; }
+.timeline.itin li.itin-day-row::after { display:none; }
