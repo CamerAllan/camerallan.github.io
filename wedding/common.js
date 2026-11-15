@@ -32,6 +32,7 @@ const DEMO = {
     {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'09:00',time_es:'9:00',title:'Bridal party: hair & makeup',title_es:'Cortejo nupcial: peluquería y maquillaje',for:'bridal_party',rsvp:'',event:'wedding'},
     {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'13:00',time_es:'13:00',title:'Guests arrive',title_es:'Llegada de los invitados',details:'Please park at the Glasshouse restaurant.',for:'everyone',rsvp:'wedding'},
     {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'13:30',time_es:'13:30',title:'Ceremony',title_es:'Ceremonia',for:'everyone',rsvp:'wedding'},
+    {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'14:00',time_es:'14:00',title:'Drinks reception',title_es:'Cóctel de bienvenida',for:'everyone',rsvp:'wedding'},
     {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'[time TBC]',time_es:'[hora por confirmar]',title:'Check in to your room',title_es:'Entrada en la habitación',for:'room',rsvp:'room'},
     {day:'Sunday 13th June',day_es:'Domingo 13 de junio',time:'09:30–10:30',time_es:'09:30–10:30',title:'Breakfast',title_es:'Desayuno',details:'Included with your room.',for:'room',rsvp:'room'}
   ]
@@ -39,7 +40,7 @@ const DEMO = {
 DEMO.events = [
   { event:'night_before', title:'Night-before party', title_es:'Fiesta de la noche anterior', when:'Friday 11th June 2027, from 19:30', when_es:'Viernes 11 de junio de 2027, a partir de las 19:30', location:'Placeholder pub, Glasgow', details:'Casual drinks the night before.\nDress code: casual', details_es:'Unas copas informales la noche antes.\nVestimenta: informal' },
   { event:'wedding', title:'The wedding', title_es:'La boda', when:'Saturday 12th June 2027', when_es:'Sábado, 12 de junio de 2027', location:'Rowallan Castle, Kilmaurs, Ayrshire KA3 2LP', location_es:'Rowallan Castle, Kilmaurs, Ayrshire, Escocia KA3 2LP',
-    details:'[Placeholder: a few lines about Rowallan Castle.]\nThe whole day takes place at the castle, from the ceremony through to the ceilidh.\nDress code: cocktail attire. Highland dress is very welcome!', details_es:'[Texto provisional: unas líneas sobre Rowallan Castle.]\nTodo el día se celebra en el castillo, desde la ceremonia hasta el ceilidh.\nVestimenta: cóctel. ¡El kilt es más que bienvenido!' },
+    details:'The whole day takes place at the castle, from the ceremony through to the ceilidh.\nDress code: cocktail attire. Highland dress is very welcome!', details_es:'Todo el día se celebra en el castillo, desde la ceremonia hasta el ceilidh.\nVestimenta: cóctel. ¡El kilt es más que bienvenido!' },
   { event:'morning_after', title:'The morning after', title_es:'La mañana siguiente', when:'Sunday 13th June 2027', when_es:'Domingo, 13 de junio de 2027', location:'Rowallan Castle', details:'Breakfast is included for everyone staying at the castle.\nDress code: casual', details_es:'El desayuno está incluido para quienes se alojen en el castillo.\nVestimenta: informal' }
 ];
 function demoItinerary(inv) {
