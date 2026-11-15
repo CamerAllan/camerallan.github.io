@@ -8,12 +8,12 @@ const DEMO = {
     DEMO01: { code:'DEMO01', guests:['Alex Smith','Jamie Smith'], plusOnesAllowed:0,
       room:{ name:'The Garden Suite', description:'Ground-floor suite opening onto the walled garden.', nights:'Saturday 12th June (wedding night)', image:'rooms/mure-2.jpg, rooms/mure-1.jpg, rooms/mure-3.jpg', price:'£180',
              description_es:'Suite en la planta baja con acceso al jardín amurallado.', nights_es:'Sábado 12 de junio (noche de la boda)', price_es:'180 £' },
-      nightBefore:{ title:'Night-before party', when:'Friday 11th June 2027, from 7pm', where:'Placeholder pub, Somewhere', details:'Casual drinks and food.',
-                    title_es:'Fiesta de la noche anterior', when_es:'Viernes 11 de junio de 2027, a partir de las 19:00', where_es:'Pub provisional', details_es:'Copas y algo de comer.' } },
+      nightBefore:{ title:'Night-before party', when:'Friday 11th June 2027, from 19:30', where:'Placeholder pub, Somewhere', details:'Casual drinks and food.',
+                    title_es:'Fiesta de la noche anterior', when_es:'Viernes 11 de junio de 2027, a partir de las 19:30', where_es:'Pub provisional', details_es:'Copas y algo de comer.' } },
     DEMO02: { code:'DEMO02', guests:['Sam Jones'], plusOnesAllowed:1, room:null },
     DEMO03: { code:'DEMO03', lang:'es', guests:['Lucía García','Javier Ruiz'], plusOnesAllowed:0,
       room:{ name:'The Loft Room', description:'Cosy room in the eaves.', description_es:'Acogedora habitación abuhardillada.', nights:'Sat 12th June', nights_es:'Sábado 12 de junio', image:'rooms/loft.svg', price:'', price_es:'', free:true },
-      nightBefore:{ title:'Night-before party', title_es:'Fiesta de la noche anterior', when:'Friday 11th June 2027, from 7pm', when_es:'Viernes 11 de junio de 2027, a partir de las 19:00', where:'Placeholder pub', where_es:'Pub provisional' } }
+      nightBefore:{ title:'Night-before party', title_es:'Fiesta de la noche anterior', when:'Friday 11th June 2027, from 19:30', when_es:'Viernes 11 de junio de 2027, a partir de las 19:30', where:'Placeholder pub', where_es:'Pub provisional' } }
   },
   menu:{ diets:['Vegan','Vegetarian','Gluten-free'], courses:[
     { name:'Starter', options:[
@@ -28,16 +28,16 @@ const DEMO = {
   ]},
   saved:{},
   itinerary:[
-    {day:'Friday 11th June',day_es:'Viernes 11 de junio',time:'7:00pm',time_es:'19:00',title:'Night-before party',title_es:'Fiesta de la noche anterior',for:'night_before',rsvp:'night_before'},
-    {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'9:00am',time_es:'9:00',title:'Bridal party: hair & makeup',title_es:'Cortejo nupcial: peluquería y maquillaje',for:'bridal_party',rsvp:'',event:'wedding'},
-    {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'1:00pm',time_es:'13:00',title:'Guests arrive',title_es:'Llegada de los invitados',details:'Please park at the Glasshouse restaurant.',for:'everyone',rsvp:'wedding'},
-    {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'1:30pm',time_es:'13:30',title:'Ceremony',title_es:'Ceremonia',for:'everyone',rsvp:'wedding'},
+    {day:'Friday 11th June',day_es:'Viernes 11 de junio',time:'19:30',time_es:'19:30',title:'Night-before party',title_es:'Fiesta de la noche anterior',for:'night_before',rsvp:'night_before'},
+    {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'09:00',time_es:'9:00',title:'Bridal party: hair & makeup',title_es:'Cortejo nupcial: peluquería y maquillaje',for:'bridal_party',rsvp:'',event:'wedding'},
+    {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'13:00',time_es:'13:00',title:'Guests arrive',title_es:'Llegada de los invitados',details:'Please park at the Glasshouse restaurant.',for:'everyone',rsvp:'wedding'},
+    {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'13:30',time_es:'13:30',title:'Ceremony',title_es:'Ceremonia',for:'everyone',rsvp:'wedding'},
     {day:'Saturday 12th June',day_es:'Sábado 12 de junio',time:'[time TBC]',time_es:'[hora por confirmar]',title:'Check in to your room',title_es:'Entrada en la habitación',for:'room',rsvp:'room'},
-    {day:'Sunday 13th June',day_es:'Domingo 13 de junio',time:'9:30–10:30am',time_es:'9:30–10:30',title:'Breakfast',title_es:'Desayuno',details:'Included with your room.',for:'room',rsvp:'room'}
+    {day:'Sunday 13th June',day_es:'Domingo 13 de junio',time:'09:30–10:30',time_es:'09:30–10:30',title:'Breakfast',title_es:'Desayuno',details:'Included with your room.',for:'room',rsvp:'room'}
   ]
 };
 DEMO.events = [
-  { event:'night_before', title:'Night-before party', title_es:'Fiesta de la noche anterior', when:'Friday 11th June 2027, from 7pm', when_es:'Viernes 11 de junio de 2027, a partir de las 19:00', location:'Placeholder pub, Glasgow', details:'Casual drinks the night before.', details_es:'Unas copas informales la noche antes.' },
+  { event:'night_before', title:'Night-before party', title_es:'Fiesta de la noche anterior', when:'Friday 11th June 2027, from 19:30', when_es:'Viernes 11 de junio de 2027, a partir de las 19:30', location:'Placeholder pub, Glasgow', details:'Casual drinks the night before.', details_es:'Unas copas informales la noche antes.' },
   { event:'wedding', title:'The wedding', title_es:'La boda', when:'Saturday 12th June 2027', when_es:'Sábado, 12 de junio de 2027', location:'Rowallan Castle, Kilmaurs, Ayrshire KA3 2LP', location_es:'Rowallan Castle, Kilmaurs, Ayrshire, Escocia KA3 2LP',
     details:'[Placeholder: a few lines about Rowallan Castle.]\nDress code: cocktail attire. Highland dress is very welcome!', details_es:'[Texto provisional: unas líneas sobre Rowallan Castle.]\nVestimenta: cóctel. ¡El kilt es más que bienvenido!' },
   { event:'morning_after', title:'The morning after', title_es:'La mañana siguiente', when:'Sunday 13th June 2027', when_es:'Domingo, 13 de junio de 2027', location:'Rowallan Castle', details:'Breakfast is included for everyone staying at the castle.', details_es:'El desayuno está incluido para quienes se alojen en el castillo.' }
@@ -267,7 +267,7 @@ const STR = {
     bringingGuest: 'I’m bringing a guest', alsoInvited: 'You’re also invited: {title}', nightBefore: 'Night-before party',
     willBeThere: 'Will be there', cantMake: 'Can’t make it',
     roomSaved: 'We’ve saved a room for you: {room}', yesPlease: 'Yes please', noThanks: 'No thanks',
-    breakfast: 'Breakfast is included, served 9:30–10:30am.',
+    breakfast: 'Breakfast is included, served 09:30–10:30.',
     needAnswer: 'A few things still need an answer:', enterGuestName: 'Please enter your guest’s name',
     letUsKnow: '{who}: please let us know if you can come', tellDiet: '{who}: please tell us your dietary requirements',
     chooseCourse: '{who}: please choose a {course}', nbQuestion: '{who}: will you be at the {title}?',
@@ -279,7 +279,7 @@ const STR = {
     sending: 'Sending…', send: 'Send RSVP', sendFailed: 'Sorry, that didn’t send. Please try again.',
     yourRoom: 'Your room', accepted: 'You’ve accepted this room.', declined: 'You’ve declined this room.',
     changeAnswer: 'Change your answer', letUsKnowRoom: 'Let us know if you’d like it',
-    roomNight: 'Night', roomPrice: 'Price', breakfastLabel: 'Breakfast', breakfastShort: 'Included, served 9:30–10:30am', checkoutLabel: 'Check-out', checkoutShort: 'By 11am',
+    roomNight: 'Night', roomPrice: 'Price', breakfastLabel: 'Breakfast', breakfastShort: 'Included, served 09:30–10:30', checkoutLabel: 'Check-out', checkoutShort: 'By 11:00',
     roomFreeShort: 'No charge – it’s on us!', roomIntro: 'We’d love you to join us staying at the castle, so we’ve saved a room for you.',
     roomQ: 'Would you like it?', nbQ: 'Can you make it?', yourAnswer: 'Your answer', dietShort: 'Dietary', theWedding: 'The wedding'
   },
@@ -300,7 +300,7 @@ const STR = {
     bringingGuest: 'Vendré con acompañante', alsoInvited: 'También estáis invitados: {title}', nightBefore: 'Fiesta de la noche anterior',
     willBeThere: 'Allí estaré', cantMake: 'No podré ir',
     roomSaved: 'Os hemos reservado una habitación: {room}', yesPlease: 'Sí, por favor', noThanks: 'No, gracias',
-    breakfast: 'El desayuno está incluido y se sirve de 9:30 a 10:30.',
+    breakfast: 'El desayuno está incluido y se sirve de 09:30 a 10:30.',
     needAnswer: 'Aún faltan algunas respuestas:', enterGuestName: 'Escribe el nombre de tu acompañante',
     letUsKnow: '{who}: dinos si puedes venir', tellDiet: '{who}: cuéntanos tus requisitos alimentarios',
     chooseCourse: '{who}: elige un {course}', nbQuestion: '{who}: ¿vendrás a la {title}?',
@@ -312,7 +312,7 @@ const STR = {
     sending: 'Enviando…', send: 'Enviar respuesta', sendFailed: 'Lo sentimos, no se ha enviado. Inténtalo de nuevo.',
     yourRoom: 'Vuestra habitación', accepted: 'Habéis aceptado esta habitación.', declined: 'Habéis rechazado esta habitación.',
     changeAnswer: 'Cambiar la respuesta', letUsKnowRoom: 'Decidnos si la queréis',
-    roomNight: 'Noche', roomPrice: 'Precio', breakfastLabel: 'Desayuno', breakfastShort: 'Incluido, se sirve de 9:30 a 10:30', checkoutLabel: 'Salida', checkoutShort: 'Antes de las 11:00',
+    roomNight: 'Noche', roomPrice: 'Precio', breakfastLabel: 'Desayuno', breakfastShort: 'Incluido, se sirve de 09:30 a 10:30', checkoutLabel: 'Salida', checkoutShort: 'Antes de las 11:00',
     roomFreeShort: 'Sin coste: ¡invitamos nosotros!', roomIntro: 'Nos encantaría que os quedarais con nosotros en el castillo, así que os hemos reservado una habitación.',
     roomQ: '¿La queréis?', nbQ: '¿Podéis venir?', yourAnswer: 'Vuestra respuesta', dietShort: 'Dieta', theWedding: 'La boda'
   }

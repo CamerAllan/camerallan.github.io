@@ -57,6 +57,7 @@ function statusBadge(kind, existing) {
 
 // If a cell ever arrives as a full date string ("Fri Jun 11 2027 19:00:00 GMT+0100 …"), show just the useful part.
 function tidy(value, kind) {
+  if (kind === 'time' && !/GMT/.test(value)) return to24h(value);
   if (!/\d{2}:\d{2}:\d{2} GMT/.test(value)) return value;
   const d = new Date(value);
   if (isNaN(d)) return value;
@@ -68,8 +69,15 @@ function tidy(value, kind) {
   }
   // Take the clock time as written (1899 dates carry odd historical time-zone offsets).
   const [, hh, mm] = value.match(/(\d{2}):(\d{2}):\d{2} GMT/);
-  const h = Number(hh);
-  return getLang() === 'es' ? `${hh}:${mm}` : `${h % 12 || 12}:${mm}${h < 12 ? 'am' : 'pm'}`;
+  return `${hh}:${mm}`;
+}
+/** Times are shown on the 24-hour clock: "7:30pm" → "19:30", "9:30–10:30am" → "09:30–10:30". Other text is left alone. */
+function to24h(value) {
+  const s = String(value || '');
+  const m = s.match(/^\s*(\d{1,2})(?::(\d{2}))?\s*(?:[–-]\s*(\d{1,2})(?::(\d{2}))?)?\s*(am|pm)\s*$/i);
+  if (!m) return s;
+  const conv = (h, mm, ap) => { h = Number(h) % 12 + (ap.toLowerCase() === 'pm' ? 12 : 0); return String(h).padStart(2, '0') + ':' + (mm || '00'); };
+  return m[3] ? conv(m[1], m[2], m[5]) + '–' + conv(m[3], m[4], m[5]) : conv(m[1], m[2], m[5]);
 }
 const dayOf = it => tidy(L(it, 'day'), 'day');
 
