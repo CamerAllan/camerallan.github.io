@@ -61,7 +61,11 @@ function tidy(value, kind) {
   const d = new Date(value);
   if (isNaN(d)) return value;
   const locale = getLang() === 'es' ? 'es-ES' : 'en-GB';
-  if (kind === 'day') return d.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
+  if (kind === 'day') {
+    if (getLang() === 'es') return d.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
+    const n = d.getDate(), suf = n % 100 >= 11 && n % 100 <= 13 ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th');
+    return `${d.toLocaleDateString('en-GB', { weekday: 'long' })} ${n}${suf} ${d.toLocaleDateString('en-GB', { month: 'long' })}`;
+  }
   // Take the clock time as written (1899 dates carry odd historical time-zone offsets).
   const [, hh, mm] = value.match(/(\d{2}):(\d{2}):\d{2} GMT/);
   const h = Number(hh);

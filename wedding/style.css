@@ -319,3 +319,11 @@ header { margin-bottom:28px; }
 .site-nav a { font-size:.875rem; }
 /* Black-and-white photo */
 .hero { filter:grayscale(1); }
+
+/* Blue borders 50% thicker */
+main, #gate { border-width:14px; box-shadow:inset 0 0 0 7px var(--paper), inset 0 0 0 8.5px var(--duck); --card-border:14px; }
+@media (max-width:520px) { main, #gate { border-width:11px; --card-border:11px; } }
+.hero-wrap::before { border-width:6px; box-shadow:inset 0 0 0 4px var(--paper), inset 0 0 0 5.5px var(--duck); }
+.card, .dish, .site-nav, .event-card, .notice { border-width:1.5px; }
+.timeline.itin { border-left-width:1.5px; }
+.panel-wine { box-shadow:none; }
