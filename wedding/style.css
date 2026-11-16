@@ -83,9 +83,9 @@ html:not([lang=es]) [data-lang=es], html[lang=es] [data-lang=en] { display:none 
 .who-row .who-name { display:block; font-weight:bold; }
 .meals-empty { margin:6px 0 0; }
 
-/* Bridesmaid colour swatch: set the colour here once chosen */
+/* Bridesmaid colour swatch: the same duck-egg blue as the site's border */
 .swatch { display:inline-block; width:1.4em; height:1.4em; vertical-align:middle; border-radius:50%; border:1px solid var(--line);
-  background:repeating-linear-gradient(45deg, #eee 0 4px, #ddd 4px 8px); }
+  background:var(--duck); margin-left:4px; }
 
 /* Lock screen: while locked, only the surname prompt (and the language flag) is shown */
 html.locked main { display:none; }
